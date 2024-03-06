@@ -2,13 +2,13 @@ from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.oxml import parse_xml
 from docx.oxml.ns import nsdecls
 from sympy import Rational, Symbol, Expr
-from omml import sympy2omml, latex2omml
+from report.docx.omml import sympy2omml, latex2omml
 from typing import List
 from docx.document import Document as DocumentType
 from docx.table import Table, _Cell
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
-
+from lxml.etree import _Element
 def paint_table_row(table, row_index, color='FFE699'):
     for _, cell in enumerate(table.rows[row_index].cells):
         shading_elm = parse_xml(f'<w:shd {nsdecls("w")} w:fill="{color}"/>')
@@ -40,7 +40,11 @@ def fill_table(table, data: List[List], alignment='center'):
             if isinstance(cell_value, Rational) or isinstance(cell_value, Symbol) or isinstance(cell_value, Expr):
                 run.element.append(sympy2omml(cell_value))
             elif isinstance(cell_value, str):
-                run.element.append(latex2omml(cell_value))
+                # run.element.append(latex2omml(cell_value))
+                run.text = cell_value
+
+            elif isinstance(cell_value, _Element):
+                run.element.append(cell_value)
             else:
                 cell.text = str(cell_value)
             match alignment:
@@ -63,7 +67,12 @@ def create_table_filled(
         data: List[List],
         alignment='center'
 ):
-    result = create_table(document, len(data), len(data[0]))
+    max_row_len = -1
+    for row in data:
+        if len(row) > max_row_len:
+            max_row_len = len(row)
+
+    result = create_table(document, len(data), max_row_len)
     fill_table(table=result, data=data, alignment=alignment)
     return result
 

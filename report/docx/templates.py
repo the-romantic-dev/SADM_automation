@@ -1,7 +1,7 @@
 import re
 from lxml.etree import _Element
 from typing import Dict, Any
-from core import add_text, add_picture, add_document_content
+from report.docx.core import add_text, add_picture, add_document_content
 from docx.text.paragraph import Paragraph
 from docx.text.run import Run
 from docx.document import Document as DocumentType
@@ -22,7 +22,6 @@ def extract_name_from_template(string):
 def process_run_append(run, data_producer):
     current_data = data_producer()
     if isinstance(current_data, str):
-        " or isinstance(current_data, _XSLTResultTree)"
         if current_data.endswith('.png'):
             print(f'Вставлено изображение {run.text}')
             add_picture(picture_path=current_data, run=run)

@@ -3,7 +3,7 @@ from lxml import etree
 from sympy import latex
 def latex2omml(latex_expr):
     mathml_output = latex2mathml.converter.convert(latex=latex_expr)
-    mml2omml_path = r'MML2OMML.XSL'
+    mml2omml_path = r'D:\Убежище\Университет\5 семестр\СисАнал\Скрипты\SADM_automation\report\docx\MML2OMML.XSL'
 
     tree = etree.fromstring(mathml_output)
     xslt = etree.parse(mml2omml_path)

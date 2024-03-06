@@ -3,7 +3,7 @@ from docx.text.paragraph import Paragraph
 from docx.text.run import Run
 from docx.document import Document as DocumentType
 from docx.oxml import OxmlElement
-from tables import _make_table_from_child_document
+from report.docx.tables import _make_table_from_child_document
 
 # document_name = 'output.docx'
 
@@ -33,11 +33,16 @@ from tables import _make_table_from_child_document
 #
 #     # Add the math element to the run
 #     run._element.append(oMath)
-
+def get_image_dimensions(image_path):
+    from PIL import Image
+    # Используем библиотеку PIL для получения размеров изображения
+    with Image.open(image_path) as img:
+        width, height = img.size
+    return width, height
 def add_picture(picture_path: str, run: Run):
     run.element.text = ''
     pic = run.add_picture(picture_path)
-    original_width, original_height = util.get_image_dimensions(picture_path)
+    original_width, original_height = get_image_dimensions(picture_path)
     pic.width = Pt(612)
     pic.height = Pt(int((612 / original_width) * original_height))
 

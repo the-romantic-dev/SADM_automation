@@ -40,9 +40,9 @@ class DynamicalMomentsLatex:
                     variant_latex(nodes[j], weights[j])
                 )
             if is_min:
-                aggr_function = "min"
-            else:
                 aggr_function = "max"
+            else:
+                aggr_function = "min"
             step_2_vector = " \\\\ ".join(step_2_vector_parts)
             step_2 = f"{aggr_function} \\left( \\begin{{matrix}} {step_2_vector} \\end{{matrix}}\\right)"
             step_3_vector = " \\\\ ".join([str(elem) for elem in variants])

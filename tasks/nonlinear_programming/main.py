@@ -54,7 +54,7 @@ if __name__ == '__main__':
     barrier_function.save_plot('report_data/barrier_function.png')
     frank_wolfe.save_plot('report_data/frank_wolfe.png')
 
-    template = Document('template.docx')
+    template = Document('open_system_template.docx')
     optimum_condition_filler = OptimumConditionDocxFiller().get_data_producers()
     lagrange_data_producers = LagrangeDocxFiller(lagrange).get_data_producers()
     bill_data_producers = BillDocxFiller(bill).get_data_producers()

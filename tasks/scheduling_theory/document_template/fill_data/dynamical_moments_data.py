@@ -30,7 +30,10 @@ class DynamicalMomentsLatex:
             data = self.dynamical_moments_solver.max_calculation_data
 
         def variant_latex(i, weight):
-            return f"{t_latex(i, is_min)} + {weight}"
+            if is_min:
+                return f"{t_latex(i, is_min)} + {weight}"
+            else:
+                return f"{t_latex(i, is_min)} - {weight}"
 
         def row_latex(i, nodes, variants, weights, result):
             step_1 = t_latex(i, is_min)

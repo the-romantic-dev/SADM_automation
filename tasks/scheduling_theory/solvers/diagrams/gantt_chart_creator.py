@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 import numpy as np
 from matplotlib import pyplot as plt
-
+import matplotlib.patheffects as pe
 from tasks.scheduling_theory.solvers.scheduling_problem.scheduling_problem_solver import SchedulingProblemSolver
 
 @dataclass
@@ -10,6 +10,16 @@ class ChartTaskData:
     ij: tuple[int, int]
     start: int
     end: int
+
+def x_tick_labels(arrange, step: int):
+    result = []
+    a_list = list(arrange)
+    for i in range(len(a_list)):
+        if i % step == 0:
+            result.append(str(a_list[i]))
+        else:
+            result.append("")
+    return result
 
 class GanttChartCreator:
     def __init__(self, scheduling_problem_solver: SchedulingProblemSolver):
@@ -55,7 +65,17 @@ class GanttChartCreator:
                 else:
                     y = i * p_num + p - 1
                 ax.barh(y, data.end - data.start, left=data.start, height=1, align='center', label=task_name, zorder=2)
-                ax.text((data.start + data.end) / 2, y, task_name, ha='center', va='center', color='white', fontsize=8, zorder=3)
+                ax.text(
+                    (data.start + data.end) / 2,
+                    y,
+                    task_name,
+                    ha='center',
+                    va='center',
+                    color='white',
+                    fontsize=14,
+                    zorder=3,
+                    path_effects=[pe.withStroke(linewidth=2, foreground='black')]
+                )
 
         ax.invert_yaxis()  # Перевернем ось Y
         ax.xaxis.tick_top()  # Разместим метки делений оси X наверху
@@ -65,13 +85,17 @@ class GanttChartCreator:
         ax.set_xlabel('Системное время')
 
         total_time = self.scheduling_problem_solver.total_times[rule_index]
-        ax.set_xticks(np.arange(0, total_time + 1, step=1))
+        x_ticks = np.arange(0, total_time + 1, step=1)
+        ax.set_xticks(x_ticks)
+        ticks_labels = x_tick_labels(x_ticks, step=5)
+        ax.set_xticklabels(ticks_labels)
 
         ax.set_ylabel('Ресурсы')
         # ax.set_title('Диаграмма Гантта')
 
         # Уменьшим шрифт подписей оси X
-        ax.tick_params(axis='x', labelsize=8)
+        ax.tick_params(axis='x', labelsize=12)
+        ax.tick_params(axis='y', labelsize=12)
         ax.grid(True, which='both', linestyle='-', linewidth=0.5, zorder=1)
         # plt.show()
         return plt

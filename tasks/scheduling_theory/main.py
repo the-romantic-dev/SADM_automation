@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from tasks.scheduling_theory import task_data as td
+from tasks.scheduling_theory import task_data as td, config
 from tasks.scheduling_theory.document_template.scheduling_theory_document_template import \
     SchedulingTheoryDocumentTemplate
 from tasks.scheduling_theory.solvers.diagrams.gantt_chart_creator import GanttChartCreator
@@ -55,4 +55,4 @@ if __name__ == "__main__":
     document_template.fill_probabilistic_model(probabilistic_model_solver)
     document_template.fill_scheduling_problem(scheduling_problem_solver)
 
-    document_template.save(save_path=td.folder)
+    document_template.save(save_path=config.folder)

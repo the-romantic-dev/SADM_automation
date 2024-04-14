@@ -117,10 +117,20 @@ class SchedulingProblemSolver:
         self.total_times = []
         self.solution_steps_per_rule = [self.get_solution_steps(rule) for rule in self.rules]
 
-
     def _get_available_tasks(self, passed_nodes, executed_tasks, current_tasks):
         available_tasks = []
+        available_nodes = []
         for node in passed_nodes:
+            incoming_nodes = self.scheduling_data.get_incoming_nodes(node)
+            is_all_tasks_completed = True
+            for i_node in incoming_nodes:
+                if (i_node, node) not in executed_tasks:
+                    is_all_tasks_completed = False
+                    break
+            if is_all_tasks_completed:
+                available_nodes.append(node)
+
+        for node in available_nodes:
             outcoming_nodes = self.scheduling_data.get_outcoming_nodes(node)
             for o_node in outcoming_nodes:
                 available_tasks.append((node, o_node))
@@ -211,7 +221,8 @@ class SchedulingProblemSolver:
             B={i + 1: None for i in performers_list},
             L={i + 1: None for i in performers_list}
         )
-        handle_downtime(downtimes_intervals, current_tasks, {i + 1: None for i in performers_list}, current_time, is_last_step=True)
+        handle_downtime(downtimes_intervals, current_tasks, {i + 1: None for i in performers_list}, current_time,
+                        is_last_step=True)
         self.downtime_intervals.append(downtimes_intervals)
         self.total_times.append(current_time)
         result.append(step)

@@ -39,12 +39,17 @@ class ProbabilisticModelSolver:
     def not_overtime_probability(self, path_index):
         epsilon = self.epsilon()
         D = self.dispersion()[path_index]
-
-        return round(0.5 + Phi(epsilon / math.sqrt(D)), 5)
+        result = round(0.5 + Phi(epsilon / math.sqrt(D)), 5)
+        if result == 1.0:
+            result = 0.99999
+        return result
 
 
     def result_not_overtime_probability(self):
         result = 1
         for i in range(len(self.critical_paths)):
             result *= self.not_overtime_probability(i)
-        return round(result, 5)
+        result = round(result, 5)
+        if result == 1.0:
+            result = 0.99999
+        return result

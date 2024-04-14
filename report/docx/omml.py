@@ -8,7 +8,11 @@ from sympy import latex
 def latex2omml(latex_expr):
     mathml_output = latex2mathml.converter.convert(latex=latex_expr)
     # mml2omml_path = r'D:\Убежище\Университет\5 семестр\СисАнал\Скрипты\SADM_automation\report\docx\MML2OMML.XSL'
-    mml2omml_path = Path(Path.cwd().parent.parent, "report", "docx", "MML2OMML.XSL")
+    root_name = "SADM_automation"
+    root_path = Path.cwd()
+    while root_path.name != root_name:
+        root_path = root_path.parent
+    mml2omml_path = Path(root_path, "report", "docx", "MML2OMML.XSL")
     tree = etree.fromstring(mathml_output)
     xslt = etree.parse(mml2omml_path.as_posix())
     transform = etree.XSLT(xslt)

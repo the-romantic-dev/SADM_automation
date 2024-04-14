@@ -1,4 +1,4 @@
-from report.docx.templates import fill_paragraph, fill_template
+from report.docx.templates import fill_paragraph_template, fill_template
 from tasks.discrete_programming.tsp.filler import TSPStepDocxFiller, TSPLastStepDocxFiller, TSPZeroStepDocxFiller
 from tasks.discrete_programming.tsp.solver import TSPSolver
 from docx.document import Document as DocumentType
@@ -30,6 +30,6 @@ if __name__ == "__main__":
             step_template: DocumentType = Document("tsp/step_template_last.docx")
         paragraph = result_doc.add_paragraph("{{step}}")
         fill_template(template=step_template, data_producers=tsp_filler.get_data_producers())
-        fill_paragraph(paragraph, data_producers={"step": lambda: step_template})
+        fill_paragraph_template(paragraph, data_producers={"step": lambda: step_template})
 
     result_doc.save("tsp.docx")

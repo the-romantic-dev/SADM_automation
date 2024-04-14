@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from tasks.scheduling_theory import task_data as td
+import tasks.scheduling_theory.config as cfg
 from report.docx.objects.document_template import DocumentTemplate
 from tasks.scheduling_theory.document_template.fill_data.binary_math_model_data import BinaryMathModelData, \
     ChangedBinaryMathModelData
@@ -31,7 +32,7 @@ class SchedulingTheoryDocumentTemplate(DocumentTemplate):
     def fill_task_data(self):
         self._fill_text(key="variant", text=str(td.variant))
         self._fill_text(key="performers_n", text=str(td.performers_number))
-        self._fill_picture(key="graph_img", picture_path=td.graph_img_path)
+        self._fill_picture(key="graph_img", picture_path=cfg.graph_img_path)
         if td.is_sidnev:
             self._fill_text(key="rule", text=Rule(td.scheduling_data.rule_types[0]).rule_text())
         else:
@@ -86,12 +87,11 @@ class SchedulingTheoryDocumentTemplate(DocumentTemplate):
     def fill_math_models_constraints(self, math_model_constraints_data: MathModelConstraintsData,
                                      default_math_model_solver: DefaultMathModelSolver):
         data_generator = MathModelConstraintsLatex(constraints_data=math_model_constraints_data,
-                                                                 default_math_model_solver=default_math_model_solver)
+                                                   default_math_model_solver=default_math_model_solver)
 
         tw_value_key = "Tw_value"
         tw_value_data = data_generator.default_math_model_time * data_generator.intensity_limit
         self._fill_formula(key=tw_value_key, formula_latex=str(round(tw_value_data, 3)))
-
 
         default_constraints_formulas_key = "default_math_constraints"
         default_constraints_formulas = data_generator.get_default_constraints_formulas_latex()
@@ -132,7 +132,6 @@ class SchedulingTheoryDocumentTemplate(DocumentTemplate):
         reserves_matrix_key = "reserves_matrix"
         reserves_matrix_data = reserves_latex_generator.get_reserves_matrix()
         self._fill_table(key=reserves_matrix_key, table_data=reserves_matrix_data)
-
 
         critical_paths_key = "critical_paths"
         critical_paths_data = reserves_latex_generator.get_ciritcal_path_latexs()
@@ -202,7 +201,8 @@ class SchedulingTheoryDocumentTemplate(DocumentTemplate):
         overtime_probability_formula_key = "overtime_probability_formula"
         overtime_probability_formula_data = data_generator.get_overtime_probability_formulas()
 
-        self._fill_formulas_list(key=overtime_probability_formula_key, latex_formulas_list=overtime_probability_formula_data)
+        self._fill_formulas_list(key=overtime_probability_formula_key,
+                                 latex_formulas_list=overtime_probability_formula_data)
 
         expected_value_key = "expected_value_calculation"
         expected_value_data = data_generator.expected_value_latex()
@@ -241,7 +241,7 @@ class SchedulingTheoryDocumentTemplate(DocumentTemplate):
         self._fill_text(key=overtime_limit_percent_key, text=f"{overtime_limit_percent_data}")
 
         overtime_probability_percent_key = "overtime_probability_percent"
-        overtime_probability_percent_data = f"{data_generator.probability_solver.result_not_overtime_probability() * 100}%"
+        overtime_probability_percent_data = f"{round(data_generator.probability_solver.result_not_overtime_probability() * 100, 3)}%"
         self._fill_text(key=overtime_probability_percent_key, text=overtime_probability_percent_data)
 
     def fill_scheduling_problem(self, scheduling_problem_solver: SchedulingProblemSolver):
@@ -259,10 +259,10 @@ class SchedulingTheoryDocumentTemplate(DocumentTemplate):
             time_data = str(data_generator.scheduling_problem_solver.total_times[0])
             self._fill_text(key=time_key, text=time_data)
 
-            chart_data = Path(td.chart_folder, td.chart_filename)
+            chart_data = Path(cfg.chart_folder, cfg.chart_filename)
             chart_creator = GanttChartCreator(scheduling_problem_solver)
             chart_creator.make_diagram(is_compact=False, rule_index=0).savefig(chart_data.as_posix(),
-                                                                              bbox_inches='tight')
+                                                                               bbox_inches='tight')
             self._fill_picture(key=chart_key, picture_path=chart_data)
         else:
             for i in range(len(td.rule_types)):
@@ -273,7 +273,7 @@ class SchedulingTheoryDocumentTemplate(DocumentTemplate):
                 time_data = str(data_generator.scheduling_problem_solver.total_times[i])
                 self._fill_text(key=time_key + f"_{i + 1}", text=time_data)
 
-                chart_data = Path(td.chart_folder, f"gantt_chart_{i + 1}.png")
+                chart_data = Path(cfg.chart_folder, f"gantt_chart_{i + 1}.png")
                 chart_creator = GanttChartCreator(scheduling_problem_solver)
                 chart_creator.make_diagram(is_compact=True, rule_index=i).savefig(chart_data.as_posix(),
                                                                                   bbox_inches='tight')

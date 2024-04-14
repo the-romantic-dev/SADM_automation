@@ -107,15 +107,20 @@ class IntensiveMathModelSolver:
             return i, j
 
         def obj_expression(m_tau):
-            m = m_tau[:len(m_tau) // 2]
-            return sum(m)
+            if is_sidnev:
+                tau = m_tau[len(m_tau) // 2 + 1:]
+                T = m_tau[len(m_tau) // 2]
+                return sum(tau) + T
+            else:
+                m = m_tau[:len(m_tau) // 2]
+                return sum(m)
 
         def constraints_expressions(m_tau):
             m = m_tau[:len(m_tau) // 2]
             tau = m_tau[len(m_tau) // 2 + 1:]
             T = m_tau[len(m_tau) // 2]
             if is_sidnev:
-                constraints = [-w * len(all_edges) + obj_expression(m_tau)]
+                constraints = [w * len(all_edges) - sum(m)]
             else:
                 constraints = [w * self.default_total_time - T]
             nodes = self.scheduling_data.nodes

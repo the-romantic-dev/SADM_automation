@@ -1,10 +1,14 @@
 import re
+
+from docx.table import Table, _Cell
 from lxml.etree import _Element
 from typing import Dict, Any
 from report.docx.core import add_text, add_picture, add_document_content
 from docx.text.paragraph import Paragraph
 from docx.text.run import Run
 from docx.document import Document as DocumentType
+
+
 def contains_template(string):
     pattern = r'\{\{[^\}]+\}\}'  # Регулярное выражение для поиска шаблона {{...}}
     match = re.search(pattern, string)
@@ -18,6 +22,7 @@ def extract_name_from_template(string):
         return match.group(1)  # Извлекаем значение из захваченной группы
     else:
         return None
+
 
 def process_run_append(run, data_producer):
     current_data = data_producer()
@@ -52,9 +57,17 @@ def fill_template(template: DocumentType, data_producers: Dict[str, Any]):
     for i, paragraph in enumerate(template.paragraphs):
         paragraph: Paragraph = paragraph
         if contains_template(paragraph.text):
-            fill_paragraph(paragraph, data_producers)
+            fill_paragraph_template(paragraph, data_producers)
+    for i, table in enumerate(template.tables):
+        table: Table = table
+        for row in table.rows:
+            for cell in row.cells:
+                paragraph: Paragraph = cell.paragraphs[0]
+                if contains_template(paragraph.text):
+                    fill_paragraph_template(paragraph, data_producers)
 
-def fill_paragraph(paragraph: Paragraph, data_producers: Dict[str, Any]):
+
+def fill_paragraph_template(paragraph: Paragraph, data_producers: Dict[str, Any]):
     pieced_name = ""
     is_piecing_started = False
     for run in paragraph.runs:

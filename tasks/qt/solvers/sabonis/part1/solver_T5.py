@@ -7,8 +7,8 @@ class SolverT5:
         mu = 1 / (t / 60)
         traffic_intensities_1 = [
             *[lamb / (mu * (j + 1)) for j in range(k)],
-            *[lamb / (k * mu) for _ in range(m - k)],
-            *[(lamb - 1) / (k * mu) for _ in range(n - m)]
+            *[lamb / (k * mu) for _ in range(m - k + 1)],
+            *[(lamb - 1) / (k * mu) for _ in range(n - m - 1)]
         ]
         state_probabilities_1 = calculate_probabilities(traffic_intensities_1)
         traffic_intensities_2 = [
@@ -40,5 +40,5 @@ class SolverT5:
         print(f"n_o = {self.qs_1.queue_loading()} | {self.qs_2.queue_loading()}")
 
 
-solver = SolverT5(lamb=6, t=30, k=5, m=7, n=12)
+solver = SolverT5(lamb=5, t=40, k=4, m=5, n=10)
 solver.solve()

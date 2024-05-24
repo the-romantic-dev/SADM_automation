@@ -8,10 +8,10 @@ class Solver84(WaitAndSystemTimeQSComparator):
     def __init__(self, k, m):
         lamb = sp.symbols("λ")
         mu = sp.symbols("μ")
-        qs1 = FiniteQueueQS(k=k + 3, m=m, lamb=lamb, mu=mu)
-        qs2 = FiniteQueueQS(k=k + 4, m=m - 3, lamb=lamb, mu=mu)
-        super().__init__(qs1, qs2, k + 3, k + 3)
+        qs1 = FiniteQueueQS(k=k, m=m, lamb=lamb, mu=mu)
+        qs2 = FiniteQueueQS(k=k + 1, m=m - 3, lamb=lamb, mu=mu)
+        super().__init__(qs1, qs2, k, k)
 
 
-solver = Solver84(k=1, m=6)
+solver = Solver84(k=3, m=6)
 solver.solve()

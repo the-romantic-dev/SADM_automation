@@ -3,14 +3,13 @@ import numpy as np
 from scipy.optimize import minimize
 
 all_edges = [
-    (1, 2, 7), (1, 3, 7), (1, 5, 4),
-    (2, 4, 7), (2, 5, 4),
-    (3, 5, 5),
-    (4, 7, 5),
-    (5, 6, 7), (5, 7, 4),
-    (6, 7, 7), (6, 8, 6), (6, 9, 7),
-    (7, 8, 7), (7, 9, 3),
-    (8, 9, 3)
+    (1, 2, 6), (1, 3, 7),
+    (2, 4, 3), (2, 3, 4), (2, 5, 7),
+    (3, 4, 6), (3, 5, 3), (3, 6, 6),
+    (4, 5, 5), (4, 7, 3),
+    (5, 7, 5), (5, 6, 5), (5, 8, 7),
+    (6, 7, 3), (6, 8, 7),
+    (7, 8, 6),
 ]
 max_i = 10
 linear_indices = [edge[0] * max_i + edge[1] for edge in all_edges]
@@ -45,33 +44,20 @@ def constraints(variables):
     m_variables = variables[:len(variables) // 2]
     tau_variables = variables[len(variables) // 2 + 1:]
     T = variables[len(variables) // 2]
+    nodes = set([edge[0] for edge in all_edges] + [edge[1] for edge in all_edges])
+    in_edges = lambda node: [edge for edge in all_edges if edge[1] == node]
+    out_edges = lambda node: [edge for edge in all_edges if edge[0] == node]
     result = [
-        0.75 * len(all_edges) - sum(m_variables),
-        tau(2, 5) - tau(1, 2) - 7 / m(1, 2),
-        tau(2, 4) - tau(1, 2) - 7 / m(1, 2),
-        tau(3, 5) - tau(1, 3) - 7 / m(1, 3),
-        tau(4, 7) - tau(2, 4) - 7 / m(2, 4),
-        tau(5, 7) - tau(1, 5) - 4 / m(1, 5),
-        tau(5, 7) - tau(2, 5) - 4 / m(2, 5),
-        tau(5, 7) - tau(3, 5) - 5 / m(3, 5),
-        tau(5, 6) - tau(1, 5) - 4 / m(1, 5),
-        tau(5, 6) - tau(2, 5) - 4 / m(2, 5),
-        tau(5, 6) - tau(3, 5) - 5 / m(3, 5),
-        tau(6, 7) - tau(5, 6) - 7 / m(5, 6),
-        tau(6, 8) - tau(5, 6) - 7 / m(5, 6),
-        tau(6, 9) - tau(5, 6) - 7 / m(5, 6),
-        tau(7, 8) - tau(5, 7) - 4 / m(5, 7),
-        tau(7, 8) - tau(4, 7) - 5 / m(4, 7),
-        tau(7, 8) - tau(6, 7) - 7 / m(6, 7),
-        tau(7, 9) - tau(5, 7) - 4 / m(5, 7),
-        tau(7, 9) - tau(4, 7) - 5 / m(4, 7),
-        tau(7, 9) - tau(6, 7) - 7 / m(6, 7),
-        tau(8, 9) - tau(7, 8) - 7 / m(7, 8),
-        tau(8, 9) - tau(6, 8) - 6 / m(6, 8),
-        T - tau(7, 9) - 3 / m(7, 9),
-        T - tau(6, 9) - 7 / m(6, 9),
-        T - tau(8, 9) - 3 / m(8, 9),
+        0.75 * len(all_edges) - sum(m_variables)
     ]
+    for node in nodes:
+        for out_edge in out_edges(node):
+            for in_edge in in_edges(node):
+                result.append(
+                    tau(out_edge[0], out_edge[1]) - tau(in_edge[0], in_edge[1]) - in_edge[2] / m(in_edge[0], in_edge[1])
+                )
+    for in_edge in in_edges(max(nodes)):
+        result.append(T - tau(in_edge[0], in_edge[1]) - in_edge[2] / m(in_edge[0], in_edge[1]))
     return result
 
 
@@ -93,5 +79,6 @@ def solve_intensive_model():
         t_result[(i, j)] = t_value
     T_result = round(solution.x[len(solution.x) // 2], 4)
     return t_result, m_result, T_result
+
 
 print(solve_intensive_model())

@@ -4,7 +4,6 @@ from pathlib import Path
 from tasks.scheduling_theory import task_data as td, config
 from tasks.scheduling_theory.document_template.scheduling_theory_document_template import \
     SchedulingTheoryDocumentTemplate
-from tasks.scheduling_theory.solvers.diagrams.gantt_chart_creator import GanttChartCreator
 from tasks.scheduling_theory.solvers.math.math_moments_constraints_data import MathModelConstraintsData
 from tasks.scheduling_theory.solvers.math.math_solver import DefaultMathModelSolver, IntensiveMathModelSolver, \
     BinaryMathModelSolver, ChangedBinaryMathModelSolver

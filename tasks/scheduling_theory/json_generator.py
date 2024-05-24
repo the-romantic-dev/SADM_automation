@@ -3,32 +3,31 @@ from pathlib import Path
 
 from tasks.scheduling_theory.solvers.scheduling_problem.rule import RuleType
 
-folder = Path(r"D:\Убежище\Университет\6 семестр\САПР\1\Сабонис\Кейта")
+folder = Path(r"D:\Убежище\Университет\6 семестр\САПР\1\Сиднев\Писарик")
 
 graph_edges = [
-    (1, 2, 3), (1, 3, 10),
-    (2, 3, 14), (2, 5, 13), (2, 4, 14), (2, 7, 8),
-    (3, 5, 15),
-    (4, 5, 16), (4, 6, 5), (4, 8, 2),
-    (5, 6, 7), (5, 7, 7), (5, 8, 18),
-    (6, 7, 2), (6, 8, 11), (6, 9, 6),
-    (7, 8, 4), (7, 9, 4),
-    (8, 9, 14)
+    (1, 2, 6), (1, 3, 7),
+    (2, 4, 3), (2, 3, 4), (2, 5, 7),
+    (3, 4, 6), (3, 5, 3), (3, 6, 6),
+    (4, 5, 5), (4, 7, 3),
+    (5, 7, 5), (5, 6, 5), (5, 8, 7),
+    (6, 7, 3), (6, 8, 7),
+    (7, 8, 6),
 ]
 
-variant = 87
+variant = 8
 
-is_sidnev = False
+is_sidnev = True
 
 performers_number = 3
 
-rule_types = [RuleType.MIN_DURATION, RuleType.MAX_DURATION, RuleType.MIN_RESERVE]
+rule_types = [RuleType.MAX_DURATION, RuleType.MAX_DURATION, RuleType.MIN_RESERVE]
 
-intensity_limit = 0.6
+intensity_limit = 0.7
 
-standard_deviation = 0.09
+standard_deviation = 0.1
 
-overtime_limit = 0.19
+overtime_limit = 0.16
 
 # Создаем словарь с данными
 rule_types_json = [rule.name for rule in rule_types]

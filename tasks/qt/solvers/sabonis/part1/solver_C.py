@@ -45,5 +45,5 @@ class SolverC:
             f"P_об = {1 - escape_probability - refuse_probability}")
 
 
-solver = SolverC(n=2, t1=3, t2=10, t3=10, k=2, m=17)
+solver = SolverC(n=2, t1=4, t2=10, t3=10, k=3, m=15)
 solver.solve()

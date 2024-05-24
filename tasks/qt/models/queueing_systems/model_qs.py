@@ -7,6 +7,8 @@ class FiniteStateModelQS:
                  source_limit: int | None):
         if queue_length is None and source_limit is None:
             raise ValueError("Бесконечное количество состояний")
+        if queue_length is not None and len(state_probabilities) != channel_count + queue_length + 1:
+            raise ValueError("Наебал с количеством вероятностей")
         self._state_probabilities = state_probabilities
         self.channel_count = channel_count
         self.queue_length = queue_length

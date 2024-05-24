@@ -15,12 +15,13 @@ class PlotType(enum.Enum):
 
 
 def build_plot(rho_values, f_values, plot_name):
-    plt.plot(rho_values, f_values)
-    # plt.plot(rho_values, [1 for _ in rho_values])
+    plt.plot(rho_values, f_values, label="φ(ρ)")
+    plt.plot(rho_values, [1 for _ in rho_values], label="φ = 1")
     plt.xlabel('ρ')
     plt.ylabel('φ')
     plt.title(plot_name)
     plt.grid(True)
+    plt.legend()
     plt.show()
 
     plt.clf()
@@ -33,10 +34,10 @@ class Solver82:
         mu = sp.symbols("μ")
         self.k = k
         if isinstance(m, int):
-            self.qs_1 = FiniteQueueQS(k=k + 3, m=k * m, lamb=k * lamb, mu=mu)
+            self.qs_1 = FiniteQueueQS(k=k, m=k * m, lamb=k * lamb, mu=mu)
             self.qs_2 = FiniteQueueQS(k=1, m=k * m, lamb=k * lamb, mu=k * mu)
         else:
-            self.qs_1 = InfiniteQueueQS(k=k + 3, lamb=k * lamb, mu=mu)
+            self.qs_1 = InfiniteQueueQS(k=k, lamb=k * lamb, mu=mu)
             self.qs_2 = InfiniteQueueQS(k=1, lamb=k * lamb, mu=k * mu)
 
     def solve(self):
@@ -74,5 +75,5 @@ class Solver82:
         return rho_values, f_values
 
 
-solver = Solver82(k=2, m=2)
+solver = Solver82(k=2, m=1)
 solver.solve()

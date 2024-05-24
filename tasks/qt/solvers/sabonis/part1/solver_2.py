@@ -84,5 +84,5 @@ class Solver2:
         print(f"P_н.о = {queue_escape_probability + channel_escape_probability + self.impatient_qs.state_probability(-1)}")
 
 
-solver = Solver2(t=2, k=10, m=3, n=2)
+solver = Solver2(t=2, k=15, m=5, n=1)
 solver.solve()

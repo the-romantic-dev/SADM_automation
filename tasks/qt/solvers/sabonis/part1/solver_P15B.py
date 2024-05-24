@@ -5,66 +5,61 @@ from tasks.qt.models.queueing_systems.probabilities_calculator import calculate_
 
 
 class QSModelP15BInfinite:
-    def __init__(self, rho_1, rho_2, rho_3, rho_4, k, m):
-        self.rho_1 = rho_1
-        self.rho_2 = rho_2
-        self.rho_3 = rho_3
-        self.rho_4 = rho_4
-        self.factor_1 = rho_1 ** k / math.factorial(k)
-        self.factor_2 = self.factor_1 * rho_2 ** (m - k) / k ** (m - k)
-        self.factor_3 = self.factor_2 * self.rho_3 / k
+    def __init__(self, lamb_1, mu_1, mu_2, k, m, probabs_num):
+        self.rho_1 = lamb_1 / mu_1
+        self.lamb_1 = lamb_1
+        self.rho_2 = lamb_1 / mu_2
         self.k = k
         self.m = m
+        self.probabs_num = probabs_num
+        summ = sum([self.Pj(j) for j in range(self.probabs_num)])
+        print(summ)
+
+    def traffic_intensity(self, j):
+        if j == 0:
+            return 1
+        k = self.k
+        m = self.m
+        if j <= self.k:
+            result = self.rho_1 / j
+        elif k < j <= k + m:
+            result = self.rho_1 / k
+        else:
+            result = self.rho_2 / k
+        return result
 
     def P0(self):
-        result = 1
-        for j in range(1, self.k + 1):
-            result += self.rho_1 ** j / math.factorial(j)
-        for j in range(self.k + 1, self.m + 1):
-            jk = j - self.k
-            result += self.factor_1 * self.rho_2 ** jk / self.k ** jk
-
-        result += self.factor_3
-
-        result += self.factor_3 * self.rho_4 / (self.k - self.rho_4)
+        result = 0
+        ti_list = []
+        for j in range(self.probabs_num):
+            ti = self.traffic_intensity(j)
+            ti_list.append(ti)
+            prod = math.prod(ti_list)
+            result += prod
         return result ** -1
 
     def Pj(self, j):
-        if j <= self.k:
-            result = self.rho_1 ** j / math.factorial(j)
-        elif j <= self.m:
-            jk = j - self.k
-            result = self.factor_1 * self.rho_2 ** jk / self.k ** jk
-        elif j == self.m + 1:
-            result = self.factor_3
-        else:
-            result = self.factor_3 * self.rho_4 ** (j - self.m - 1) / self.k ** (j - self.k)
-        return result * self.P0()
+        prod = math.prod([self.traffic_intensity(i) for i in range(j + 1)])
+        return prod * self.P0()
 
     def queue_loading(self):
-        result = 0
         k = self.k
-        m = self.m
-        factor_3 = self.factor_3
-        P0 = self.P0()
-        rho_4 = self.rho_4
-        for j in range(k + 1, m + 2):
+        result = 0
+        for j in range(k + 1, self.probabs_num):
             result += (j - k) * self.Pj(j)
-        result += factor_3 * rho_4 / (k - rho_4) * P0 * (k / (k - rho_4) + m - k + 1)
         return result
 
     def channels_loading(self):
-        result = 0
         k = self.k
-        before_k_probabilities_sum = 0
-        for j in range(k + 1):
-            before_k_probabilities_sum += self.Pj(j)
+        result = 0
+        for j in range(1, k + 1):
             result += j * self.Pj(j)
-        result += (1 - before_k_probabilities_sum) * k
+        for j in range(k + 1, self.probabs_num):
+            result += k * self.Pj(j)
         return result
 
-    def queue_average_time(self, average_lamb):
-        return self.queue_loading() / average_lamb
+    def queue_average_time(self):
+        return self.queue_loading() / self.lamb_1
 
 
 class SolverP15B:
@@ -73,14 +68,7 @@ class SolverP15B:
             result = 0
             result += lamb_1 * sum(state_probabilities_1[:k + 1])
             result += lamb_2 * sum(state_probabilities_1[k + 1:m + 2])
-            result += lamb_3 * sum(state_probabilities_1[m + 2:2 * m + 1])
-            return result
-
-        def infinite_average_lamb():
-            result = 0
-            result += lamb_1 * sum([self.qs_2.Pj(j) for j in range(k + 1)])
-            result += lamb_2 * sum([self.qs_2.Pj(j) for j in range(k + 1, m + 2)])
-            result += lamb_3 * self.qs_2.P0() * self.qs_2.factor_3 * rho_4 / (k - rho_4)
+            result += lamb_3 * sum(state_probabilities_1[m + 2:])
             return result
 
         lamb_1 = 1
@@ -95,36 +83,36 @@ class SolverP15B:
         rho_4 = lamb_3 / mu_2
 
         traffic_intensities_1 = [
-            *[lamb_1 / (mu_1 * (j + 1)) for j in range(k)],
-            *[lamb_2 / (k * mu_1) for _ in range(m - k)],
-            lamb_2 / (k * mu_2),
-            *[lamb_3 / (k * mu_2) for _ in range(m + 2, 2 * m + 1)]
+            *[rho_1 / j for j in range(1, k + 1)],
+            *[rho_2 / k for _ in range(m)],
+            rho_3 / k,
+            *[rho_4 / k for _ in range(m)]
         ]
         state_probabilities_1 = calculate_probabilities(traffic_intensities_1)
 
         self.qs_1 = FiniteStateModelQS(
             state_probabilities=state_probabilities_1,
             arrival_rate=finite_average_lamb(),
-            channel_count=k, queue_length=2 * m, source_limit=None
+            channel_count=k, queue_length=2 * m + 1, source_limit=None
         )
 
         self.qs_2 = QSModelP15BInfinite(
-            rho_1=rho_1, rho_2=rho_2, rho_3=rho_3, rho_4=rho_4,
-            k=k, m=m
+            lamb_1=lamb_1, mu_1=mu_1, mu_2=mu_2,
+            k=k, m=m, probabs_num=30
         )
-        self.qs_2_lamb = infinite_average_lamb()
-        print(f"mu_1 = {mu_1}")
-        print(f"mu_2 = {mu_2}")
-        print(f"rho_1 = {rho_1}")
-        print(f"rho_2 = {rho_2}")
-        print(f"rho_3 = {rho_3}")
-        print(f"rho_4 = {rho_4}")
+        self.qs_2_lamb = lamb_1
+        # print(f"mu_1 = {mu_1}")
+        # print(f"mu_2 = {mu_2}")
+        # print(f"rho_1 = {rho_1}")
+        # print(f"rho_2 = {rho_2}")
+        # print(f"rho_3 = {rho_3}")
+        # print(f"rho_4 = {rho_4}")
 
     def solve(self):
         print(f"Среднее число машин в очереди: {self.qs_1.queue_loading()} | {self.qs_2.queue_loading()}")
         print(f"Среднее число занятых колонок: {self.qs_1.channels_loading()} | {self.qs_2.channels_loading()}")
         print(
-            f"Среднее время ожидания машин в очереди: {self.qs_1.queue_average_time()} | {self.qs_2.queue_average_time(self.qs_2_lamb)}")
+            f"Среднее время ожидания машин в очереди: {self.qs_1.queue_average_time()} | {self.qs_2.queue_average_time()}")
 
 
 solver = SolverP15B(k=5, a=4, m=5)

@@ -89,6 +89,6 @@ class OpenQSSystemSolver:
         self.total_property = PropertyQS(
             j=sum([p.j for p in self.properties]),
             n_o=sum([p.n_o for p in self.properties]),
-            t_wait=sum([p.t_wait for p in self.properties]),
-            t_sys=sum([p.t_sys for p in self.properties])
+            t_wait=sum([p.t_wait * self.alphas[i] for i, p in enumerate(self.properties)]),
+            t_sys=sum([p.t_sys * self.alphas[i] for i, p in enumerate(self.properties)])
         )

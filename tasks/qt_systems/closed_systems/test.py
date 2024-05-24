@@ -1,44 +1,58 @@
-import matplotlib.pyplot as plt
-import numpy as np
+import math
 
-from netgraph import Graph, ArcDiagram, get_circular_layout, get_curved_edge_paths, get_sugiyama_layout
+from tasks.qt_systems.closed_systems.data import Node
 
-edges = {
-    (1, 2): "1/2",
-    (2, 3): "lol"
-    # (1, 3): "13/14",
-    # (2, 1): "17/18  "
-}
-nodes_positions = {
-    1: (1, 1),
-    2: (2, 1),
-    3: (3, 1),
-}
+nodes = [
+    Node(channels_count=1, mu=40),
+    Node(channels_count=1, mu=70),
+    Node(channels_count=1, mu=120),
+    Node(channels_count=1, mu=130)
+]
 
-edges_paths = {
-    (1, 2): np.array([(1, 1), (1.5, 1.2), (2, 1)]),
-    (2, 3): np.array([(2, 1), (2.5, 1.2), (3, 1)]),
-}
-# layout_nodes = get_sugiyama_layout(edges=list(edges.keys()))
-# layout_edges = get_curved_edge_paths(
-#     edges=list(edges.keys()),
-#     node_positions=nodes_positions,
-#     k=10, selfloop_radius=0.3,
-#     bundle_parallel_edges=False,
-#     origin=[0, 0],
-#     scale=[5, 5]
-#
-# )
-graph = Graph(
-    list(edges.keys()), edge_width=2, arrows=True,
-    edge_layout=edges_paths,
-    node_labels={1 : 'a', 2 : 'b', 3: 'c'},
-    edge_labels=edges,
-    edge_alpha=1,
-    node_layout=nodes_positions,
-    node_size=7,
-    edge_label_rotate=False,
-    edge_label_fontdict=dict(size=16),
-    node_label_fontdict=dict(size=16)
-)
-plt.show()
+
+def generate_probabilities_indices(n, length, current_sum=0, current_index=[], result=[]):
+    if length == 0:
+        if current_sum == n:
+            result.append(tuple(current_index))
+        return
+
+    for num in range(n - current_sum + 1):
+        generate_probabilities_indices(n, length - 1, current_sum + num, [*current_index, num], result)
+
+    return result
+
+
+def calculate_probabilities(probabilities_indices: list[tuple], omegas: list):
+    total = sum([state_z(n, omegas) for n in probabilities_indices])
+    result = [float(state_z(n, omegas) / total) for n in probabilities_indices]
+    return result
+
+
+def state_z(n: tuple, omegas: list):
+    requests_per_node = n
+    result = math.prod([z_i(i=i, n_i=requests_per_node[i], omegas=omegas) for i in range(len(requests_per_node))])
+    return result
+
+
+def mu_i(i, k):
+    return nodes[i].mu * min(k, nodes[i].channels_count)
+
+
+def z_i(i, n_i, omegas):
+    if n_i == 0:
+        return 1
+    result = 1
+    result *= omegas[i] ** n_i
+    result /= math.prod([mu_i(i, k) for k in range(1, n_i + 1)])
+    return result
+
+
+indices = generate_probabilities_indices(n=15, length=4)
+probabilities = calculate_probabilities(probabilities_indices=indices, omegas=[0.25, 0.25, 0.25, 0.25])
+
+prob_sum = 0
+for i in range(len(indices)):
+    if indices[i][0] == 0:
+        prob_sum += probabilities[i]
+        print(f"{indices[i]} = {probabilities[i]}")
+print(prob_sum)

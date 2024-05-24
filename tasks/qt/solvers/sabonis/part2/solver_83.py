@@ -42,11 +42,11 @@ class Solver83:
         lamb = sp.symbols("λ")
         mu = sp.symbols("μ")
         self.k = k
-        self.qs_1 = InfiniteQueueQS(k=k + 3, lamb=lamb, mu=mu)
-        self.qs_2 = InfiniteQueueQS(k=k + 3, lamb=lamb, mu=2 * mu)
+        self.qs_1 = InfiniteQueueQS(k=k, lamb=lamb, mu=mu)
+        self.qs_2 = InfiniteQueueQS(k=k, lamb=lamb, mu=2 * mu)
 
     def solve(self):
-        max_rho = self.k + 3
+        max_rho = self.k
         rho_1_values, f1_values = self.build_values(plot_type=PlotType.WAIT, max_rho=max_rho - 0.01, steps=100)
         rho_2_values, f2_values = self.build_values(plot_type=PlotType.SYSTEM, max_rho=max_rho - 0.01, steps=100)
 
@@ -75,5 +75,5 @@ class Solver83:
         return rho_values, f_values
 
 
-solver = Solver83(k=1)
+solver = Solver83(k=2)
 solver.solve()

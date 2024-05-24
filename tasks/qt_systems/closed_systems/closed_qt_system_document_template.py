@@ -73,7 +73,7 @@ def normalized_float_latex(f_num: float):
 
 def generate_probabilities_table_data(probabilities_indices, probabilities):
     def probability_name_latex(index):
-        return f"P_{{ {index} }}"
+        return f"P_{{ {''.join([str(j) for j in index])} }}"
     result = []
     for i in range(len(probabilities)):
         result.append([
@@ -117,9 +117,9 @@ class ClosedQTSystemDocumentTemplate(DocumentTemplate):
         self._fill_formula(key="states_num", formula_latex=states_num_latex(
             states_num=len(solver.probabilities),
             N=data.requests_number,
-            M=4
+            M=len(data.nodes)
         ))
-        self._fill_table(
-            key="state_probabilities_table",
-            table_data=generate_probabilities_table_data(solver.probabilities_indices, solver.probabilities)
-        )
+        # self._fill_table(
+        #     key="state_probabilities_table",
+        #     table_data=generate_probabilities_table_data(solver.probabilities_indices, solver.probabilities)
+        # )

@@ -84,5 +84,5 @@ class SolverAC9:
         print(f"t_ож = {self.qs.queue_average_time()}")
 
 
-solver = SolverAC9(n=7, k=0.05, m=0.5, r=2)
+solver = SolverAC9(n=10, k=0.05, m=0.5, r=1)
 solver.solve()

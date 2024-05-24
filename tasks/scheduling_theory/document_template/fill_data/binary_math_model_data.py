@@ -78,29 +78,48 @@ class ChangedBinaryMathModelData:
         self.changed_binary_math_model_solver = changed_binary_math_model_solver
 
     def get_allocation_latex(self):
-        return allocation_latex(1, self.changed_binary_math_model_solver.task_allocation)
+        ta = self.changed_binary_math_model_solver.task_allocation
+        result = []
+        for i in range(len(ta)):
+            result.append(
+                allocation_latex(index=i + 1, tasks_list=ta[i])
+            )
+        return result
+        # return allocation_latex(1, )
 
     def get_variables_num_latex(self):
-        tasks_num = len(self.changed_binary_math_model_solver.task_allocation)
-        return f"2 \\cdot {comb_latex(tasks_num)} = {2 * comb(tasks_num)}"
+        ta = self.changed_binary_math_model_solver.task_allocation
+        comb_latexs = []
+        combs = []
+        for i in range(len(ta)):
+            comb_latexs.append(comb_latex(len(ta[i])))
+            combs.append(2 * comb(len(ta[i])))
+        return f"2 \\cdot ({'+'.join(comb_latexs)}) = {sum(combs)}"
 
     def get_constraints_num_latex(self):
-        tasks_num = len(self.changed_binary_math_model_solver.task_allocation)
-        return f"3 \\cdot {comb_latex(tasks_num)} = {3 * comb(tasks_num)}"
+        ta = self.changed_binary_math_model_solver.task_allocation
+        comb_latexs = []
+        combs = []
+        for i in range(len(ta)):
+            comb_latexs.append(comb_latex(len(ta[i])))
+            combs.append(3 * comb(len(ta[i])))
+        return f"3 \\cdot ({'+'.join(comb_latexs)}) = {sum(combs)}"
 
     def get_constraints_latex(self):
         result = []
-        allocation_size = len(self.changed_binary_math_model_solver.task_allocation)
-        for a in range(allocation_size):
-            for b in range(a + 1, allocation_size):
-                i, j = self.changed_binary_math_model_solver.task_allocation[a]
-                l, m = self.changed_binary_math_model_solver.task_allocation[b]
-                weight_ij = self.changed_binary_math_model_solver.scheduling_data.get_edge_weight((i, j))
-                weight_lm = self.changed_binary_math_model_solver.scheduling_data.get_edge_weight((l, m))
-                triple = binary_constraints_latex(i, j, l, m, weight_ij, weight_lm)
-                result.append(triple[0])
-                result.append(triple[1])
-                result.append(triple[2])
+        ta = self.changed_binary_math_model_solver.task_allocation
+        for curr_allocation in ta:
+            allocation_size = len(curr_allocation)
+            for a in range(allocation_size):
+                for b in range(a + 1, allocation_size):
+                    i, j = curr_allocation[a]
+                    l, m = curr_allocation[b]
+                    weight_ij = self.changed_binary_math_model_solver.scheduling_data.get_edge_weight((i, j))
+                    weight_lm = self.changed_binary_math_model_solver.scheduling_data.get_edge_weight((l, m))
+                    triple = binary_constraints_latex(i, j, l, m, weight_ij, weight_lm)
+                    result.append(triple[0])
+                    result.append(triple[1])
+                    result.append(triple[2])
         return result
 
     def get_result_t_table(self):
@@ -128,5 +147,8 @@ class ChangedBinaryMathModelData:
         return [variables, values]
 
     def get_tasks_order_latex(self):
-        order = self.changed_binary_math_model_solver.tasks_order()
-        return f" \\longrightarrow ".join([t_ij(i, j) for i, j in order])
+        orders = self.changed_binary_math_model_solver.tasks_order()
+        result = []
+        for perf in range(len(orders)):
+            result.append(f"{perf + 1}: " + f"\\longrightarrow ".join([t_ij(i, j) for i, j in orders[perf]]))
+        return result

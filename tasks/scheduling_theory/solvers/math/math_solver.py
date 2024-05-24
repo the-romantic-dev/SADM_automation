@@ -205,52 +205,68 @@ class ChangedBinaryMathModelSolver:
         self.t_solution, self.y_solution = self.solve_task()
 
     def tasks_order(self):
-        order_dict = {}
+
+        result = []
         y_ones: list[BinaryVariableSolutionData] = list(filter(lambda elem: elem.value == 1, self.y_solution))
+        y_ones_per_performer = [[] for _ in self.task_allocation]
         for y in y_ones:
-            if y.task_1 not in order_dict:
-                order_dict[y.task_1] = 0
-            if y.task_2 not in order_dict:
-                order_dict[y.task_2] = 0
-            order_dict[y.task_1] += 1
-            order_dict[y.task_2] -= 1
-        result_order = sorted(order_dict.keys(), key=lambda elem: order_dict[elem], reverse=True)
-        return result_order
+            for i in range(len(self.task_allocation)):
+                if y.task_1 in self.task_allocation[i]:
+                    y_ones_per_performer[i].append(y)
+        for yop in y_ones_per_performer:
+            order_dict = {}
+            for y in yop:
+                if y.task_1 not in order_dict:
+                    order_dict[y.task_1] = 0
+                if y.task_2 not in order_dict:
+                    order_dict[y.task_2] = 0
+                order_dict[y.task_1] += 1
+                order_dict[y.task_2] -= 1
+            result_order = sorted(order_dict.keys(), key=lambda elem: order_dict[elem], reverse=True)
+            result.append(result_order)
+        return result
 
     def _allocate_tasks(self):
         tasks = self.scheduling_data.get_edges()
-        return tasks[:3]
+        result = [tasks[:3]]
+        for i in range(1, self.scheduling_data.performers_number):
+            result.append(tasks[3 + 2 * i - 2: 3 + 2 * i])
+        return result
 
     def _generate_binary_variables(self):
         y_variables = {}
-        allocation_size = len(self.task_allocation)
-        for a in range(allocation_size):
-            for b in range(a + 1, allocation_size):
-                i, j = self.task_allocation[a]
-                l, m = self.task_allocation[b]
-                y_var_1 = LpVariable(name=f"Y_{i}{j}_{l}{m}", cat="Binary")
-                y_variables[((i, j), (l, m))] = y_var_1
-                y_var_2 = LpVariable(name=f"Y_{l}{m}_{i}{j}", cat="Binary")
-                y_variables[((l, m), (i, j))] = y_var_2
+        ta = self.task_allocation
+        for curr_allocation in ta:
+            allocation_size = len(curr_allocation)
+            for a in range(allocation_size):
+                for b in range(a + 1, allocation_size):
+                    i, j = curr_allocation[a]
+                    l, m = curr_allocation[b]
+                    y_var_1 = LpVariable(name=f"Y_{i}{j}_{l}{m}", cat="Binary")
+                    y_variables[((i, j), (l, m))] = y_var_1
+                    y_var_2 = LpVariable(name=f"Y_{l}{m}_{i}{j}", cat="Binary")
+                    y_variables[((l, m), (i, j))] = y_var_2
         return y_variables
 
     def _generate_binary_constraints(self, t_variables, y_variables):
         result = []
-        allocation_size = len(self.task_allocation)
-        M = 1000
-        for a in range(allocation_size):
-            for b in range(a + 1, allocation_size):
-                i, j = self.task_allocation[a]
-                l, m = self.task_allocation[b]
-                y_ij_lm = y_variables[((i, j), (l, m))]
-                y_lm_ij = y_variables[((l, m), (i, j))]
-                t_ij = t_variables[(i, j)]
-                t_lm = t_variables[(l, m)]
-                weight_ij = self.scheduling_data.get_edge_weight((i, j))
-                weight_lm = self.scheduling_data.get_edge_weight((l, m))
-                result.append((M + weight_lm) * y_ij_lm + (t_ij - t_lm) >= weight_lm)
-                result.append((M + weight_ij) * y_lm_ij + (t_lm - t_ij) >= weight_ij)
-                result.append(y_ij_lm + y_lm_ij == 1)
+        ta = self.task_allocation
+        for curr_allocation in ta:
+            allocation_size = len(curr_allocation)
+            M = 1000
+            for a in range(allocation_size):
+                for b in range(a + 1, allocation_size):
+                    i, j = curr_allocation[a]
+                    l, m = curr_allocation[b]
+                    y_ij_lm = y_variables[((i, j), (l, m))]
+                    y_lm_ij = y_variables[((l, m), (i, j))]
+                    t_ij = t_variables[(i, j)]
+                    t_lm = t_variables[(l, m)]
+                    weight_ij = self.scheduling_data.get_edge_weight((i, j))
+                    weight_lm = self.scheduling_data.get_edge_weight((l, m))
+                    result.append((M + weight_lm) * y_ij_lm + (t_ij - t_lm) >= weight_lm)
+                    result.append((M + weight_ij) * y_lm_ij + (t_lm - t_ij) >= weight_ij)
+                    result.append(y_ij_lm + y_lm_ij == 1)
         return result
 
     def solve_task(self):

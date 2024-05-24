@@ -169,7 +169,8 @@ class SchedulingTheoryDocumentTemplate(DocumentTemplate):
 
         task_allocation_key = "changed_binary_performers_tasks_allocation"
         task_allocation_data = data_generator.get_allocation_latex()
-        self._fill_formula(key=task_allocation_key, formula_latex=task_allocation_data)
+        # self._fill_formula(key=task_allocation_key, formula_latex=task_allocation_data)
+        self._fill_formulas_list(key=task_allocation_key, latex_formulas_list=task_allocation_data)
 
         variables_num_key = "changed_binary_variables_num"
         variables_num_data = data_generator.get_variables_num_latex()
@@ -193,7 +194,7 @@ class SchedulingTheoryDocumentTemplate(DocumentTemplate):
 
         tasks_order_key = "changed_binary_tasks_order"
         tasks_order_data = data_generator.get_tasks_order_latex()
-        self._fill_formula(key=tasks_order_key, formula_latex=tasks_order_data)
+        self._fill_formulas_list(key=tasks_order_key, latex_formulas_list=tasks_order_data)
 
     def fill_probabilistic_model(self, probability_solver: ProbabilisticModelSolver):
         data_generator = ProbabilityData(probability_solver)

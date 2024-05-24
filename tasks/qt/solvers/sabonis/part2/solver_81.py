@@ -48,7 +48,7 @@ class Solver81:
         rho = sp.symbols("ρ")
         rho_1 = rho
         rho_2 = k * rho
-        return k * (n_o(1, m, rho_1) + n_o(2, m, rho_1) + n_o(k, m, rho_1)) / (3 * n_o(k + 3, k * m, rho_2))
+        return k * (n_o(1, m, rho_1) + n_o(2, m, rho_1) + n_o(k, m, rho_1)) / (3 * n_o(k, k * m, rho_2))
 
     def phi_c(self):
         m = self.m
@@ -57,12 +57,12 @@ class Solver81:
         rho_1 = rho
         rho_2 = k * rho
         no1 = (n_o(1, m, rho_1) + n_o(2, m, rho_1) + n_o(k, m, rho_1)) / 3
-        no2 = n_o(k + 3, k * m, rho_2)
+        no2 = n_o(k, k * m, rho_2)
         if isinstance(m, str):
             return (no1 + rho_1) / (no2 + rho_2)
         else:
             p_err_1 = p(p_err(1, m, rho_1), p_err(2, m, rho_1), p_err(k, m, rho_1))
-            p_err_2 = p_err(k + 3, k * m, rho_2)
+            p_err_2 = p_err(k, k * m, rho_2)
             if m > 0:
                 return (no1 + rho_1 * (1 - p_err_1)) / (no2 + rho_2 * (1 - p_err_2))
             else:
@@ -104,21 +104,25 @@ class Solver81:
         print(f"φ_1_last = {phi_1_values[-1]}")
         print(f"φ_2_last = {phi_2_values[-1]}")
         # Строим график
-        plt.plot(rho_values, phi_1_values)
+        plt.plot(rho_values, phi_1_values, label="φ(ρ)")
+        plt.plot(rho_values, [1 for i in range(len(rho_values))], label="φ = 1")
         plt.xlabel('ρ')
         plt.ylabel('φ')
         plt.title('φ_ож')
         plt.grid(True)
+        plt.legend()
         plt.show()
 
         plt.clf()
         plt.cla()
 
-        plt.plot(rho_values, phi_2_values)
+        plt.plot(rho_values, phi_2_values, label="φ(ρ)")
+        plt.plot(rho_values, [1 for i in range(len(rho_values))], label="φ = 1")
         plt.xlabel('ρ')
         plt.ylabel('φ')
         plt.title('φ_с')
         plt.grid(True)
+        plt.legend()
         plt.show()
 
 

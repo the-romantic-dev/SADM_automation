@@ -3,7 +3,7 @@ import re
 from docx.table import Table, _Cell
 from lxml.etree import _Element
 from typing import Dict, Any
-from report.docx.core import add_text, add_picture, add_document_content
+from report.docx.core import add_text, add_picture, add_document_content, insert_document_content
 from docx.text.paragraph import Paragraph
 from docx.text.run import Run
 from docx.document import Document as DocumentType
@@ -38,8 +38,10 @@ def process_run_append(run, data_producer):
         run.element.text = ''
         run.element.append(current_data)
     elif isinstance(current_data, DocumentType):
-        print(f'Обработана вставка из документа в {run.text}')
-        add_document_content(run=run, document=current_data)
+        paragraph_element = run.element.getparent()
+        print(f'Обработана вставка из документа в {paragraph_element.text}')
+        # add_document_content(run=run, document=current_data)
+        insert_document_content(paragraph_element, document=current_data)
     elif isinstance(current_data, Run):
         print(f'Вставка Run в {run.text}')
         run.element.text = ''
@@ -91,6 +93,11 @@ def fill_paragraph_template(paragraph: Paragraph, data_producers: Dict[str, Any]
                 if not is_piecing_started:
                     pass
         if name in data_producers.keys():
-            process_run_append(run=run, data_producer=data_producers[name])
+            current_data = data_producers[name]
+            if current_data is None:
+                print(f'Удаление тега {run.text}')
+                paragraph._element.remove(run._element)
+            else:
+                process_run_append(run=run, data_producer=current_data)
         elif name is not None:
             print(f'Во входном словаре для заполнения нет ключа [{name}]')

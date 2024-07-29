@@ -9,6 +9,8 @@ from docx.table import Table, _Cell
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 from lxml.etree import _Element
+
+
 def paint_table_row(table, row_index, color='FFE699'):
     for _, cell in enumerate(table.rows[row_index].cells):
         shading_elm = parse_xml(f'<w:shd {nsdecls("w")} w:fill="{color}"/>')
@@ -90,6 +92,7 @@ def _make_table_from_child_document(child, document):
                 end={'sz': 2, 'val': 'single', 'color': '#000000'}
             )
     return table
+
 
 def set_cell_border(cell: _Cell, **kwargs):
     """

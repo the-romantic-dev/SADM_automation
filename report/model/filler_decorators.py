@@ -30,16 +30,16 @@ def _insert(template: DocumentTemplate, key: str, data, insert_type: InsertType)
     match insert_type:
         case InsertType.FORMULA:
             if not isinstance(data, Formula):
-                raise ValueError("For InsertType.FORMULA insert data must be Formula type")
+                raise ValueError("For InsertType.FORMULA insert util must be Formula type")
             template.insert_formula(key=key, formula=data)
         case InsertType.TEXT:
             if not isinstance(data, str):
-                raise ValueError("For InsertType.TEXT insert data must be str type")
+                raise ValueError("For InsertType.TEXT insert util must be str type")
             template.insert_text(key=key, text=data)
         case InsertType.IMAGE:
             raise ValueError("TODO: сделай вставку изображения")
         case InsertType.FORMULAS_LIST:
-            error = ValueError("For InsertType.FORMULAS_LIST insert data must be list[Formula] type")
+            error = ValueError("For InsertType.FORMULAS_LIST insert util must be list[Formula] type")
             if not isinstance(data, list):
                 raise error
             else:
@@ -49,10 +49,10 @@ def _insert(template: DocumentTemplate, key: str, data, insert_type: InsertType)
             template.insert_formulas_list(key=key, formulas_list=data)
         case InsertType.DOCUMENT:
             if not isinstance(data, Document):
-                raise ValueError("For InsertType.DOCUMENT insert data must be Document type")
+                raise ValueError("For InsertType.DOCUMENT insert util must be Document type")
             template.insert_data_from_document(key=key, document=data)
         case InsertType.DOCUMENTS_LIST:
-            error = ValueError("For InsertType.DOCUMENT_LIST insert data must be list[Document] type")
+            error = ValueError("For InsertType.DOCUMENT_LIST insert util must be list[Document] type")
             if not isinstance(data, list):
                 raise error
             else:

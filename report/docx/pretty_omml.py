@@ -138,3 +138,12 @@ def replace_rationals_expr(expr: Expr):
     for num in expr.atoms(Number):
         replacements[num] = get_replacement(num)
     return expr.xreplace(replacements)
+
+
+def num_as_str(num: Rational | float | int):
+    if isinstance(num, int):
+        return str(num)
+    if isinstance(num, Rational):
+        num = float(num)
+    result = f"{num:.15f}".rstrip('0').rstrip('.')
+    return result

@@ -42,7 +42,7 @@ def paint_table_cell(table, row_index, column_index, color='FFE699'):
 
 def fill_table(table, data: List[List], alignment='center'):
     if len(table.rows) != len(data):
-        raise IndexError("Количество строк в data не совпадает с количеством строк в таблице")
+        raise IndexError("Количество строк в util не совпадает с количеством строк в таблице")
     for i, row in enumerate(data):
         for j, cell_value in enumerate(row):
             cell = table.cell(i, j)

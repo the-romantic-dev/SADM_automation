@@ -4,16 +4,18 @@ from sympy import symbols, Rational
 
 from report.docx.pretty_omml import sympy_matrix_to_omml, replace_rationals_expr
 from report.model.document_template import DocumentTemplate
+from report.model.filler_decorators import text, formulas_list
 from report.model.formula import Formula
 from report.model.template_filler import TemplateFiller
 from tasks.task1_2_lp.document_template.bruteforce_step_tf import BruteforceStepTF
-from tasks.task1_2_lp.document_template.matrix_symplex_step_tf import MatrixSymplexStepTF
+from tasks.task1_2_lp.document_template.matrix_symplex.matrix_symplex_step_tf import MatrixSymplexStepTF
+from tasks.task1_2_lp.document_template.matrix_symplex.util.step_data import MatrixSymplexStepData
 from tasks.task1_2_lp.document_template.util import eq_latex
 from tasks.task1_2_lp.local_definitions import TASK_DIR
 from tasks.task1_2_lp.models.basis_solution.basis_solution import BasisSolution
 from tasks.task1_2_lp.models.lp_problem.lp_problem import LPProblem
 from tasks.task1_2_lp.solvers.bruteforce_solver.bruteforce_solver import BruteforceSolver
-from tasks.task1_2_lp.solvers.symplex_solver.symplex_solver import get_next_basis, SymplexSolver
+from tasks.task1_2_lp.solvers.symplex_solver.symplex_solver import SymplexSolver
 
 
 class LPProblemTF(TemplateFiller):
@@ -25,25 +27,17 @@ class LPProblemTF(TemplateFiller):
         self.symplex_solution = SymplexSolver(lp_problem).solve()
         super().__init__(template)
 
-    @TemplateFiller.filler_method
+    @text
     def _fill_variant(self):
-        self.template.insert_text(key="variant", text=str(self.variant))
+        return str(self.variant)
 
-    @TemplateFiller.filler_method
+    @formulas_list
     def _fill_problem(self):
-        formulas_list = []
-        for ltx in self.lp_problem.get_latex_list():
-            formula = Formula([ltx])
-            formulas_list.append(formula)
-        self.template.insert_formulas_list(key="problem", formulas_list=formulas_list)
+        return [Formula(ltx) for ltx in self.lp_problem.get_latex_list()]
 
-    @TemplateFiller.filler_method
+    @formulas_list
     def _fill_canonical_form_problem(self):
-        formulas_list = []
-        for ltx in self.lp_problem.canonical_form.get_latex_list():
-            formula = Formula([ltx])
-            formulas_list.append(formula)
-        self.template.insert_formulas_list(key="canonical_form_problem", formulas_list=formulas_list)
+        return [Formula(ltx) for ltx in self.lp_problem.canonical_form.get_latex_list()]
 
     @TemplateFiller.filler_method
     def _fill_bruteforce_solution(self):
@@ -93,7 +87,11 @@ class LPProblemTF(TemplateFiller):
         filled_documents = []
         for i, sol in enumerate(self.symplex_solution):
             matrix_symplex_step_template = DocumentTemplate(template_path)
-            matrix_symplex_step_tf = MatrixSymplexStepTF(matrix_symplex_step_template, solution_index=i, basis_solution=sol)
+            next_sol = None
+            if i + 1 < len(self.symplex_solution):
+                next_sol = self.symplex_solution[i + 1]
+            step_data = MatrixSymplexStepData(current_solution=sol, current_index=i, next_solution=next_sol)
+            matrix_symplex_step_tf = MatrixSymplexStepTF(matrix_symplex_step_template, step_data)
             matrix_symplex_step_tf.fill()
 
             filled_documents.append(matrix_symplex_step_tf.template.document)

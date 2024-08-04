@@ -7,6 +7,7 @@ from sympy import Matrix, latex, Expr, Number, Rational, Integer, Float, primefa
 from report.docx.docx_namespaces import m as m_ns
 from report.docx.docx_namespaces import w as w_ns
 from report.docx.omml import latex2omml
+from report.model.report_prettifier import rational_latex
 
 
 class BraceType(Enum):
@@ -90,9 +91,39 @@ def sympy_matrix_to_omml(matrix: Matrix, brace_type: BraceType = BraceType.PAREN
 
         return matches[0]
 
-    matrix = replace_rationals_matrix(matrix)
-    bare_matrix_latex = delete_square_brackets(latex(matrix))
-    matrix_omml = latex2omml(bare_matrix_latex)
+    def matrix_latex(_matrix: Matrix):
+        matrix_as_list = _matrix.tolist()
+
+        for row in matrix_as_list:
+            for i in range(len(row)):
+                row[i] = rational_latex(row[i])
+
+        if not matrix_as_list or not isinstance(matrix_as_list[0], list):
+            return "Ошибка: Входные данные должны быть вложенным списком."
+
+        rows = len(matrix_as_list)
+        cols = len(matrix_as_list[0])
+
+        latex_matrix = "\\begin{matrix}\n"
+
+        for i, row in enumerate(matrix_as_list):
+            if len(row) != cols:
+                return "Ошибка: Все строки должны иметь одинаковую длину."
+
+            latex_matrix += " & ".join(row)
+
+            if i < rows - 1:
+                latex_matrix += " \\\\\n"
+            else:
+                latex_matrix += "\n"
+
+        latex_matrix += "\\end{matrix}"
+
+        return latex_matrix
+
+    # matrix = replace_rationals_matrix(matrix)
+    # bare_matrix_latex =
+    matrix_omml = latex2omml(matrix_latex(matrix))
     return braces(matrix_omml, brace_type=brace_type)
 
 
@@ -106,44 +137,43 @@ def replace_in_xml(xml: str, key: str, data: str) -> str:
     pattern = f'>[^<>]*{re.escape(key)}[^<>]*</'
     return re.sub(pattern, replace_func, xml)
 
-
-def is_rational_finite_float(num: Rational):
-    q_prime_factors = set(primefactors(num.q))
-    for factor in q_prime_factors:
-        if factor != 2 and factor != 5:
-            return False
-    return True
-
-
-def replace_rationals_matrix(matrix: MutableDenseMatrix):
-    return matrix.applyfunc(lambda x: get_replacement(x))
+# def is_rational_finite_float(num: Rational):
+#     q_prime_factors = set(primefactors(num.q))
+#     for factor in q_prime_factors:
+#         if factor != 2 and factor != 5:
+#             return False
+#     return True
 
 
-def get_replacement(_num: Number):
-    result = _num
-    if isinstance(_num, Rational):
-        if _num.q == 1:  # если знаменатель равен 1, это целое число
-            result = Integer(_num)
-        else:
-            if is_rational_finite_float(_num):
-                result = Float(_num)
-            else:
-                result = _num
-    return result
+# def replace_rationals_matrix(matrix: MutableDenseMatrix):
+#     return matrix.applyfunc(lambda x: get_replacement(x))
 
 
-def replace_rationals_expr(expr: Expr):
-    replacements = {}
+# def get_replacement(_num: Number):
+#     result = _num
+#     if isinstance(_num, Rational):
+#         if _num.q == 1:  # если знаменатель равен 1, это целое число
+#             result = Integer(_num)
+#         else:
+#             if is_rational_finite_float(_num):
+#                 result = Float(_num)
+#             else:
+#                 result = _num
+#     return result
 
-    for num in expr.atoms(Number):
-        replacements[num] = get_replacement(num)
-    return expr.xreplace(replacements)
+
+# def replace_rationals_expr(expr: Expr):
+#     replacements = {}
+#
+#     for num in expr.atoms(Number):
+#         replacements[num] = get_replacement(num)
+#     return expr.xreplace(replacements)
 
 
-def num_as_str(num: Rational | float | int):
-    if isinstance(num, int):
-        return str(num)
-    if isinstance(num, Rational):
-        num = float(num)
-    result = f"{num:.15f}".rstrip('0').rstrip('.')
-    return result
+# def num_as_str(num: Rational | float | int):
+#     if isinstance(num, int):
+#         return str(num)
+#     if isinstance(num, Rational):
+#         num = float(num)
+#     result = f"{num:.15f}".rstrip('0').rstrip('.')
+#     return result

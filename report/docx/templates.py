@@ -3,7 +3,7 @@ import re
 from docx.table import Table, _Cell
 from lxml.etree import _Element
 from typing import Dict, Any
-from report.docx.core import add_text, add_picture, add_document_content, insert_document_content
+from report.docx.core import add_text, add_picture, insert_document_content
 from docx.text.paragraph import Paragraph
 from docx.text.run import Run
 from docx.document import Document as DocumentType

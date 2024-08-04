@@ -110,5 +110,5 @@ class TemplatesList(DataProducer):
         temp_document: DocumentType = Document()
         for template in data:
             add_document_content_in_end(main_document=temp_document, data_document=template)
-        temp_document.save(r"D:\Убежище\Университет\5 семестр\СисАнал\Скрипты\SADM_automation\tasks\task1_2_lp\templates\sabonis\bruteforce\temp.docx")
+        temp_document.save(r"/tasks/task1_2_lp/_templates\sabonis\bruteforce\temp.docx")
         super().__init__(data=temp_document)

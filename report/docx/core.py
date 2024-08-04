@@ -1,11 +1,7 @@
 from docx.oxml import CT_P
 from docx.shared import Pt
-from docx.text.paragraph import Paragraph
 from docx.text.run import Run
 from docx.document import Document as DocumentType
-from lxml.etree import _Element
-
-from report.docx.tables import _make_table_from_child_document
 
 
 def add_picture(picture_path: str, run: Run):
@@ -44,30 +40,30 @@ def insert_document_content(paragraph_element: CT_P, document: DocumentType):
     main_body = paragraph_element.getparent()
     main_body.remove(paragraph_element)
 
-def add_document_content(run: Run, document: DocumentType):
-    from docx.oxml import CT_P
-    from docx.oxml import CT_Tbl
-
-    run.element.text = ''
-    parent_elm = document.element.body
-    paste_elements = []
-    for child in parent_elm.iterchildren():
-        if isinstance(child, CT_P):
-            result = Paragraph(child, document)
-        elif isinstance(child, CT_Tbl):
-            result = _make_table_from_child_document(child, document)
-        else:
-            continue
-        if result is not None:
-            paste_elements.append(result._element)
-
-    paragraph = run._element.getparent()
-    if isinstance(paragraph, CT_P):
-        adding_element = paragraph
-    else:
-        adding_element = run._r
-    for elem in reversed(paste_elements):
-        adding_element.addnext(elem)
+# def add_document_content(run: Run, document: DocumentType):
+#     from docx.oxml import CT_P
+#     from docx.oxml import CT_Tbl
+#
+#     run.element.text = ''
+#     parent_elm = document.element.body
+#     paste_elements = []
+#     for child in parent_elm.iterchildren():
+#         if isinstance(child, CT_P):
+#             result = Paragraph(child, document)
+#         elif isinstance(child, CT_Tbl):
+#             result = _make_table_from_child_document(child, document)
+#         else:
+#             continue
+#         if result is not None:
+#             paste_elements.append(result._element)
+#
+#     paragraph = run._element.getparent()
+#     if isinstance(paragraph, CT_P):
+#         adding_element = paragraph
+#     else:
+#         adding_element = run._r
+#     for elem in reversed(paste_elements):
+#         adding_element.addnext(elem)
 
 
 def show_document_structure(document: DocumentType):

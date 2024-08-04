@@ -31,7 +31,7 @@ def fill_graph_docx():
     graph_solver = GraphSolver(edges)
     graph_solver.show_graph()
     graph_data_producer = GraphDocxFiller(graph_solver, 1, 12).get_data_producers()
-    template: DocumentType = Document("document_template/graph/graph_template.docx")
+    template: DocumentType = Document("view/graph/graph_template.docx")
     fill_template(template=template, data_producers=graph_data_producer)
     template.save("fillers/graph/graph.docx")
 

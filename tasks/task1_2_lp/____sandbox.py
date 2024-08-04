@@ -2,8 +2,8 @@ from pathlib import Path
 
 from docx import Document
 
-from report.model.document_template import DocumentTemplate
-from report.model.formula import Formula
+from report.model.template.document_template import DocumentTemplate
+from report.model.elements.formula import Formula
 if __name__ == '__main__':
 
     folder_path = Path(r"D:\Desktop\test")

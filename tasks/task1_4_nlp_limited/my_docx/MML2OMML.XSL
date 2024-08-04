@@ -1558,12 +1558,12 @@
        
        If the following sibling is:
        
-          mml:mstyle, then apply templates to the children of this mml:mstyle
+          mml:mstyle, then apply _templates to the children of this mml:mstyle
           
           mml:mrow, determine if this mrow is a linear fraction 
           (see comments for FlinearFrac template).
               If so, make an Omml linear fraction.
-              If not, apply templates as was done for mml:mstyle.
+              If not, apply _templates as was done for mml:mstyle.
        
        -->
   <xsl:template name="NaryHandleMrowMstyle">
@@ -1613,7 +1613,7 @@
 
   <!-- MathML munder/mover can represent several Omml constructs 
        (m:bar, m:limLow, m:limUpp, m:acc, m:groupChr, etc.).  The following 
-       templates (FIsBar, FIsAcc, and FIsGroupChr) are used to determine 
+       _templates (FIsBar, FIsAcc, and FIsGroupChr) are used to determine
 			 which of these Omml constructs an munder/mover should be translated into. -->
 
   <!-- Note:  ndCur should only be an munder/mover MathML element.
@@ -2733,7 +2733,7 @@
                   </m:e>
 
                   <!-- We have prescripts but no super scripts, therefore, do a sub 
-									and apply templates to all tokens counted by cndScript. -->
+									and apply _templates to all tokens counted by cndScript. -->
                   <m:sub>
                     <xsl:apply-templates select="*[position() &gt; 1 and (position() &lt;= ($cndScript + 1))]" />
                   </m:sub>
@@ -2748,7 +2748,7 @@
                   </m:e>
 
                   <!-- We have prescripts but no sub scripts, therefore, do a sub 
-									and apply templates to all tokens counted by cndScript. -->
+									and apply _templates to all tokens counted by cndScript. -->
                   <m:sup>
                     <xsl:apply-templates select="*[position() &gt; 1 and (position() &lt;= ($cndScript + 1))]" />
                   </m:sup>
@@ -2801,7 +2801,7 @@
 	     a mathml equation array row.
 	
 			 So far, the only thing that needs to be ignored is the argument of an nary.  We
-			 can ignore this since it is output when we apply-templates to the munder[over]/msub[sup].
+			 can ignore this since it is output when we apply-_templates to the munder[over]/msub[sup].
 	-->
   <xsl:template name="FIgnoreCollection">
     <xsl:param name="ndCur" select="." />
@@ -2931,7 +2931,7 @@
           </xsl:if>
         </xsl:when>
         <!-- If this node is an non-special mrow or mstyle and we aren't supposed to ignore this collection, then
-				     go ahead an apply templates to this node. -->
+				     go ahead an apply _templates to this node. -->
         <xsl:when test="$fIgnoreCollection=0 and ((self::mml:mrow and $fSpecialCollection=0) or self::mml:mstyle)">
           <xsl:call-template name="ProcessEqArrayRow">
             <xsl:with-param name="ndCur" select="." />
@@ -2964,7 +2964,7 @@
               </xsl:element>
             </xsl:element>
           </xsl:if>
-          <!-- Now that the '&' have been extracted, just apply-templates to this node.-->
+          <!-- Now that the '&' have been extracted, just apply-_templates to this node.-->
           <xsl:apply-templates select="." />
         </xsl:when>
         <!-- If there are no alignment points as descendants, then go ahead and output this node. -->
@@ -3558,7 +3558,7 @@
   <xsl:template match="mml:mpadded">
     <xsl:choose>
       <xsl:when test="count(parent::mml:mphantom)=1 and count(preceding-sibling::*)=0 and count(following-sibling::*)=0">
-        <!-- This mpadded is inside an mphantom that has already setup phantom attributes, therefore, just apply templates -->
+        <!-- This mpadded is inside an mphantom that has already setup phantom attributes, therefore, just apply _templates -->
         <xsl:apply-templates select="*" />
       </xsl:when>
       <xsl:otherwise>

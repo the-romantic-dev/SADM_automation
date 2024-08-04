@@ -1,7 +1,5 @@
 from pathlib import Path
 
-from sympy import latex
-
 from report.docx.pretty_omml import sympy_matrix_to_omml
 from report.model.elements.paragraph import Paragraph
 from report.model.elements.plain_text import PlainText

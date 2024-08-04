@@ -20,9 +20,6 @@ rsidR = rand_hex()
 rsidTr = rand_hex()
 
 
-# def create_row_element(data: list[str | Formula]):
-
-
 def create_col_element(data: str | Formula, color: str = None):
     tc = create_element(tag=f"{{{w}}}tc")
     tcPr = element_from_string_with_namespaces(

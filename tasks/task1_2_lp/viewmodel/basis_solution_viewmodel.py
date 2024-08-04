@@ -1,6 +1,6 @@
-from sympy import latex, Rational, sign
+from sympy import latex
 
-from report.model.report_prettifier import rational_latex, expression_latex
+from report.model.report_prettifier import expression_latex
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 
 

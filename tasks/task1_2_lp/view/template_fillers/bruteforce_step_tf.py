@@ -29,17 +29,9 @@ class BruteforceStepTF(TemplateFiller):
 
     @elements_list
     def _fill_expressions(self):
-        # basis_expressions = [replace_rationals_expr(expr) for expr in self.basis_solution._express_basis_through_free]
         basis_expressions = self.basis_solution_vm.basis_expressions_latex
-        # basis_variables = self.basis_solution.basis_variables_latex
         formulas_list = [Formula(expr_latex) for expr_latex in basis_expressions]
-        # for i, variable in enumerate(basis_variables):
-        #     formula = Formula(eq_latex(variable, basis_expressions[i]))
-        #     formulas_list.append(formula)
         formulas_list.append(Formula(self.basis_solution_vm.f_expression_latex))
-        # expr = replace_rationals_expr(self.basis_solution._express_objective_through_free)
-        # objective_formula = Formula(eq_latex(f, expr))
-        # formulas_list.append(objective_formula)
         return formulas_list
 
     @elements_list

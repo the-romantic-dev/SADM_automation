@@ -109,13 +109,6 @@ class LPProblem:
                 break
         return result
 
-    # def get_latex_list(self):
-    #     result = [self._objective.as_latex]
-    #     for c in self._constraints:
-    #         result.append(c.as_latex)
-    #     result.append(get_non_negative_vars_latex(self.var_count))
-    #     return result
-
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return self.__dict__ == other.__dict__

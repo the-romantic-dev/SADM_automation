@@ -1,5 +1,3 @@
-from copy import copy
-
 from sympy import latex
 
 from report.model.elements.formula import Formula

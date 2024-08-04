@@ -109,27 +109,6 @@ class DocumentTemplate:
 
         self._insert(key=key, insert_func=insert_func, report="FORMULA")
 
-    def insert_formulas_list(self, key: str, formulas_list: list[Formula]):
-
-        def insert_func(ik: InsertKey):
-            if not can_replace_paragraph(ik.paragraph):
-                print(
-                    f"Нельзя вставить список формул по ключу [{key}] вместо параграфа [{ik.paragraph.text}],"
-                    f"т.к в параграфе есть другой текст помимо ключа")
-                return
-            formula_paragraph_elements = []
-            for formula in formulas_list:
-                new_paragraph = copy_paragraph(ik.paragraph)
-                new_paragraph_element = new_paragraph._p
-                tag_run_element = new_paragraph.runs[0]._r
-                tag_run_element.addnext(formula.oMath)
-                new_paragraph_element.remove(tag_run_element)
-                formula_paragraph_elements.append(new_paragraph_element)
-
-            replace_paragraph_with_elements(ik.paragraph, formula_paragraph_elements)
-
-        self._insert(key=key, insert_func=insert_func, report="FORMULAS LIST")
-
     def insert_data_from_document(self, key: str, document: DocumentType):
         def insert_func(ik: InsertKey):
             if not can_replace_paragraph(ik.paragraph):
@@ -141,22 +120,6 @@ class DocumentTemplate:
             replace_paragraph_with_elements(ik.paragraph, elements_to_insert)
 
         self._insert(key=key, insert_func=insert_func, report="DOCUMENT")
-
-    def insert_data_from_documents_list(self, key: str, documents: list[DocumentType]):
-
-        def insert_func(ik: InsertKey):
-            if not can_replace_paragraph(ik.paragraph):
-                print(
-                    f"Нельзя вставить содержимое списка документов по ключу [{key}] вместо параграфа [{ik.paragraph.text}],"
-                    f"т.к в параграфе есть другой текст помимо ключа")
-                return
-
-            elements_to_insert = []
-            for document in documents:
-                elements_to_insert.extend(get_document_elements(document))
-            replace_paragraph_with_elements(ik.paragraph, elements_to_insert)
-
-        self._insert(key=key, insert_func=insert_func, report="DOCUMENT LIST")
 
     def insert_table(self, key: str, table: Table):
         def insert_func(ik: InsertKey):
@@ -170,24 +133,6 @@ class DocumentTemplate:
             replace_paragraph_with_elements(ik.paragraph, [table_element])
 
         self._insert(key=key, insert_func=insert_func, report="TABLE")
-
-    def insert_tables_list(self, key: str, tables_list: list[Table]):
-        def insert_func(ik: InsertKey):
-            if not can_replace_paragraph(ik.paragraph):
-                print(
-                    f"Нельзя вставить список таблиц по ключу [{key}] вместо параграфа [{ik.paragraph.text}],"
-                    f"т.к в параграфе есть другой текст помимо ключа")
-                return
-
-            elements_to_insert = []
-            for table in tables_list:
-                elements_to_insert.append(table.table_element)
-                p = copy_paragraph(ik.paragraph)
-                p.text = ""
-                elements_to_insert.append(p._p)
-            replace_paragraph_with_elements(ik.paragraph, elements_to_insert)
-
-        self._insert(key=key, insert_func=insert_func, report="TABLES_LIST")
 
     def insert_elements_list(self, key: str, elements_list: list[Table | Formula | MyParagraph | DocumentType]):
         def insert_func(ik: InsertKey):

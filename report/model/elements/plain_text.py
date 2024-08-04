@@ -1,11 +1,4 @@
 from dataclasses import dataclass
-from enum import Enum, auto
-
-
-# class TextStyle(Enum):
-#     DEFAULT = auto()
-#     BOLD = auto()
-#     ITALIC = auto()
 
 
 @dataclass

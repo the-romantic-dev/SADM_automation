@@ -55,26 +55,3 @@ def expression_latex(coeffs: list[Rational], variables: list[Symbol], constant: 
         result = result[2:]
 
     return result
-
-# class PrettyRational:
-#     def __init__(self, rational: Rational):
-#         self.rational = rational
-#
-#     @property
-#     def is_finite_float(self):
-#         q_prime_factors = set(primefactors(self.rational.q))
-#         for factor in q_prime_factors:
-#             if factor not in [2, 5]:
-#                 return False
-#         return True
-#
-#     @property
-#     def latex(self) -> str:
-#         if self.rational.q == 1:
-#             return str(self.rational.p)
-#         else:
-#             if self.is_finite_float:
-#                 num = float(self.rational)
-#                 return f"{num:.15f}".rstrip('0')
-#             else:
-#                 return f"\\frac{{{self.rational.p}}}{{{self.rational.q}}}"

@@ -3,6 +3,11 @@ from tasks.task1_2_lp.model.lp_problem.enums.comp_operator import CompOperator
 from tasks.task1_2_lp.model.lp_problem.lp_problem import LPProblem
 
 
+def get_non_negative_vars_latex(vars_count: int):
+    result = [f"x_{i + 1} \\ge 0" for i in range(vars_count)]
+    return ",".join(result)
+
+
 def problem_latex(lp_problem: LPProblem) -> list[str]:
     def comp_operator_sign(operator: CompOperator):
         match operator:
@@ -22,6 +27,7 @@ def problem_latex(lp_problem: LPProblem) -> list[str]:
         constraint_expression_latex = expression_latex(constraint.coeffs, constraint.variables)
         constraint_latex = f"{constraint_expression_latex}{comp_operator_sign(constraint.comp_operator)}{rational_latex(constraint.const)}"
         result.append(constraint_latex)
+    result.append(get_non_negative_vars_latex(lp_problem.var_count))
     return result
 
 

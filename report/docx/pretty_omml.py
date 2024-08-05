@@ -1,5 +1,7 @@
 import re
 from enum import Enum
+
+import lxml.etree
 from lxml import etree as lxml_etree
 from lxml.etree import _Element
 from sympy import Matrix
@@ -15,10 +17,15 @@ class BraceType(Enum):
     BRACKETS = 1
     STRAIGHT = 2
     CURLY = 3
+    LEFT_CURLY = 4
+
+
+def is_math_element(element):
+    return element.tag == f"{{{m_ns}}}oMath"
 
 
 def braces(math_element: _Element, brace_type: BraceType = BraceType.PARENTHESES) -> _Element:
-    if math_element.tag != f"{{{m_ns}}}oMath":
+    if not is_math_element(math_element):
         raise ValueError("Элемент не является частью уравнения Word")
 
     brace_elements = element_from_string_with_namespaces(
@@ -37,6 +44,9 @@ def braces(math_element: _Element, brace_type: BraceType = BraceType.PARENTHESES
         case BraceType.CURLY:
             brace_elements[0].set(f"{{{m_ns}}}val", "{")
             brace_elements[1].set(f"{{{m_ns}}}val", "}")
+        case BraceType.LEFT_CURLY:
+            brace_elements[0].set(f"{{{m_ns}}}val", "{")
+            brace_elements[1].set(f"{{{m_ns}}}val", "")
         case _:
             brace_elements = []
 
@@ -80,6 +90,46 @@ def element_from_string_with_namespaces(xml: str, namespaces: dict[str, str]):
     for elem in root_element.iterchildren():
         parsed_elements.append(elem)
     return parsed_elements
+
+
+def elements_list_to_matrix_element(elements: list[list[_Element]], alignment: str):
+    oMath = lxml_etree.Element(f"{{{m_ns}}}oMath")
+    m = lxml_etree.SubElement(oMath, f"{{{m_ns}}}m")
+
+    cols = len(elements[0])
+    mPr = element_from_string_with_namespaces(
+        xml=f"""
+            <m:mPr>
+                <m:mcs>
+                    <m:mc>
+                        <m:mcPr>
+                            <m:count m:val="{cols}" />
+                            <m:mcJc m:val="{alignment}" />
+                        </m:mcPr>
+                    </m:mc>
+                </m:mcs>
+                <m:ctrlPr>
+                    <w:rPr>
+                        <w:rFonts w:ascii="Cambria Math" w:hAnsi="Cambria Math" />
+                        <w:i />
+                    </w:rPr>
+                </m:ctrlPr>
+            </m:mPr>
+        """,
+        namespaces={"w": w_ns, "m": m_ns}
+    )[0]
+    m.append(mPr)
+
+    for row in elements:
+        mr = lxml.etree.SubElement(m, f"{{{m_ns}}}mr")
+        for element in row:
+            me: _Element = lxml.etree.SubElement(mr, f"{{{m_ns}}}e")
+            if is_math_element(element):
+                children = element.getchildren()
+                me.extend(children)
+            else:
+                raise ValueError("It is not oMath element")
+    return oMath
 
 
 def sympy_matrix_to_omml(matrix: Matrix, brace_type: BraceType = BraceType.PARENTHESES) -> _Element:

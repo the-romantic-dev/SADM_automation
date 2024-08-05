@@ -5,10 +5,11 @@ from report.model.elements.paragraph import Paragraph
 from report.model.elements.plain_text import PlainText
 from report.model.report_prettifier import rational_latex
 from report.model.template.document_template import DocumentTemplate
-from report.model.template.filler_decorators import text, elements_list, formula
+from report.model.template.filler_decorators import text, elements_list, formula, document
 from report.model.elements.formula import Formula
 from report.model.template.template_filler import TemplateFiller
-from tasks.task1_2_lp.view.template_fillers.bruteforce_step_tf import BruteforceStepTF
+from tasks.task1_2_lp.view.template_fillers.auxiliary_task_tf import AuxiliaryTaskTF
+from tasks.task1_2_lp.view.template_fillers.bruteforce.bruteforce_step_tf import BruteforceStepTF
 from tasks.task1_2_lp.view.template_fillers.symplex.matrix_symplex.matrix_symplex_step_tf import MatrixSymplexStepTF
 from tasks.task1_2_lp.view.template_fillers.symplex.table_symplex.symplex_table import SymplexTable
 from tasks.task1_2_lp.view.template_fillers.symplex.util.step_data import SymplexStepData
@@ -123,3 +124,12 @@ class LPProblemTF(TemplateFiller):
             _elements_list.append(Paragraph(paragraph_data))
             _elements_list.append(symplex_table.table)
         return _elements_list
+
+    @document
+    def _fill_auxiliary_task(self):
+        TEMPLATES_DIR = Path(TASK_DIR, "_templates/sabonis/auxiliary_task/")
+        template_path = Path(TEMPLATES_DIR, "auxiliary_task.docx")
+        template = DocumentTemplate(template_path)
+        template_filler = AuxiliaryTaskTF(template, self.lp_problem)
+        template_filler.fill()
+        return template.document

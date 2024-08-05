@@ -6,7 +6,7 @@ from report.model.elements.formula import Formula
 from report.model.template.filler_decorators import text, elements_list, formula
 from report.model.template.template_filler import TemplateFiller
 from tasks.task1_2_lp.viewmodel.basis_solution_viewmodel import BasisSolutionViewModel
-from tasks.task1_2_lp.view.template_fillers.acceptability_marker_tf import AcceptabilityMarkerTF
+from tasks.task1_2_lp.view.template_fillers.bruteforce.acceptability_marker_tf import AcceptabilityMarkerTF
 from tasks.task1_2_lp.local_definitions import TASK_DIR
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 

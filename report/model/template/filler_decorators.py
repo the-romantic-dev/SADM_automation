@@ -10,15 +10,13 @@ from report.model.template.template_filler import TemplateFiller
 from report.model.elements.paragraph import Paragraph as MyParagraph
 from docx.document import Document as DocumentType
 
+
 class InsertType(Enum):
     TEXT = auto()
     FORMULA = auto()
     IMAGE = auto()
-    # FORMULAS_LIST = auto()
     DOCUMENT = auto()
-    # DOCUMENTS_LIST = auto()
     TABLE = auto()
-    # TABLES_LIST = auto()
     ELEMENTS_LIST = auto()
 
 
@@ -32,6 +30,9 @@ def _get_key(func):
 
 
 def _insert(template: DocumentTemplate, key: str, data, insert_type: InsertType):
+    if data is None:
+        template.delete_key(key)
+        return
     match insert_type:
         case InsertType.FORMULA:
             if not isinstance(data, Formula):
@@ -43,34 +44,18 @@ def _insert(template: DocumentTemplate, key: str, data, insert_type: InsertType)
             template.insert_text(key=key, text=data)
         case InsertType.IMAGE:
             raise ValueError("TODO: сделай вставку изображения")
-        # case InsertType.FORMULAS_LIST:
-        #     error = ValueError("For InsertType.FORMULAS_LIST insert util must be list[Formula] type")
-        #     if not isinstance(data, list):
-        #         raise error
-        #     else:
-        #         for elem in data:
-        #             if not isinstance(elem, Formula):
-        #                 raise error
-        #     template.insert_formulas_list(key=key, formulas_list=data)
         case InsertType.DOCUMENT:
             if not isinstance(data, Document):
                 raise ValueError("For InsertType.DOCUMENT insert data must be Document type")
             template.insert_data_from_document(key=key, document=data)
-        # case InsertType.DOCUMENTS_LIST:
-        #     error = ValueError("For InsertType.DOCUMENT_LIST insert util must be list[Document] type")
-        #     if not isinstance(data, list):
-        #         raise error
-        #     else:
-        #         for elem in data:
-        #             if not isinstance(elem, Document):
-        #                 raise error
-        #     template.insert_data_from_documents_list(key=key, documents=data)
         case InsertType.TABLE:
             if not isinstance(data, Table):
                 raise ValueError("For InsertType.TABLE insert data must be Table type")
             template.insert_table(key=key, table=data)
         case InsertType.ELEMENTS_LIST:
-            error = ValueError("For InsertType.ELEMENTS_LIST insert data must be list[Table | Formula | MyParagraph | DocumentType] type")
+            error = ValueError(
+                "For InsertType.ELEMENTS_LIST insert data must "
+                "be list[Table | Formula | MyParagraph | DocumentType] type")
             if not isinstance(data, list):
                 raise error
             else:
@@ -107,16 +92,8 @@ def document(func):
     return filler(func, insert_type=InsertType.DOCUMENT)
 
 
-# def formulas_list(func):
-#     return filler(func, insert_type=InsertType.FORMULAS_LIST)
-
-
 def text(func):
     return filler(func, insert_type=InsertType.TEXT)
-
-
-# def documents_list(func):
-#     return filler(func, insert_type=InsertType.DOCUMENTS_LIST)
 
 
 def table(func):

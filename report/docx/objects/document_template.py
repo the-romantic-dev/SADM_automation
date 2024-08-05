@@ -42,7 +42,6 @@ class DocumentTemplate:
     def _fill_formula(self, key: str, formula_latex: str):
         self.data_producers[key] = Formula(formula_latex).produce_data
 
-
     def _fill_text(self, key: str, text: str):
         self.data_producers[key] = lambda: text
 

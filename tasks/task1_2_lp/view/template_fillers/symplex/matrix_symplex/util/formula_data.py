@@ -1,3 +1,5 @@
+from sympy import sign
+
 import tasks.task1_2_lp.view.template_fillers.symplex.matrix_symplex.util.latex as ms_latex
 import tasks.task1_2_lp.view.template_fillers.symplex.matrix_symplex.util.matrices as ms_matrices
 import tasks.task1_2_lp.view.template_fillers.symplex.matrix_symplex.util.elements as ms_elements
@@ -33,6 +35,9 @@ def delta_equation(step_data: SymplexStepData, free_var_index: int):
     a_column = ms_matrices.A_column(step_data.current_solution, free_var_index)
     c_elem = ms_matrices.C_element(step_data.current_solution, free_var_index)
     result = (ctb_vector * p_matrix * a_column)[0, 0] - c_elem
+
+    c_sign = "-" if c_elem >= 0 else " + "
+
     formula_data = [
         f"{ms_latex.delta(free_var_index)} = ",
         ms_latex.CTB(step_data.current_index),
@@ -42,8 +47,8 @@ def delta_equation(step_data: SymplexStepData, free_var_index: int):
         sympy_matrix_to_omml(ctb_vector),
         sympy_matrix_to_omml(p_matrix),
         sympy_matrix_to_omml(a_column),
-        f" - {c_elem} = ",
-        f"{result}"
+        f" {c_sign} {c_elem * sign(c_elem)} = ",
+        f"{rational_latex(result)}"
     ]
     return formula_data
 

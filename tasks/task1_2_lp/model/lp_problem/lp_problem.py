@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from sympy import Matrix, Expr
+from sympy import Matrix, Expr, Rational
 
 from tasks.task1_2_lp.model.lp_problem.constraint.constraint import Constraint
 from tasks.task1_2_lp.model.lp_problem.enums.comp_operator import CompOperator
@@ -8,10 +8,49 @@ from tasks.task1_2_lp.model.lp_problem.enums.objective_type import ObjectiveType
 from tasks.task1_2_lp.model.lp_problem.objective.objective import Objective
 
 
+def eye_row_to_cols(matrix: Matrix) -> dict[int, list[int]]:
+    def eye_column_one_index(index: int) -> int:
+        col: Matrix = matrix.col(index)
+        elements = col.T.tolist()[0]
+        ones = []
+        for j, elem in enumerate(elements):
+            if elem == 0:
+                continue
+            elif elem == 1:
+                ones.append(j)
+            else:
+                return -1
+        if len(ones) == 1:
+            return ones[0]
+        return -1
+
+    result = dict()
+    for i in range(matrix.cols):
+        eye_elem_row = eye_column_one_index(i)
+        if eye_elem_row >= 0:
+            if eye_elem_row not in result:
+                result[eye_elem_row] = []
+            result[eye_elem_row].append(i)
+    return result
+
+
 class LPProblem:
+    M: int = 100000
+
     def __init__(self, constraints: list[Constraint], objective: Objective):
         self._constraints = constraints
         self._objective = objective
+        # self.eye_row_to_cols = None
+        # self.eye_row_to_cols = eye_row_to_cols(self.matrices[0])
+        # self.eye_rows = sorted(list(self.eye_row_to_cols.keys()))
+
+    @property
+    def eye_row_to_cols(self):
+        return eye_row_to_cols(self.canonical_form.matrices[0])
+
+    @property
+    def eye_rows(self):
+        return sorted(list(self.eye_row_to_cols.keys()))
 
     @property
     def constraints(self):
@@ -57,9 +96,59 @@ class LPProblem:
         return self._is_all_eq() and self._is_consts_positive() and self._objective.type == ObjectiveType.MAX
 
     @property
+    def auxiliary_form(self):
+        if self.has_simple_start_basis:
+            raise ArithmeticError("Не нужно решать вспомогательную задачу")
+        eye_rows = self.eye_rows
+        A = self.canonical_form.matrices[0]
+        artificial_var_indices = [self.canonical_form.var_count + i for i in range(A.rows - len(eye_rows))]
+
+        def non_eye_rows():
+            _result = []
+            for i in range(A.rows):
+                if i not in eye_rows:
+                    _result.append(i)
+            return _result
+
+        _non_eye_rows = non_eye_rows()
+        old_constraints = deepcopy(self.canonical_form.constraints)
+        new_constraints = []
+        for i, oc in enumerate(old_constraints):
+            coeffs = oc.coeffs
+            if i not in _non_eye_rows:
+                new_coeffs = coeffs + [0 for _ in range(len(artificial_var_indices))]
+            else:
+                artificial_var_index = artificial_var_indices[_non_eye_rows.index(i)]
+                new_coeffs = coeffs + [
+                    Rational(0) if self.canonical_form.var_count + j != artificial_var_index else Rational(1) for j in
+                    range(len(artificial_var_indices))]
+            nc = Constraint(new_coeffs, oc.const, oc.comp_operator)
+            new_constraints.append(nc)
+        obj_coeffs = [Rational(0) for _ in range(self.canonical_form.var_count)] + [Rational(-1) for _ in
+                                                                                    range(len(artificial_var_indices))]
+        new_objective = Objective(ObjectiveType.MAX, coeffs=obj_coeffs)
+        return LPProblem(constraints=new_constraints, objective=new_objective)
+
+    @property
+    def has_simple_start_basis(self):
+        rows = len(self.constraints)
+        _eye_rows = self.eye_rows
+        if len(set(_eye_rows)) != rows:
+            return False
+        for i in range(1, len(_eye_rows)):
+            if _eye_rows[i] - _eye_rows[i - 1] != 1:
+                return False
+        return True
+
+    @property
     def start_basis(self) -> list[int]:
-        # TODO изменить на поиск базиса
-        return [2, 3]
+        if not self.has_simple_start_basis:
+            raise ArithmeticError("Чтобы найти базис в ЗЛП должна быть единичная подматрица")
+        basis_len = len(self.constraints)
+        result = []
+        for cols in self.eye_row_to_cols.values():
+            result.append(cols[0])
+        return result
 
     @property
     def canonical_form(self):

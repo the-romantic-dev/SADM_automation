@@ -100,7 +100,7 @@ class Constraint:
         return pretty(eq)
 
     def __repr__(self):
-        return str(self)
+        return str(self.as_expr)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):

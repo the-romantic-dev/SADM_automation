@@ -73,6 +73,21 @@ class BasisSolution:
         return result
 
     @property
+    def solution(self):
+        result = []
+        var_count = self.lp_problem.canonical_form.var_count
+        basis = self.basis
+        basis_values = self.basis_values
+        for i in range(var_count):
+            if i in basis:
+                in_basis_index = basis.index(i)
+                value = basis_values[in_basis_index]
+                result.append(value)
+            else:
+                result.append(Rational(0))
+        return result
+
+    @property
     def is_acceptable(self):
         """ Является ли решение допустимым (значения базисных переменных должны быть неотрицательными) """
         result = True
@@ -95,6 +110,8 @@ class BasisSolution:
     def is_opt(self):
         """ Является ли решение оптимальным (коэффициенты целевой функции при свободных переменных неположительные) """
         obj_coeffs = self.objective_coeffs
+        if not self.is_acceptable:
+            return False
         result = True
         for c in obj_coeffs:
             if c > 0:

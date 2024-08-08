@@ -37,7 +37,7 @@ def create_paragraph() -> _Element:
 
 
 class Paragraph:
-    def __init__(self, content: list[PlainText, Formula]):
+    def __init__(self, content: list[PlainText | Formula]):
         self.content = content
 
     @property

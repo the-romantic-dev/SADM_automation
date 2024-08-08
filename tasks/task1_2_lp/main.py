@@ -18,17 +18,17 @@ if __name__ == '__main__':
 
     problem = LPProblem(
         constraints=[
-            Constraint(coeffs=[Rational(1), Rational(2)], const=Rational("5.3")),
-            Constraint(coeffs=[Rational(-1), Rational(2)], const=Rational("2.8"))
+            Constraint(coeffs=[Rational(1), Rational("0.3")], const=Rational("10.2")),
+            Constraint(coeffs=[Rational(-1), Rational("0.4")], const=Rational("-1.2"))
         ],
-        objective=Objective(ObjectiveType.MAX, coeffs=[Rational(1), Rational(1)])
+        objective=Objective(ObjectiveType.MAX, coeffs=[Rational(1), Rational(-2)])
     )
     template_filler = LPProblemTF(variant=4, lp_problem=problem, template=document_template)
     template_filler.fill()
 
     end_time = time()
 
-    save_path = Path(r"D:\Desktop\test")
+    save_path = Path(r"C:\Projects\test")
     template_filler.save(save_path, add_pdf=False)
 
     print(f"Общее время выполнения: {end_time - start_time} секунд")

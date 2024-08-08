@@ -30,19 +30,14 @@ def get_next_basis(basis_solution: BasisSolution) -> tuple[tuple, tuple, tuple] 
     return tuple(new_basis), tuple(new_free), swap
 
 
-# def basis_different(basis_1, basis_2):
-#     for i in range(len(basis_1)):
-#         if basis_1[i] != basis_2[i]:
-#             return basis_1[i], basis_2[i]
-#     return None
-
-
 class SymplexSolver:
     def __init__(self, lp_problem: LPProblem):
         self.lp_problem = lp_problem
 
-    def solve(self):
-        curr_basis_solution = BasisSolution(self.lp_problem, self.lp_problem.start_basis)
+    def solve(self, start_basis: list[int] = None):
+        if start_basis is None:
+            start_basis = self.lp_problem.start_basis
+        curr_basis_solution = BasisSolution(self.lp_problem, start_basis)
         result = [curr_basis_solution]
         swaps = []
         while not curr_basis_solution.is_opt:
@@ -50,4 +45,24 @@ class SymplexSolver:
             swaps.append(swap)
             curr_basis_solution = BasisSolution(self.lp_problem, new_basis, new_free)
             result.append(curr_basis_solution)
+        return result, swaps
+
+    def auxiliary_solve(self):
+        auxiliary_form = self.lp_problem.auxiliary_form
+        curr_basis_solution = BasisSolution(auxiliary_form, auxiliary_form.start_basis)
+        result = [curr_basis_solution]
+        swaps = []
+
+        def does_basis_contains_art_var(basis: list[int]):
+            for b in basis:
+                if b >= self.lp_problem.canonical_form.var_count:
+                    return True
+            return False
+
+        while does_basis_contains_art_var(curr_basis_solution.basis):
+            new_basis, new_free, swap = get_next_basis(curr_basis_solution)
+            swaps.append(swap)
+            curr_basis_solution = BasisSolution(auxiliary_form, new_basis, new_free)
+            result.append(curr_basis_solution)
+
         return result, swaps

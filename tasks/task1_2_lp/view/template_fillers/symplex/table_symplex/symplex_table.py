@@ -33,7 +33,7 @@ class SymplexTable:
         row.extend([Formula(rational_latex(c)) for c in coeffs])
         row.append(Formula(rational_latex(b)))
         if self.swap is not None:
-            in_var_index = self.swap[1]
+            in_var_index = self.sol.free.index(self.swap[1])
             a = coeffs[in_var_index]
             row.append(Formula(rational_latex(-b / a)))
         return row

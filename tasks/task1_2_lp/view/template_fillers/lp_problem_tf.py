@@ -8,6 +8,7 @@ from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import text, elements_list, formula, document
 from report.model.elements.formula import Formula
 from report.model.template.template_filler import TemplateFiller
+from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 from tasks.task1_2_lp.view.template_fillers.auxiliary_task_tf import AuxiliaryTaskTF
 from tasks.task1_2_lp.view.template_fillers.bruteforce.bruteforce_step_tf import BruteforceStepTF
 from tasks.task1_2_lp.view.template_fillers.symplex.matrix_symplex.matrix_symplex_step_tf import MatrixSymplexStepTF
@@ -28,7 +29,19 @@ class LPProblemTF(TemplateFiller):
         self.lp_problem_vm = LPProblemViewModel(lp_problem)
         bruteforce_solver = BruteforceSolver(lp_problem=self.lp_problem)
         self.bruteforce_solution, self.best_bruteforce_solution_index = bruteforce_solver.solve()
-        self.symplex_solution, self.symplex_swaps = SymplexSolver(lp_problem).solve()
+        self.symplex_start_basis_index = 0
+        symplex_solver = SymplexSolver(lp_problem)
+        self.auxiliary_solution: list[BasisSolution] | None = None
+        self.auxiliary_swaps: list[tuple[int, int]] | None = None
+        if self.lp_problem.has_simple_start_basis:
+            start_basis = self.lp_problem.start_basis
+        else:
+            self.auxiliary_solution, self.auxiliary_swaps = symplex_solver.auxiliary_solve()
+            start_basis = self.auxiliary_solution[-1].basis
+            self.symplex_start_basis_index = len(self.auxiliary_solution) - 1
+
+        # self.start_basis = symplex_solver.auxiliary_solve(start_basis)
+        self.symplex_solution, self.symplex_swaps = symplex_solver.solve(start_basis)
         super().__init__(template)
 
     @text
@@ -103,7 +116,8 @@ class LPProblemTF(TemplateFiller):
                 swap = self.symplex_swaps[i]
                 in_var = swap[1]
                 out_var = swap[0]
-            step_data = SymplexStepData(current_solution=sol, current_index=i, in_var=in_var, out_var=out_var)
+            current_index = self.symplex_start_basis_index + i
+            step_data = SymplexStepData(current_solution=sol, current_index=current_index, in_var=in_var, out_var=out_var)
             matrix_symplex_step_tf = MatrixSymplexStepTF(matrix_symplex_step_template, step_data)
             matrix_symplex_step_tf.fill()
 
@@ -117,8 +131,9 @@ class LPProblemTF(TemplateFiller):
             swap = self.symplex_swaps[i] if i < len(self.symplex_swaps) else None
             symplex_table = SymplexTable(sol, swap)
             basis_variables_latex = BasisSolutionViewModel(sol).basis_variables_latex
+            current_index = self.symplex_start_basis_index + i
             paragraph_data = [
-                PlainText(text=f"Базис {i}: ", bold=True, italic=False, size=28),
+                PlainText(text=f"Базис {current_index}: ", bold=True, italic=False, size=28),
                 Formula(",".join(basis_variables_latex), font_size=28, bold=True)
             ]
             _elements_list.append(Paragraph(paragraph_data))
@@ -127,9 +142,15 @@ class LPProblemTF(TemplateFiller):
 
     @document
     def _fill_auxiliary_task(self):
+        if self.auxiliary_solution is None:
+            return None
         TEMPLATES_DIR = Path(TASK_DIR, "_templates/sabonis/auxiliary_task/")
         template_path = Path(TEMPLATES_DIR, "auxiliary_task.docx")
         template = DocumentTemplate(template_path)
-        template_filler = AuxiliaryTaskTF(template, self.lp_problem)
+        template_filler = AuxiliaryTaskTF(template, self.lp_problem, auxiliary_solution=self.auxiliary_solution, auxiliary_swaps=self.auxiliary_swaps)
         template_filler.fill()
         return template.document
+
+    # @formula
+    # def _fill_new_constraint(self):
+

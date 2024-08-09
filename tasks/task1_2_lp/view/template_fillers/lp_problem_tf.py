@@ -3,7 +3,7 @@ from pathlib import Path
 from report.docx.pretty_omml import sympy_matrix_to_omml
 from report.model.elements.paragraph import Paragraph
 from report.model.elements.plain_text import PlainText
-from report.model.report_prettifier import rational_latex
+from report.model.report_prettifier import rational_latex, expression_latex
 from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import text, elements_list, formula, document
 from report.model.elements.formula import Formula
@@ -20,6 +20,7 @@ from tasks.task1_2_lp.model.solvers.bruteforce_solver.bruteforce_solver import B
 from tasks.task1_2_lp.model.solvers.symplex_solver.symplex_solver import SymplexSolver
 from tasks.task1_2_lp.viewmodel.basis_solution_viewmodel import BasisSolutionViewModel
 from tasks.task1_2_lp.viewmodel.lp_problem_viewmodel import LPProblemViewModel
+from tasks.task1_2_lp.viewmodel.reverse_symplex_viewmodel import ReverseSymplexViewModel
 
 
 class LPProblemTF(TemplateFiller):
@@ -151,6 +152,13 @@ class LPProblemTF(TemplateFiller):
         template_filler.fill()
         return template.document
 
-    # @formula
-    # def _fill_new_constraint(self):
-
+    @formula
+    def _fill_new_constraint(self):
+        rsvm = ReverseSymplexViewModel(self.bruteforce_solution)
+        new_constraint = rsvm.new_constraint
+        formula_data = [
+            expression_latex(new_constraint.coeffs, new_constraint.variables),
+            "\\le",
+            rational_latex(new_constraint.const)
+        ]
+        return Formula(formula_data)

@@ -30,5 +30,5 @@ if __name__ == '__main__':
     end_time = time()
     template_filler.save(report_path, add_pdf=False)
 
-    print(f"Общее время выполнения: {end_time - start_time} секунд")
+    print(f"Общее время выполнения: {end_time - start_time:.2f} секунд")
 

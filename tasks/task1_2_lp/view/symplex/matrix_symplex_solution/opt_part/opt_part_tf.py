@@ -5,7 +5,7 @@ from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import formula
 from report.model.elements.formula import Formula
 from report.model.template.template_filler import TemplateFiller
-from tasks.task1_2_lp.view.symplex.matrix_symplex.util import elements as ms_elements, formula_data as ms_formula_data
+from tasks.task1_2_lp.view.symplex.matrix_symplex_solution.util import elements as ms_elements, formula_data as ms_formula_data
 from tasks.task1_2_lp.view.symplex.step_data import SymplexStepData
 
 package_path = Path(os.path.dirname(os.path.abspath(__file__)))

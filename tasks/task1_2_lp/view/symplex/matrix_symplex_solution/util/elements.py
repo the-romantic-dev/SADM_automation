@@ -4,7 +4,7 @@ from report.docx.docx_namespaces import m, w
 from report.docx.pretty_omml import replace_in_xml, element_from_string_with_namespaces
 from tasks.task1_2_lp.local_definitions import TASK_DIR
 
-ELEMENTS_XML_DIR = Path(TASK_DIR, "view/symplex/matrix_symplex/elements_xml")
+ELEMENTS_XML_DIR = Path(TASK_DIR, "view/symplex/matrix_symplex_solution/elements_xml")
 
 
 def _get_xml_from_file(filename: str):

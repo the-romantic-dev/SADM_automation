@@ -18,6 +18,7 @@ class InsertType(Enum):
     DOCUMENT = auto()
     TABLE = auto()
     ELEMENTS_LIST = auto()
+    TEMPLATE_FILLER = auto()
 
 
 def _get_key(func):
@@ -48,6 +49,12 @@ def _insert(template: DocumentTemplate, key: str, data, insert_type: InsertType)
             if not isinstance(data, Document):
                 raise ValueError("For InsertType.DOCUMENT insert data must be Document type")
             template.insert_data_from_document(key=key, document=data)
+        case InsertType.TEMPLATE_FILLER:
+            if not isinstance(data, TemplateFiller):
+                raise ValueError("For InsertType.TEMPLATE_FILLER insert data must be TemplateFiller type")
+            data.fill()
+            doc = data.template.document
+            template.insert_data_from_document(key=key, document=doc)
         case InsertType.TABLE:
             if not isinstance(data, Table):
                 raise ValueError("For InsertType.TABLE insert data must be Table type")
@@ -102,3 +109,7 @@ def table(func):
 
 def elements_list(func):
     return filler(func, insert_type=InsertType.ELEMENTS_LIST)
+
+
+def template_filler(func):
+    return filler(func, insert_type=InsertType.TEMPLATE_FILLER)

@@ -24,7 +24,7 @@ if __name__ == '__main__':
         ],
         objective=Objective(ObjectiveType.MAX, coeffs=[Rational(1), Rational(-2)])
     )
-    template_filler = LPProblemTF(variant=4, lp_problem=problem)
+    template_filler = LPProblemTF(variant=4, lpp=problem)
     template_filler.fill()
 
     end_time = time()

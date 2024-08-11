@@ -6,9 +6,9 @@ from report.model.template.filler_decorators import formula, elements_list
 from report.model.elements.formula import Formula
 from report.model.template.template_filler import TemplateFiller
 from tasks.task1_2_lp.view.symplex.step_data import SymplexStepData
-import tasks.task1_2_lp.view.symplex.matrix_symplex.util.latex as ms_latex
-import tasks.task1_2_lp.view.symplex.matrix_symplex.util.formula_data as ms_formula_data
-import tasks.task1_2_lp.view.symplex.matrix_symplex.util.elements as ms_elements
+import tasks.task1_2_lp.view.symplex.matrix_symplex_solution.util.latex as ms_latex
+import tasks.task1_2_lp.view.symplex.matrix_symplex_solution.util.formula_data as ms_formula_data
+import tasks.task1_2_lp.view.symplex.matrix_symplex_solution.util.elements as ms_elements
 
 package_path = Path(os.path.dirname(os.path.abspath(__file__)))
 template_path = Path(package_path, "non_opt_part.docx")

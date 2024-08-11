@@ -10,7 +10,7 @@ from report.model.template.filler_decorators import formula, elements_list
 from report.model.template.template_filler import TemplateFiller
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 from tasks.task1_2_lp.model.lp_problem.lp_problem import LPProblem
-from tasks.task1_2_lp.view.symplex.table_symplex.symplex_table import SymplexTable
+from tasks.task1_2_lp.view.symplex.table_symplex_solution.symplex_table import SymplexTable
 from tasks.task1_2_lp.viewmodel.basis_solution_viewmodel import BasisSolutionViewModel
 from tasks.task1_2_lp.viewmodel.lp_problem_viewmodel import LPProblemViewModel
 
@@ -28,26 +28,24 @@ template_path = Path(package_path, "auxiliary_task.docx")
 
 
 class AuxiliaryTaskTF(TemplateFiller):
-    def __init__(self, lp_problem: LPProblem, auxiliary_solution: list[BasisSolution],
+    def __init__(self, lpp_vm: LPProblemViewModel, auxiliary_solution: list[BasisSolution],
                  auxiliary_swaps: list[tuple[int, int] | None]):
         template = DocumentTemplate(template_path)
         super().__init__(template)
-        self.lp_problem = lp_problem
+        self.lpp_vm = lpp_vm
         self.sol = auxiliary_solution
         self.swaps = auxiliary_swaps
 
     @formula
     def _fill_canonical_artificial_transformation(self):
-        vm = LPProblemViewModel(self.lp_problem)
-        canonical_brace = problem_element(vm.canonical_problem_latex())
-        art_form_brace = problem_element(vm.art_form_latex())
+        canonical_brace = problem_element(self.lpp_vm.canonical_problem_latex())
+        art_form_brace = problem_element(self.lpp_vm.art_form_latex())
         formula_data = [canonical_brace, "\\rightarrow", art_form_brace]
         return Formula(formula_data)
 
     @formula
     def _fill_auxiliary_problem(self):
-        vm = LPProblemViewModel(self.lp_problem)
-        formula_data = problem_element(vm.auxiliary_form_latex())
+        formula_data = problem_element(self.lpp_vm.auxiliary_form_latex())
         return Formula(formula_data)
 
     @elements_list

@@ -5,11 +5,11 @@ from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import text, formula, elements_list, document
 from report.model.elements.formula import Formula
 from report.model.template.template_filler import TemplateFiller
-from tasks.task1_2_lp.view.symplex.matrix_symplex.non_opt_part.non_opt_part_tf import NonOptPartTF
-from tasks.task1_2_lp.view.symplex.matrix_symplex.opt_part.opt_part_tf import OptPartTF
+from tasks.task1_2_lp.view.symplex.matrix_symplex_solution.non_opt_part.non_opt_part_tf import NonOptPartTF
+from tasks.task1_2_lp.view.symplex.matrix_symplex_solution.opt_part.opt_part_tf import OptPartTF
 from tasks.task1_2_lp.view.symplex.step_data import SymplexStepData
-from tasks.task1_2_lp.view.symplex.matrix_symplex.util import latex as ms_latex
-from tasks.task1_2_lp.view.symplex.matrix_symplex.util import formula_data as ms_fd
+from tasks.task1_2_lp.view.symplex.matrix_symplex_solution.util import latex as ms_latex
+from tasks.task1_2_lp.view.symplex.matrix_symplex_solution.util import formula_data as ms_fd
 
 package_path = Path(os.path.dirname(os.path.abspath(__file__)))
 template_path = Path(package_path, "matrix_symplex_step.docx")

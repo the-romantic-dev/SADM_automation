@@ -11,6 +11,7 @@ from report.model.template.template_filler import TemplateFiller
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 from tasks.task1_2_lp.view.template_fillers.auxiliary_task_tf import AuxiliaryTaskTF
 from tasks.task1_2_lp.view.template_fillers.bruteforce.bruteforce_step_tf import BruteforceStepTF
+from tasks.task1_2_lp.view.template_fillers.reverse_symplex_tf import ReverseSymplexTF
 from tasks.task1_2_lp.view.template_fillers.symplex.matrix_symplex.matrix_symplex_step_tf import MatrixSymplexStepTF
 from tasks.task1_2_lp.view.template_fillers.symplex.table_symplex.symplex_table import SymplexTable
 from tasks.task1_2_lp.view.template_fillers.symplex.util.step_data import SymplexStepData
@@ -118,7 +119,8 @@ class LPProblemTF(TemplateFiller):
                 in_var = swap[1]
                 out_var = swap[0]
             current_index = self.symplex_start_basis_index + i
-            step_data = SymplexStepData(current_solution=sol, current_index=current_index, in_var=in_var, out_var=out_var)
+            step_data = SymplexStepData(current_solution=sol, current_index=current_index, in_var=in_var,
+                                        out_var=out_var)
             matrix_symplex_step_tf = MatrixSymplexStepTF(matrix_symplex_step_template, step_data)
             matrix_symplex_step_tf.fill()
 
@@ -148,17 +150,13 @@ class LPProblemTF(TemplateFiller):
         TEMPLATES_DIR = Path(TASK_DIR, "_templates/sabonis/auxiliary_task/")
         template_path = Path(TEMPLATES_DIR, "auxiliary_task.docx")
         template = DocumentTemplate(template_path)
-        template_filler = AuxiliaryTaskTF(template, self.lp_problem, auxiliary_solution=self.auxiliary_solution, auxiliary_swaps=self.auxiliary_swaps)
+        template_filler = AuxiliaryTaskTF(template, self.lp_problem, auxiliary_solution=self.auxiliary_solution,
+                                          auxiliary_swaps=self.auxiliary_swaps)
         template_filler.fill()
         return template.document
 
-    @formula
-    def _fill_new_constraint(self):
-        rsvm = ReverseSymplexViewModel(self.bruteforce_solution)
-        new_constraint = rsvm.new_constraint
-        formula_data = [
-            expression_latex(new_constraint.coeffs, new_constraint.variables),
-            "\\le",
-            rational_latex(new_constraint.const)
-        ]
-        return Formula(formula_data)
+    @document
+    def _fill_reverse_symplex(self):
+        tf = ReverseSymplexTF(self.bruteforce_solution)
+        tf.fill()
+        return tf.template.document

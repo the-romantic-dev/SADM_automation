@@ -63,11 +63,6 @@ class ReverseSymplexViewModel:
         return Constraint(coeffs=coeffs_list[:2], const=const,
                           comp_operator=CompOperator.LE)
 
-        # # edge_centers = [neighbor_edge_center(opt, neighbor) for neighbor in neighbors]
-        #
-        # coeffs = self.coeffs
-        # opt_constraint_value = constraint_value(coeffs, self.opt_sol)
-        # b = opt_constraint_value - delta
 
     @property
     def opt_neighbor_solutions(self) -> list[BasisSolution]:
@@ -87,7 +82,3 @@ class ReverseSymplexViewModel:
             if is_basis_neighbors(self.opt_sol.basis, sol.basis):
                 neighbors.append(sol)
         return neighbors
-
-    @property
-    def find_neighbor_edge_center(self):
-        edge_centers

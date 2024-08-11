@@ -4,11 +4,11 @@ from report.docx.docx_namespaces import m, w
 from report.docx.pretty_omml import replace_in_xml, element_from_string_with_namespaces
 from tasks.task1_2_lp.local_definitions import TASK_DIR
 
-TEMPLATES_DIR = Path(TASK_DIR, "_templates/sabonis/matrix_symplex/")
+ELEMENTS_XML_DIR = Path(TASK_DIR, "view/symplex/matrix_symplex/elements_xml")
 
 
 def _get_xml_from_file(filename: str):
-    txt_path = Path(TEMPLATES_DIR, filename)
+    txt_path = Path(ELEMENTS_XML_DIR, filename)
     with open(txt_path.as_posix(), 'r', encoding='utf-8') as file:
         formula_xml = file.read()
     return formula_xml

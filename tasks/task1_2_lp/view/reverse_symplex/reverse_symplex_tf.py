@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from report.model.elements.formula import Formula
@@ -5,12 +6,12 @@ from report.model.report_prettifier import expression_latex, rational_latex
 from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import formula
 from report.model.template.template_filler import TemplateFiller
-from tasks.task1_2_lp.local_definitions import TASK_DIR
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 from tasks.task1_2_lp.model.lp_problem.lp_problem import LPProblem
 from tasks.task1_2_lp.viewmodel.reverse_symplex_viewmodel import ReverseSymplexViewModel
 
-template_path = Path(TASK_DIR, "_templates/sabonis/reverse_symplex/reverse_symplex.docx")
+package_path = Path(os.path.dirname(os.path.abspath(__file__)))
+template_path = Path(package_path, "reverse_symplex.docx")
 
 
 class ReverseSymplexTF(TemplateFiller):

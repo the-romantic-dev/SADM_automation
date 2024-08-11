@@ -1,31 +1,33 @@
+import os
 from pathlib import Path
 
 from report.docx.pretty_omml import sympy_matrix_to_omml
 from report.model.elements.paragraph import Paragraph
 from report.model.elements.plain_text import PlainText
-from report.model.report_prettifier import rational_latex, expression_latex
+from report.model.report_prettifier import rational_latex
 from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import text, elements_list, formula, document
 from report.model.elements.formula import Formula
 from report.model.template.template_filler import TemplateFiller
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
-from tasks.task1_2_lp.view.template_fillers.auxiliary_task_tf import AuxiliaryTaskTF
-from tasks.task1_2_lp.view.template_fillers.bruteforce.bruteforce_step_tf import BruteforceStepTF
-from tasks.task1_2_lp.view.template_fillers.reverse_symplex_tf import ReverseSymplexTF
-from tasks.task1_2_lp.view.template_fillers.symplex.matrix_symplex.matrix_symplex_step_tf import MatrixSymplexStepTF
-from tasks.task1_2_lp.view.template_fillers.symplex.table_symplex.symplex_table import SymplexTable
-from tasks.task1_2_lp.view.template_fillers.symplex.util.step_data import SymplexStepData
-from tasks.task1_2_lp.local_definitions import TASK_DIR
+from tasks.task1_2_lp.view.auxiliary_task.auxiliary_task_tf import AuxiliaryTaskTF
+from tasks.task1_2_lp.view.bruteforce_step.bruteforce_step_tf import BruteforceStepTF
+from tasks.task1_2_lp.view.reverse_symplex.reverse_symplex_tf import ReverseSymplexTF
+from tasks.task1_2_lp.view.symplex.matrix_symplex.matrix_symplex_step.matrix_symplex_step_tf import MatrixSymplexStepTF
+from tasks.task1_2_lp.view.symplex.table_symplex.symplex_table import SymplexTable
+from tasks.task1_2_lp.view.symplex.step_data import SymplexStepData
 from tasks.task1_2_lp.model.lp_problem.lp_problem import LPProblem
 from tasks.task1_2_lp.model.solvers.bruteforce_solver.bruteforce_solver import BruteforceSolver
 from tasks.task1_2_lp.model.solvers.symplex_solver.symplex_solver import SymplexSolver
 from tasks.task1_2_lp.viewmodel.basis_solution_viewmodel import BasisSolutionViewModel
 from tasks.task1_2_lp.viewmodel.lp_problem_viewmodel import LPProblemViewModel
-from tasks.task1_2_lp.viewmodel.reverse_symplex_viewmodel import ReverseSymplexViewModel
+
+package_path = Path(os.path.dirname(os.path.abspath(__file__)))
+template_path = Path(package_path, "lp_problem.docx")
 
 
 class LPProblemTF(TemplateFiller):
-    def __init__(self, variant: int, lp_problem: LPProblem, template: DocumentTemplate):
+    def __init__(self, variant: int, lp_problem: LPProblem):
         self.variant = variant
         self.lp_problem = lp_problem
         self.lp_problem_vm = LPProblemViewModel(lp_problem)
@@ -42,8 +44,9 @@ class LPProblemTF(TemplateFiller):
             start_basis = self.auxiliary_solution[-1].basis
             self.symplex_start_basis_index = len(self.auxiliary_solution) - 1
 
-        # self.start_basis = symplex_solver.auxiliary_solve(start_basis)
         self.symplex_solution, self.symplex_swaps = symplex_solver.solve(start_basis)
+
+        template = DocumentTemplate(template_path)
         super().__init__(template)
 
     @text
@@ -60,13 +63,9 @@ class LPProblemTF(TemplateFiller):
 
     @elements_list
     def _fill_bruteforce_solution(self):
-        TEMPLATES_DIR = Path(TASK_DIR, "_templates/sabonis/bruteforce/")
-        template_path = Path(TEMPLATES_DIR, "brutforce_step.docx")
-
         filled_documents = []
         for i, sol in enumerate(self.bruteforce_solution):
-            bruteforce_step_template = DocumentTemplate(template_path)
-            bruteforce_step_tf = BruteforceStepTF(bruteforce_step_template, solution_index=i, basis_solution=sol)
+            bruteforce_step_tf = BruteforceStepTF(solution_index=i, basis_solution=sol)
             bruteforce_step_tf.fill()
 
             filled_documents.append(bruteforce_step_tf.template.document)
@@ -106,12 +105,8 @@ class LPProblemTF(TemplateFiller):
 
     @elements_list
     def _fill_matrix_symplex_solution(self):
-        TEMPLATES_DIR = Path(TASK_DIR, "_templates/sabonis/matrix_symplex/")
-        template_path = Path(TEMPLATES_DIR, "matrix_symplex_step.docx")
-
         filled_documents = []
         for i, sol in enumerate(self.symplex_solution):
-            matrix_symplex_step_template = DocumentTemplate(template_path)
             in_var = None
             out_var = None
             if i < len(self.symplex_swaps):
@@ -121,7 +116,7 @@ class LPProblemTF(TemplateFiller):
             current_index = self.symplex_start_basis_index + i
             step_data = SymplexStepData(current_solution=sol, current_index=current_index, in_var=in_var,
                                         out_var=out_var)
-            matrix_symplex_step_tf = MatrixSymplexStepTF(matrix_symplex_step_template, step_data)
+            matrix_symplex_step_tf = MatrixSymplexStepTF(step_data)
             matrix_symplex_step_tf.fill()
 
             filled_documents.append(matrix_symplex_step_tf.template.document)
@@ -147,13 +142,10 @@ class LPProblemTF(TemplateFiller):
     def _fill_auxiliary_task(self):
         if self.auxiliary_solution is None:
             return None
-        TEMPLATES_DIR = Path(TASK_DIR, "_templates/sabonis/auxiliary_task/")
-        template_path = Path(TEMPLATES_DIR, "auxiliary_task.docx")
-        template = DocumentTemplate(template_path)
-        template_filler = AuxiliaryTaskTF(template, self.lp_problem, auxiliary_solution=self.auxiliary_solution,
+        template_filler = AuxiliaryTaskTF(self.lp_problem, auxiliary_solution=self.auxiliary_solution,
                                           auxiliary_swaps=self.auxiliary_swaps)
         template_filler.fill()
-        return template.document
+        return template_filler.template.document
 
     @document
     def _fill_reverse_symplex(self):

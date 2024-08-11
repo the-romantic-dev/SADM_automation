@@ -1,14 +1,20 @@
+import os
+from pathlib import Path
+
 from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import formula
 from report.model.elements.formula import Formula
 from report.model.template.template_filler import TemplateFiller
-from tasks.task1_2_lp.view.template_fillers.symplex.matrix_symplex.util import elements as ms_elements
-from tasks.task1_2_lp.view.template_fillers.symplex.matrix_symplex.util import formula_data as ms_formula_data
-from tasks.task1_2_lp.view.template_fillers.symplex.util.step_data import SymplexStepData
+from tasks.task1_2_lp.view.symplex.matrix_symplex.util import elements as ms_elements, formula_data as ms_formula_data
+from tasks.task1_2_lp.view.symplex.step_data import SymplexStepData
+
+package_path = Path(os.path.dirname(os.path.abspath(__file__)))
+template_path = Path(package_path, "opt_part.docx")
 
 
 class OptPartTF(TemplateFiller):
-    def __init__(self, template: DocumentTemplate, step_data: SymplexStepData):
+    def __init__(self, step_data: SymplexStepData):
+        template = DocumentTemplate(template_path)
         super().__init__(template)
         self.step_data = step_data
 

@@ -1,14 +1,23 @@
+import os
+from pathlib import Path
+
 from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import text, formula, elements_list, document
 from report.model.elements.formula import Formula
 from report.model.template.template_filler import TemplateFiller
-from tasks.task1_2_lp.view.template_fillers.symplex.util.step_data import SymplexStepData
-from tasks.task1_2_lp.view.template_fillers.symplex.matrix_symplex.util import template_fillers as ms_tf
-from tasks.task1_2_lp.view.template_fillers.symplex.matrix_symplex.util import latex as ms_latex, formula_data as ms_fd
+from tasks.task1_2_lp.view.symplex.matrix_symplex.non_opt_part.non_opt_part_tf import NonOptPartTF
+from tasks.task1_2_lp.view.symplex.matrix_symplex.opt_part.opt_part_tf import OptPartTF
+from tasks.task1_2_lp.view.symplex.step_data import SymplexStepData
+from tasks.task1_2_lp.view.symplex.matrix_symplex.util import latex as ms_latex
+from tasks.task1_2_lp.view.symplex.matrix_symplex.util import formula_data as ms_fd
+
+package_path = Path(os.path.dirname(os.path.abspath(__file__)))
+template_path = Path(package_path, "matrix_symplex_step.docx")
 
 
 class MatrixSymplexStepTF(TemplateFiller):
-    def __init__(self, template: DocumentTemplate, step_data: SymplexStepData):
+    def __init__(self, step_data: SymplexStepData):
+        template = DocumentTemplate(template_path)
         super().__init__(template)
         self.step_data = step_data
 
@@ -59,6 +68,10 @@ class MatrixSymplexStepTF(TemplateFiller):
 
     @document
     def _fill_opt_dependency_part(self):
-        tf = ms_tf.opt_tf(self.step_data)
+        step_data = self.step_data
+        if step_data.current_solution.is_opt:
+            tf = OptPartTF(step_data)
+        else:
+            tf = NonOptPartTF(step_data)
         tf.fill()
         return tf.template.document

@@ -1,21 +1,25 @@
+import os
 from pathlib import Path
 
 from report.model.report_prettifier import rational_latex
 from report.model.template.document_template import DocumentTemplate
 from report.model.elements.formula import Formula
-from report.model.template.filler_decorators import text, elements_list, formula
+from report.model.template.filler_decorators import text, elements_list, formula, document
 from report.model.template.template_filler import TemplateFiller
 from tasks.task1_2_lp.viewmodel.basis_solution_viewmodel import BasisSolutionViewModel
-from tasks.task1_2_lp.view.template_fillers.bruteforce.acceptability_marker_tf import AcceptabilityMarkerTF
-from tasks.task1_2_lp.local_definitions import TASK_DIR
+from tasks.task1_2_lp.view.bruteforce_step.acceptability_marker.acceptability_marker_tf import AcceptabilityMarkerTF
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
+
+package_path = Path(os.path.dirname(os.path.abspath(__file__)))
+template_path = Path(package_path, "bruteforce_step.docx")
 
 
 class BruteforceStepTF(TemplateFiller):
-    def __init__(self, template: DocumentTemplate, solution_index: int, basis_solution: BasisSolution):
+    def __init__(self, solution_index: int, basis_solution: BasisSolution):
         self.basis_solution = basis_solution
         self.basis_solution_vm = BasisSolutionViewModel(basis_solution)
         self.solution_index = solution_index
+        template = DocumentTemplate(template_path)
         super().__init__(template)
 
     @text
@@ -43,17 +47,12 @@ class BruteforceStepTF(TemplateFiller):
         values = [rational_latex(const) for const in [*basis_values, objective_value]]
         return [Formula(f"{var} = {val}") for var, val in zip(variables, values)]
 
-    @TemplateFiller.filler_method
+    @document
     def _fill_acceptable_marker(self):
-        template_path = Path(TASK_DIR, "_templates/sabonis/bruteforce/acceptability_marker.docx")
+        if self.basis_solution.is_acceptable:
+            return None
         acceptability_marker_tf = AcceptabilityMarkerTF(
-            template=DocumentTemplate(template_path),
             unacceptable_variables=self.basis_solution.unacceptable_variables
         )
-        key = "acceptable_marker"
-        if self.basis_solution.is_acceptable:
-            self.template.delete_key(key)
-        else:
-            acceptability_marker_tf.fill()
-            filled_document = acceptability_marker_tf.template.document
-            self.template.insert_data_from_document(key=key, document=filled_document)
+        acceptability_marker_tf.fill()
+        return acceptability_marker_tf.template.document

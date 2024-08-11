@@ -1,3 +1,6 @@
+import os
+from pathlib import Path
+
 from report.docx.pretty_omml import braces, elements_list_to_matrix_element, BraceType
 from report.model.elements.formula import Formula
 from report.model.elements.paragraph import Paragraph
@@ -7,15 +10,12 @@ from report.model.template.filler_decorators import formula, elements_list
 from report.model.template.template_filler import TemplateFiller
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 from tasks.task1_2_lp.model.lp_problem.lp_problem import LPProblem
-from tasks.task1_2_lp.model.solvers.symplex_solver.symplex_solver import SymplexSolver
-from tasks.task1_2_lp.view.template_fillers.symplex.table_symplex.symplex_table import SymplexTable
+from tasks.task1_2_lp.view.symplex.table_symplex.symplex_table import SymplexTable
 from tasks.task1_2_lp.viewmodel.basis_solution_viewmodel import BasisSolutionViewModel
 from tasks.task1_2_lp.viewmodel.lp_problem_viewmodel import LPProblemViewModel
 
 
 def problem_element(problem_latex: list[str]):
-    # lp_problem_vm = LPProblemViewModel(lp_problem)
-    # problem_latex = lp_problem_vm.canonical_problem_latex()
     problem_formulas = [Formula(l) for l in problem_latex]
     problem_omml = [f.oMath for f in problem_formulas]
     problem_problem_as_matrix = elements_list_to_matrix_element([[e] for e in problem_omml], alignment="left")
@@ -23,9 +23,14 @@ def problem_element(problem_latex: list[str]):
     return result
 
 
+package_path = Path(os.path.dirname(os.path.abspath(__file__)))
+template_path = Path(package_path, "auxiliary_task.docx")
+
+
 class AuxiliaryTaskTF(TemplateFiller):
-    def __init__(self, template: DocumentTemplate, lp_problem: LPProblem, auxiliary_solution: list[BasisSolution],
+    def __init__(self, lp_problem: LPProblem, auxiliary_solution: list[BasisSolution],
                  auxiliary_swaps: list[tuple[int, int] | None]):
+        template = DocumentTemplate(template_path)
         super().__init__(template)
         self.lp_problem = lp_problem
         self.sol = auxiliary_solution
@@ -47,7 +52,6 @@ class AuxiliaryTaskTF(TemplateFiller):
 
     @elements_list
     def _fill_start_basis_symplex_search(self):
-        # solutions, swaps = SymplexSolver(self.lp_problem).auxiliary_solve()
         self.swaps.append(None)
         _elements_list = []
         for i, sol, swap in zip(range(len(self.sol)), self.sol, self.swaps):

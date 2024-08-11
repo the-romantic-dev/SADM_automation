@@ -1,11 +1,11 @@
 from sympy import sign
 
-import tasks.task1_2_lp.view.template_fillers.symplex.matrix_symplex.util.latex as ms_latex
-import tasks.task1_2_lp.view.template_fillers.symplex.matrix_symplex.util.matrices as ms_matrices
-import tasks.task1_2_lp.view.template_fillers.symplex.matrix_symplex.util.elements as ms_elements
+import tasks.task1_2_lp.view.symplex.matrix_symplex.util.latex as ms_latex
+import tasks.task1_2_lp.view.symplex.matrix_symplex.util.matrices as ms_matrices
+import tasks.task1_2_lp.view.symplex.matrix_symplex.util.elements as ms_elements
 from report.docx.pretty_omml import sympy_matrix_to_omml
 from report.model.report_prettifier import rational_latex
-from tasks.task1_2_lp.view.template_fillers.symplex.util.step_data import SymplexStepData
+from tasks.task1_2_lp.view.symplex.step_data import SymplexStepData
 
 
 def CTB_equation(step_data):

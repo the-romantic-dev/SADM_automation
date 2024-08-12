@@ -36,7 +36,7 @@ class TableSymplexSolutionTF(SolutionTF):
                 Formula(",".join(basis_variables_latex), font_size=28, bold=True)
             ]
             _elements_list.append(Paragraph(paragraph_data))
-            _elements_list.append(symplex_table.table)
+            _elements_list.append(symplex_table.symplex_table)
         return _elements_list
 
     @formula

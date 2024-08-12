@@ -12,7 +12,8 @@ black_color = "000000"
 
 
 class SymplexTable:
-    def __init__(self, basis_solution: BasisSolution, swap: tuple[int, int]):
+    def __init__(self, basis_solution: BasisSolution, swap: tuple[int, int], is_reversed: bool = False):
+        self.is_reversed = is_reversed
         self.sol = basis_solution
         self.swap = swap
 
@@ -21,7 +22,7 @@ class SymplexTable:
         header_row = [""]
         header_row.extend([Formula(f"x_{i + 1}") for i in self.sol.free])
         header_row.append(Formula("b"))
-        if self.swap is not None:
+        if self.swap is not None and not self.is_reversed:
             header_row.append(Formula("-\\frac{b_i}{a_i}"))
         return header_row
 
@@ -32,11 +33,21 @@ class SymplexTable:
         b = self.sol.basis_values[basis_index]
         row.extend([Formula(rational_latex(c)) for c in coeffs])
         row.append(Formula(rational_latex(b)))
-        if self.swap is not None:
+        if self.swap is not None and not self.is_reversed:
             in_var_index = self.sol.free.index(self.swap[1])
             a = coeffs[in_var_index]
             row.append(Formula(rational_latex(-b / a)))
         return row
+
+    @property
+    def _reversed_criteria_row(self):
+        result = [Formula("-\\frac{c_j}{a_{ij}}")]
+        out_var_index = self.sol.basis.index(self.swap[0])
+        out_row = self.sol.basis_coeffs[out_var_index]
+        obj_row = self.sol.objective_coeffs
+        result.extend([Formula(rational_latex(-c / a)) for c, a in zip(obj_row, out_row)])
+        result.append("")
+        return result
 
     @property
     def _f_row(self):
@@ -45,7 +56,7 @@ class SymplexTable:
         value = self.sol.objective_value
         row.extend([Formula(rational_latex(c)) for c in coeffs])
         row.append(Formula(rational_latex(value)))
-        if self.swap is not None:
+        if self.swap is not None and not self.is_reversed:
             row.append("")
         return row
 
@@ -53,8 +64,12 @@ class SymplexTable:
     def _color_fills(self):
         result = {(0, 0): black_color}
         if self.swap is not None:
-            rows_count = 2 + len(self.sol.basis)
-            cols_count = 3 + len(self.sol.free)
+            if self.is_reversed:
+                rows_count = 3 + len(self.sol.basis)
+                cols_count = 2 + len(self.sol.free)
+            else:
+                rows_count = 2 + len(self.sol.basis)
+                cols_count = 3 + len(self.sol.free)
             result[(rows_count - 1, cols_count - 1)] = black_color
 
             out_var_row = self.sol.basis.index(self.swap[0]) + 1
@@ -69,10 +84,12 @@ class SymplexTable:
         return result
 
     @property
-    def table(self) -> Table:
+    def symplex_table(self) -> Table:
         table_data = [self._header_row]
         for i in range(len(self.sol.basis)):
             table_data.append(self._expr_row(i))
         table_data.append(self._f_row)
+        if self.is_reversed and self.swap is not None:
+            table_data.append(self._reversed_criteria_row)
         color_fills = self._color_fills
         return Table(table_data, color_fills)

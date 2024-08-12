@@ -110,8 +110,8 @@ class BasisSolution:
     def is_opt(self):
         """ Является ли решение оптимальным (коэффициенты целевой функции при свободных переменных неположительные) """
         obj_coeffs = self.objective_coeffs
-        if not self.is_acceptable:
-            return False
+        # if not self.is_acceptable:
+        #     return False
         result = True
         for c in obj_coeffs:
             if c > 0:

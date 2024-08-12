@@ -1,25 +1,50 @@
-from copy import copy
-
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 from tasks.task1_2_lp.model.lp_problem.lp_problem import LPProblem
 
 
-def get_next_basis(basis_solution: BasisSolution) -> tuple[tuple, tuple, tuple] | None:
-    if basis_solution.is_opt or not basis_solution.is_acceptable:
+def is_opt(sol: BasisSolution, is_reversed: bool) -> bool:
+    result = sol.is_opt
+    if is_reversed:
+        result = sol.is_acceptable
+    return result
+
+
+def is_acceptable(sol: BasisSolution, is_reversed: bool) -> bool:
+    result = sol.is_acceptable
+    if is_reversed:
+        result = sol.is_opt
+    return result
+
+
+def get_swap_indices(sol: BasisSolution, is_reversed: bool):
+    c = sol.objective_coeffs
+    b = sol.basis_values
+    coeffs = sol.basis_coeffs
+    if is_reversed:
+        out_var_index = b.index(min(b))
+        out_var_row = coeffs[out_var_index]
+
+        column_criteria = [c[i] / -out_var_row[i] for i in range(len(c))]
+        filtered_criteria = list(filter(lambda elem: elem > 0, column_criteria))
+        in_var_index = column_criteria.index(min(filtered_criteria))
+    else:
+        in_var_index = c.index(max(c))
+        in_var_column = [row[in_var_index] for row in coeffs]
+
+        row_criteria = [b[i] / -in_var_column[i] for i in range(len(b))]
+        filtered_criteria = list(filter(lambda elem: elem >= 0, row_criteria))
+        out_var_index = row_criteria.index(min(filtered_criteria))
+    return out_var_index, in_var_index
+
+
+def get_next_basis(sol: BasisSolution, is_reversed: bool) -> tuple[list[int], list[int], tuple[int, int]] | None:
+    if is_opt(sol, is_reversed) or not is_acceptable(sol, is_reversed):
         return None
 
-    obj_coeffs = basis_solution.objective_coeffs
-    in_var_index = obj_coeffs.index(max(obj_coeffs))
-    basis_values = basis_solution.basis_values
-    basis_coeffs = basis_solution.basis_coeffs
-    in_var_column = [row[in_var_index] for row in basis_coeffs]
+    out_var_index, in_var_index = get_swap_indices(sol, is_reversed)
 
-    row_criteria = [basis_values[i] / -in_var_column[i] for i in range(len(basis_values))]
-    filtered_non_negative_rc = list(filter(lambda elem: elem >= 0, row_criteria))
-    out_var_index = row_criteria.index(min(filtered_non_negative_rc))
-
-    old_basis = basis_solution.basis
-    old_free = basis_solution.free
+    old_basis = sol.basis
+    old_free = sol.free
     new_basis: list = list(old_basis)
     new_basis[out_var_index] = old_free[in_var_index]
 
@@ -27,21 +52,21 @@ def get_next_basis(basis_solution: BasisSolution) -> tuple[tuple, tuple, tuple] 
     new_free[in_var_index] = old_basis[out_var_index]
 
     swap = (old_basis[out_var_index], old_free[in_var_index])
-    return tuple(new_basis), tuple(new_free), swap
+    return new_basis, new_free, swap
 
 
 class SymplexSolver:
     def __init__(self, lp_problem: LPProblem):
         self.lp_problem = lp_problem
 
-    def solve(self, start_basis: list[int] = None):
+    def solve(self, start_basis: list[int] = None, is_reversed: bool = False):
         if start_basis is None:
             start_basis = self.lp_problem.start_basis
         curr_basis_solution = BasisSolution(self.lp_problem, start_basis)
         result = [curr_basis_solution]
         swaps = []
-        while not curr_basis_solution.is_opt:
-            new_basis, new_free, swap = get_next_basis(curr_basis_solution)
+        while not is_opt(curr_basis_solution, is_reversed):
+            new_basis, new_free, swap = get_next_basis(curr_basis_solution, is_reversed)
             swaps.append(swap)
             curr_basis_solution = BasisSolution(self.lp_problem, new_basis, new_free)
             result.append(curr_basis_solution)
@@ -60,7 +85,7 @@ class SymplexSolver:
             return False
 
         while does_basis_contains_art_var(curr_basis_solution.basis):
-            new_basis, new_free, swap = get_next_basis(curr_basis_solution)
+            new_basis, new_free, swap = get_next_basis(curr_basis_solution, is_reversed=False)
             swaps.append(swap)
             curr_basis_solution = BasisSolution(auxiliary_form, new_basis, new_free)
             result.append(curr_basis_solution)

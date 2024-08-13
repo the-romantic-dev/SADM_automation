@@ -9,6 +9,7 @@ from tasks.task1_2_lp.model.solvers.reverse_symplex_solver.new_constraint_genera
 from tasks.task1_2_lp.view.auxiliary_task.auxiliary_task_tf import AuxiliaryTaskTF
 from tasks.task1_2_lp.view.bruteforce_solution.bruteforce_solution_tf import BruteforceSolutionTF
 from tasks.task1_2_lp.view.canonical_problem.canonical_problem_tf import CanonicalProblemTF
+from tasks.task1_2_lp.view.dual_problem.dual_problem_tf import DualProblemTF
 from tasks.task1_2_lp.view.geometric_solution.geometric_solution_tf import GeometricSolutionTF
 from tasks.task1_2_lp.view.problem.problem_tf import ProblemTF
 from tasks.task1_2_lp.view.reverse_symplex.reverse_symplex_tf import ReverseSymplexTF
@@ -85,3 +86,7 @@ class LPProblemTF(TemplateFiller):
     def _fill_reverse_symplex_part(self):
         new_constraint = generate_new_constraint(self.bruteforce_solution)
         return ReverseSymplexTF(opt_sol=self.symplex_solution[-1], new_constraint=new_constraint)
+
+    @template_filler
+    def _fill_dual_problem_part(self):
+        return DualProblemTF(lpp=self.lpp)

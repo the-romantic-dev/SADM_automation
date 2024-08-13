@@ -8,12 +8,14 @@ from tasks.task1_2_lp.model.lp_problem.enums.comp_operator import CompOperator
 class Constraint:
     """ Класс представляет ограничение задачи линейного программирования """
 
-    def __init__(self, coeffs: list[Rational], const: Rational, comp_operator: CompOperator = CompOperator.LE):
+    def __init__(self, coeffs: list[Rational], const: Rational, comp_operator: CompOperator = CompOperator.LE,
+                 variable_symbol: str = "x"):
         """
         :param coeffs: коэффициенты при переменных левой части ограничения
         :param const: константа в правой части ограничения
         :param comp_operator: оператор сравнения в ограничении (=, <= или >=)
         """
+        self.variable_symbol = variable_symbol
         self._coeffs = coeffs
         self._comp_operator = comp_operator
         self._const = const
@@ -43,7 +45,7 @@ class Constraint:
 
     @property
     def variables(self) -> list[Symbol]:
-        return list(symbols(f"x(1:{self.vars_count + 1})"))
+        return list(symbols(f"{self.variable_symbol}(1:{self.vars_count + 1})"))
 
     @property
     def coeffs(self):
@@ -85,11 +87,6 @@ class Constraint:
                 return Le(sum(terms), self.const)
             case CompOperator.GE:
                 return Ge(sum(terms), self.const)
-
-    # @property
-    # def as_latex(self):
-    #     float_expr = replace_rationals_expr(self.as_expr)
-    #     return latex(float_expr)
 
     def expand_coefs(self, total_vars: int):
         for _ in range(total_vars - len(self._coeffs)):

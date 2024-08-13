@@ -8,12 +8,14 @@ from tasks.task1_2_lp.model.lp_problem.enums.objective_type import ObjectiveType
 class Objective:
     """ Класс, представляющий целевую функцию задачи линейного программирования """
 
-    def __init__(self, obj_type: ObjectiveType, coeffs: list[Rational], const: Rational = Rational(0)):
+    def __init__(self, obj_type: ObjectiveType, coeffs: list[Rational], const: Rational = Rational(0),
+                 variable_symbol: str = "x"):
         """
         :param obj_type: Тип задачи линейного программирования (максимизация или минимизация)
         :param coeffs: Коэффициенты переменных целевой функции
         :param const: Константная часть целевой функции. По умолчанию 0
         """
+        self.variable_symbol = variable_symbol
         self._type = obj_type
         self._coeffs = coeffs
         self._const = const
@@ -39,7 +41,7 @@ class Objective:
 
     @property
     def variables(self):
-        return list(symbols(f"x(1:{self.vars_count + 1})"))
+        return list(symbols(f"{self.variable_symbol}(1:{self.vars_count + 1})"))
 
     @property
     def vars_count(self):
@@ -65,11 +67,6 @@ class Objective:
         terms = [x[i] * self._coeffs[i] for i in range(len(self._coeffs))]
         return sum(terms) + self._const
 
-    # @property
-    # def as_latex(self) -> str:
-    #     float_expr = replace_rationals_expr(self.as_expr)
-    #     return f"max({latex(float_expr)})"
-
     def __copy__(self):
         cls = self.__class__
         result = cls.__new__(cls)
@@ -83,12 +80,6 @@ class Objective:
         for k, v in self.__dict__.items():
             setattr(result, k, deepcopy(v, memo))
         return result
-
-    # def __key(self):
-    #     return self._type, self._coefs, self._const
-    #
-    # def __hash__(self):
-    #     return hash(self.__key())
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):

@@ -34,15 +34,31 @@ def eye_row_to_cols(matrix: Matrix) -> dict[int, list[int]]:
     return result
 
 
+def inverse_objective_type(obj_type: ObjectiveType):
+    result = ObjectiveType.MIN
+    if obj_type == ObjectiveType.MIN:
+        result = obj_type.MAX
+    return result
+
+
+def inverse_comp_operator(comp_operator: CompOperator, obj_type: ObjectiveType):
+    if comp_operator == CompOperator.GE:
+        return CompOperator.LE
+    elif comp_operator == CompOperator.LE:
+        return CompOperator.GE
+    else:
+        if obj_type == ObjectiveType.MAX:
+            return CompOperator.GE
+        else:
+            return CompOperator.LE
+
+
 class LPProblem:
     M: int = 100000
 
     def __init__(self, constraints: list[Constraint], objective: Objective):
         self._constraints = constraints
         self._objective = objective
-        # self.eye_row_to_cols = None
-        # self.eye_row_to_cols = eye_row_to_cols(self.matrices[0])
-        # self.eye_rows = sorted(list(self.eye_row_to_cols.keys()))
 
     @property
     def eye_row_to_cols(self):
@@ -148,6 +164,35 @@ class LPProblem:
         result = []
         for cols in self.eye_row_to_cols.values():
             result.append(cols[0])
+        return result
+
+    def get_dual_problem(self, variable_symbol: str):
+        A, b, C = self.matrices
+
+        new_obj_type = inverse_objective_type(self.objective.type)
+        new_obj_coeffs = b.T.tolist()[0]
+        new_objective = Objective(
+            obj_type=new_obj_type,
+            coeffs=new_obj_coeffs,
+            const=self._objective.const,
+            variable_symbol=variable_symbol)
+
+        new_A: list[list[Rational]] = A.T.tolist()
+        if self.is_canonical:
+            new_A = new_A[:-A.rows]
+        new_b = C.T.tolist()[0]
+        new_comp_operator = inverse_comp_operator(self.constraints[0].comp_operator, self.objective.type)
+        new_constraints = [Constraint(
+            coeffs=coeffs,
+            const=const,
+            comp_operator=new_comp_operator,
+            variable_symbol=variable_symbol
+        ) for coeffs, const in zip(new_A, new_b)]
+
+        result = LPProblem(
+            constraints=new_constraints,
+            objective=new_objective
+        )
         return result
 
     @property

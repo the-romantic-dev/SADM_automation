@@ -7,7 +7,7 @@ from report.model.elements.formula import Formula
 from report.model.template.filler_decorators import text, elements_list, formula, document
 from report.model.template.template_filler import TemplateFiller
 from tasks.task1_2_lp.viewmodel.basis_solution_viewmodel import BasisSolutionViewModel
-from tasks.task1_2_lp.view.bruteforce_step.acceptability_marker.acceptability_marker_tf import AcceptabilityMarkerTF
+from tasks.task1_2_lp.view.bruteforce_solution.bruteforce_step.acceptability_marker.acceptability_marker_tf import AcceptabilityMarkerTF
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 
 package_path = Path(os.path.dirname(os.path.abspath(__file__)))

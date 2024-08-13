@@ -7,8 +7,8 @@ from tasks.task1_2_lp.model.lp_problem.lp_problem import LPProblem
 from tasks.task1_2_lp.model.lp_problem.objective.objective import Objective
 
 
-def get_non_negative_vars_latex(vars_count: int):
-    result = [f"x_{i + 1} \\ge 0" for i in range(vars_count)]
+def get_non_negative_vars_latex(vars_count: int, variable_symbol: str = "x"):
+    result = [f"{variable_symbol}_{i + 1} \\ge 0" for i in range(vars_count)]
     return ",".join(result)
 
 
@@ -25,18 +25,13 @@ def problem_latex(lp_problem: LPProblem) -> list[str]:
     obj = lp_problem.objective
     constraints = lp_problem.constraints
     result = []
-    # obj_variables = obj.variables
-    # obj_coeffs = obj.coeffs
-    # for i in range(len(obj_coeffs)):
-    #     if obj_coeffs[i] >= LPProblem.M:
-    #         obj_variables[i] *= sign(obj_coeffs[i]) * symbols('M')
     obj_latex = f"max({expression_latex(obj.coeffs, obj.variables, obj.const)})"
     result.append(obj_latex)
     for constraint in constraints:
         constraint_expression_latex = expression_latex(constraint.coeffs, constraint.variables)
         constraint_latex = f"{constraint_expression_latex}{comp_operator_sign(constraint.comp_operator)}{rational_latex(constraint.const)}"
         result.append(constraint_latex)
-    result.append(get_non_negative_vars_latex(lp_problem.var_count))
+    result.append(get_non_negative_vars_latex(lp_problem.var_count, variable_symbol=obj.variable_symbol))
     return result
 
 
@@ -49,6 +44,9 @@ class LPProblemViewModel:
 
     def canonical_problem_latex(self) -> list[str]:
         return problem_latex(self.lp_problem.canonical_form)
+
+    def dual_problem_latex(self) -> list[str]:
+        return problem_latex(self.lp_problem.get_dual_problem(variable_symbol="y"))
 
     def auxiliary_form_latex(self) -> list[str]:
         return problem_latex(self.lp_problem.auxiliary_form)

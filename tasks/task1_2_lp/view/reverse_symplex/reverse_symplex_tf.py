@@ -45,7 +45,7 @@ class ReverseSymplexTF(SolutionTF):
 
     @formula
     def _fill_new_var(self):
-        return Formula(f"x_{self.new_var}")
+        return Formula(f"x_{self.new_var + 1}")
 
     @formula
     def _fill_new_var_expression(self):

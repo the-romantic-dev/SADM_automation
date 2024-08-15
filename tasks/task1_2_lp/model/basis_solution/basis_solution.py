@@ -1,3 +1,5 @@
+from functools import cached_property
+
 from sympy import symbols, solve, Expr, Symbol, Rational
 from tasks.task1_2_lp.model.lp_problem.lp_problem import LPProblem
 
@@ -72,7 +74,7 @@ class BasisSolution:
             result.append(const)
         return result
 
-    @property
+    @cached_property
     def solution(self):
         result = []
         var_count = self.lp_problem.canonical_form.var_count

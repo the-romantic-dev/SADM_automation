@@ -92,11 +92,14 @@ class Constraint:
         for _ in range(total_vars - len(self._coeffs)):
             self._coeffs.append(Rational(0))
 
-    def __str__(self):
-        eq = self.as_expr
-        return pretty(eq)
-
     def __repr__(self):
+        # return str(self.as_expr)
+        return str(self.as_expr)
+
+    def pretty_str(self):
+        return pretty(self.as_expr)
+
+    def __str__(self):
         return str(self.as_expr)
 
     def __eq__(self, other):

@@ -6,6 +6,7 @@ from scipy.spatial import ConvexHull
 from shapely import Point
 from sympy import pretty
 
+from report.model.report_prettifier import rational_str
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 from tasks.task1_2_lp.model.lp_problem.constraint.constraint import Constraint
 from tasks.task1_2_lp.model.lp_problem.lp_problem import LPProblem
@@ -109,7 +110,7 @@ class LPPPlot(Plot):
             b2 = pretty(sol.basis_variables[1])
             b1_value = sol.solution[sol.basis[0]]
             b2_value = sol.solution[sol.basis[1]]
-            label = f"Базис: \n{b1} = {b1_value}\n{b2} = {b2_value}"
+            label = f"Базис: \n{b1} = {rational_str(b1_value)}\n{b2} = {rational_str(b2_value)}"
             annotation = self.add_annotation(label, pos, text_offset=(0, 0), va='center',
                                              arrow_properties=dict(arrowstyle='-'), z_order=2)
             annotations.append(annotation)

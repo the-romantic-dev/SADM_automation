@@ -71,7 +71,7 @@ class LPPPlot(Plot):
     def _add_constraints(self):
         plot_data = self.constraints_plot_data
         for pd in plot_data:
-            data = self.add_plot(x=pd.x, y=pd.y, color=pd.color)
+            self.add_plot(x=pd.x, y=pd.y, color=pd.color)
 
     def _add_constraints_annotations(self):
         plot_data = self.constraints_plot_data
@@ -81,7 +81,7 @@ class LPPPlot(Plot):
             mid_point = (annotated_section[0] + annotated_section[1]) // 2
             mid_x = float(pd.x[mid_point])
             mid_y = float(pd.y[mid_point])
-            data = self.add_annotation(
+            self.add_annotation(
                 text=pd.constraint.pretty_str(),
                 point=Point(mid_x, mid_y),
                 ha="center", va="bottom",

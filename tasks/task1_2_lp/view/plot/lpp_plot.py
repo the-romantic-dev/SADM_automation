@@ -1,18 +1,20 @@
 from functools import cached_property
 
 import numpy as np
-from adjustText import adjust_text
-from matplotlib.collections import PathCollection
-from matplotlib.patches import Polygon
-from matplotlib.transforms import Bbox
+from matplotlib.text import Annotation
 from scipy.spatial import ConvexHull
+from shapely import Point
 from sympy import pretty
 
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
+from tasks.task1_2_lp.model.lp_problem.constraint.constraint import Constraint
 from tasks.task1_2_lp.model.lp_problem.lp_problem import LPProblem
+
+from tasks.task1_2_lp.view.plot.annotation_rectangle import AnnotationRectangle
+from tasks.task1_2_lp.view.plot.constraint_line import ConstraintLine
 from tasks.task1_2_lp.view.plot.constraint_plot_data import ConstraintPlotData
 from tasks.task1_2_lp.view.plot.dataclasses.ax_bounds import AxBounds
-from tasks.task1_2_lp.view.plot.dataclasses.position import Position
+from tasks.task1_2_lp.view.plot.ellipse import Ellipse
 from tasks.task1_2_lp.view.plot.plot import Plot
 
 
@@ -23,7 +25,6 @@ class LPPPlot(Plot):
         self.ax_bounds = AxBounds.get_from_solutions(solutions, padding=5.0)
         self.lpp = lpp
         self.solutions = solutions
-        self.objects = []
         super().__init__(self.ax_bounds)
 
     @cached_property
@@ -41,11 +42,36 @@ class LPPPlot(Plot):
         self._add_solution_points()
         self._add_points_annotation()
 
+    def _adjust_annotations(self, annotations: list[Annotation], offset_radius: float):
+        constraints = self.lpp.constraints + Constraint.get_non_negative_constraints(vars_count=2)
+        lines = [ConstraintLine(constraint).line_string(self.ax_bounds) for constraint in constraints]
+        rectangles = [AnnotationRectangle(annotations[i], self.ax, margin=1) for i in range(len(annotations))]
+        for i in range(len(rectangles)):
+            curr_rect = rectangles[i]
+            other_rectangles = rectangles[:i] + rectangles[i + 1:]
+            ellipse = Ellipse(
+                center=curr_rect.anchor_point,
+                width=curr_rect.width + offset_radius * 2,
+                height=curr_rect.height + offset_radius * 2,
+            )
+
+            objects = lines + other_rectangles
+            point_to_area = dict()
+            for p in ellipse.points(resolution=100):
+                curr_rect.center = p
+                area = 0
+                for obj in objects:
+                    area += curr_rect.intersection_area(obj)
+                point_to_area[p] = area
+            best_point = min(point_to_area, key=point_to_area.get)
+
+            annotations[i].anncoords = 'data'
+            annotations[i].set_position((best_point.x, best_point.y))
+
     def _add_constraints(self):
         plot_data = self.constraints_plot_data
         for pd in plot_data:
             data = self.add_plot(x=pd.x, y=pd.y, color=pd.color)
-            # self.objects.extend(data)
 
     def _add_constraints_annotations(self):
         plot_data = self.constraints_plot_data
@@ -57,54 +83,35 @@ class LPPPlot(Plot):
             mid_y = float(pd.y[mid_point])
             data = self.add_annotation(
                 text=pd.constraint.pretty_str(),
-                position=Position(x=mid_x, y=mid_y),
+                point=Position(x=mid_x, y=mid_y),
+                ha="center", va="bottom",
+                text_offset=(0, 10),
                 angle=pd.angle(self.aspect),
                 fill_color=pd.color,
                 alpha=0.3
             )
-            self.objects.append(data.get_window_extent())
 
     def _add_acceptable_field_fill(self):
         acceptable_sols = filter(lambda sol: sol.is_acceptable, self.solutions)
         positions = np.asarray([(float(sol.solution[0]), float(sol.solution[1])) for sol in acceptable_sols])
         hull = ConvexHull(positions)
         hull_points = positions[hull.vertices]
-        data: list[Polygon] = self.add_fill(x=hull_points[:, 0], y=hull_points[:, 1], color='#FFB4BB', alpha=0.9)
-
-        self.objects.extend([d.get_window_extent() for d in data])
+        self.add_fill(x=hull_points[:, 0], y=hull_points[:, 1], color='#FFB4BB', alpha=0.9, z_order=1)
 
     def _add_solution_points(self):
-        positions = [Position(float(sol.solution[0]), float(sol.solution[1])) for sol in self.solutions]
-        data = self.add_points(positions, size=50, color='#BAFFC9', z_order=3)
-        box_half_width = 5
-
-        def bbox(pos: Position):
-            points = np.asarray([
-                [pos.x - box_half_width, pos.y - box_half_width],
-                [pos.x + box_half_width, pos.y + box_half_width]
-            ])
-            return Bbox(points=points)
-
-        bboxes = [bbox(pos) for pos in positions]
-        self.objects.extend(bboxes)
+        positions = [Point(float(sol.solution[0]), float(sol.solution[1])) for sol in self.solutions]
+        self.add_points(positions, size=50, color='#BAFFC9', z_order=3)
 
     def _add_points_annotation(self):
         annotations = []
-        positions = [Position(float(sol.solution[0]), float(sol.solution[1])) for sol in self.solutions]
+        positions = [Point(float(sol.solution[0]), float(sol.solution[1])) for sol in self.solutions]
         for pos, sol in zip(positions, self.solutions):
             b1 = pretty(sol.basis_variables[0])
             b2 = pretty(sol.basis_variables[1])
             b1_value = sol.solution[sol.basis[0]]
             b2_value = sol.solution[sol.basis[1]]
             label = f"Базис: \n{b1} = {b1_value}\n{b2} = {b2_value}"
-            annotation = self.add_annotation(label, pos, text_offset=(0, 0),
-                                             arrow_properties=dict(facecolor='black', shrink=0.05))
+            annotation = self.add_annotation(label, pos, text_offset=(0, 0), va='center',
+                                             arrow_properties=dict(arrowstyle='-'), z_order=2)
             annotations.append(annotation)
-
-        adjust_text(texts=annotations,
-                    expand_text=(1, 1),
-                    ha='center', va='top',
-                    force_text=.6,
-                    lim=277,
-                    force_points=0.1,
-                    objects=self.objects)
+        self._adjust_annotations(annotations, offset_radius=0.8)

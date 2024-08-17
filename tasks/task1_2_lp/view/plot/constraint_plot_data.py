@@ -1,10 +1,10 @@
 from functools import cached_property
 
 import numpy as np
+from shapely import Point
 from sympy import Expr
 
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
-from tasks.task1_2_lp.view.plot.dataclasses.position import Position
 from tasks.task1_2_lp.view.plot.plot import AxBounds
 from tasks.task1_2_lp.model.lp_problem.constraint.constraint import Constraint
 
@@ -63,12 +63,15 @@ class ConstraintPlotData:
         return result
 
     def get_widest_section_indices(self, belonging_solutions: list[BasisSolution]) -> tuple[int, int]:
-        positions = [Position(sol.solution[0], sol.solution[1]) for sol in belonging_solutions]
-        constraint_ends = [Position(float(self.x[0]), float(self.y[0])), Position(float(self.x[-1]), float(self.y[-1]))]
-        positions.extend(constraint_ends)
-        positions = sorted(positions, key=lambda pos: pos.x)
+        points = [Point(sol.solution[0], sol.solution[1]) for sol in belonging_solutions]
+        constraint_ends = [
+            Point(float(self.x[0]), float(self.y[0])),
+            Point(float(self.x[-1]), float(self.y[-1]))
+        ]
+        points.extend(constraint_ends)
+        points = sorted(points, key=lambda pos: pos.x)
 
-        def distance(pos1: Position, pos2: Position):
+        def distance(pos1: Point, pos2: Point):
             x1, y1 = pos1.x, pos1.y
             x2, y2 = pos2.x, pos2.y
             dx = float(x2 - x1)
@@ -78,14 +81,14 @@ class ConstraintPlotData:
         def widest_section_positions():
             max_distance = -1
             max_section_positions = []
-            for i in range(1, len(positions)):
-                dist = distance(positions[i - 1], positions[i])
+            for i in range(1, len(points)):
+                dist = distance(points[i - 1], points[i])
                 if dist > max_distance:
                     max_distance = dist
-                    max_section_positions = [positions[i - 1], positions[i]]
+                    max_section_positions = [points[i - 1], points[i]]
             return max_section_positions
 
-        def find_nearest_pos_index(pos: Position) -> int:
+        def find_nearest_pos_index(pos: Point) -> int:
             value = pos.x
             idx = (np.abs(self.x - value)).argmin()
             return idx

@@ -3,9 +3,9 @@ from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
+from shapely import Point
 
 from tasks.task1_2_lp.view.plot.dataclasses.ax_bounds import AxBounds
-from tasks.task1_2_lp.view.plot.dataclasses.position import Position
 
 
 def set_desmos_style(ax: Axes):
@@ -71,7 +71,8 @@ class Plot:
 
     def add_annotation(self,
                        text: str,
-                       position: Position,
+                       point: Point,
+                       ha='center', va='bottom',
                        text_offset: tuple[int, int] = (0, 10),
                        angle: float = 0,
                        fill_color: str = 'white',
@@ -87,10 +88,10 @@ class Plot:
 
         return self.ax.annotate(
             text=text,
-            xy=(position.x, position.y),
+            xy=(point.x, point.y),
             xytext=text_offset,
             textcoords='offset points',
-            ha='center', va='bottom',
+            ha=ha, va=va,
             rotation=angle,
             rotation_mode='anchor',
             bbox=dict(boxstyle='round,pad=0.5', fc=fill_color, ec=border_color, alpha=alpha),
@@ -99,13 +100,14 @@ class Plot:
             zorder=z_order
         )
 
-    def add_fill(self, x: np.ndarray, y: np.ndarray, color: str, alpha: float):
-        return self.ax.fill(x, y, color, alpha=alpha)
+    def add_fill(self, x: np.ndarray, y: np.ndarray, color: str, alpha: float, z_order=3):
+        return self.ax.fill(x, y, color, alpha=alpha, zorder=z_order)
 
-    def add_points(self, positions: list[Position], size: float, color: str, z_order: int):
-        x = [pos.x for pos in positions]
-        y = [pos.y for pos in positions]
-        return self.ax.scatter(x=x, y=y, s=size, c=color, zorder=z_order, linewidths=1.5, edgecolors="#000000")
+    def add_points(self, points: list[Point], size: float, color: str, z_order: int, line_width=1.5,
+                   line_color="#000000"):
+        x = [pos.x for pos in points]
+        y = [pos.y for pos in points]
+        return self.ax.scatter(x=x, y=y, s=size, c=color, zorder=z_order, linewidths=line_width, edgecolors=line_color)
 
     def show(self):
         self.add_all()

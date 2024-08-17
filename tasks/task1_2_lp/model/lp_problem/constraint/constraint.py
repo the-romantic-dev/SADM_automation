@@ -43,6 +43,15 @@ class Constraint:
         """ Количество переменных в ограничении """
         return len(self._coeffs)
 
+    @staticmethod
+    def get_non_negative_constraints(vars_count: int):
+        result: list[Constraint] = []
+        for i in range(vars_count):
+            coeffs = [Rational(0) for _ in range(vars_count)]
+            coeffs[i] = Rational(1)
+            result.append(Constraint(coeffs, const=Rational(0), comp_operator=CompOperator.GE))
+        return result
+
     @property
     def variables(self) -> list[Symbol]:
         return list(symbols(f"{self.variable_symbol}(1:{self.vars_count + 1})"))

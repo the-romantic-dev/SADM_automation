@@ -3,7 +3,7 @@ from sympy import Rational, primefactors, latex, Symbol, sign, Expr
 from tasks.task1_2_lp.model.lp_problem.lp_problem import LPProblem
 
 
-def rational_latex(rational: Rational):
+def _rational_pretty(rational: Rational, frac_str: str):
     if not isinstance(rational, Rational):
         return latex(rational)
 
@@ -21,13 +21,49 @@ def rational_latex(rational: Rational):
             num = float(rational)
             result = f"{num:.10f}".rstrip('0')
         else:
-            if rational.p * rational.q < 0:
-                op = " - "
-            else:
-                op = ""
-
-            result = f"{op} \\frac{{{abs(rational.p)}}}{{{abs(rational.q)}}}"
+            result = frac_str
     return result
+
+
+def rational_str(rational: Rational):
+    return _rational_pretty(rational, frac_str=str(rational))
+
+
+def rational_latex(rational: Rational):
+    if rational.p * rational.q < 0:
+        op = " - "
+    else:
+        op = ""
+
+    frac_str = f"{op} \\frac{{{abs(rational.p)}}}{{{abs(rational.q)}}}"
+    return _rational_pretty(rational, frac_str=frac_str)
+
+
+# def rational_latex(rational: Rational):
+#     if not isinstance(rational, Rational):
+#         return latex(rational)
+#
+#     def is_finite_float():
+#         q_prime_factors = set(primefactors(rational.q))
+#         for factor in q_prime_factors:
+#             if factor not in [2, 5]:
+#                 return False
+#         return True
+#
+#     if rational.q == 1:
+#         result = str(rational.p)
+#     else:
+#         if is_finite_float():
+#             num = float(rational)
+#             result = f"{num:.10f}".rstrip('0')
+#         else:
+#             if rational.p * rational.q < 0:
+#                 op = " - "
+#             else:
+#                 op = ""
+#
+#             result = f"{op} \\frac{{{abs(rational.p)}}}{{{abs(rational.q)}}}"
+#     return result
 
 
 def rational_coeff_term_latex(coeff: Rational, var: Symbol):

@@ -10,11 +10,11 @@ from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 from tasks.task1_2_lp.model.lp_problem.constraint.constraint import Constraint
 from tasks.task1_2_lp.model.lp_problem.lp_problem import LPProblem
 
-from tasks.task1_2_lp.view.plot.annotation_rectangle import AnnotationRectangle
-from tasks.task1_2_lp.view.plot.constraint_line import ConstraintLine
-from tasks.task1_2_lp.view.plot.constraint_plot_data import ConstraintPlotData
+from tasks.task1_2_lp.view.plot.util.annotation_rectangle import AnnotationRectangle
+from tasks.task1_2_lp.view.plot.util.constraint_line import ConstraintLine
+from tasks.task1_2_lp.view.plot.util.constraint_plot_data import ConstraintPlotData
 from tasks.task1_2_lp.view.plot.dataclasses.ax_bounds import AxBounds
-from tasks.task1_2_lp.view.plot.ellipse import Ellipse
+from tasks.task1_2_lp.view.plot.util.ellipse import Ellipse
 from tasks.task1_2_lp.view.plot.plot import Plot
 
 

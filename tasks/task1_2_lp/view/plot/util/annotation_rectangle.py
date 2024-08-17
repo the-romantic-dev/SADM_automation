@@ -11,14 +11,27 @@ from shapely.ops import split
 def rectangle(annotation: Annotation, ax: Axes, margin: float) -> Polygon:
     pixel_bbox = annotation.get_window_extent()
     x0, y0, width, height = pixel_bbox.bounds
+
     inv_transform = ax.transData.inverted()
     points = np.array([[x0, y0], [x0 + width, y0 + height]])
     inv_points = list(inv_transform.transform(points))
+    x0, y0, x1, y1 = inv_points[0][0], inv_points[0][1], inv_points[1][0], inv_points[1][1]
+
+    width = x1 - x0
+    height = y1 - y0
+
+    coefficient = width / height
+
+    margined_height = height + margin
+    margined_width = coefficient * margined_height
+    width_margin = (margined_width - width) / 2
+    height_margin = (margined_height - height) / 2
+
     result = box(
-        xmin=inv_points[0][0] - margin / 2,
-        ymin=inv_points[0][1] - margin / 2,
-        xmax=inv_points[1][0] + margin / 2,
-        ymax=inv_points[1][1] + margin / 2)
+        xmin=x0 - width_margin,
+        ymin=y0 - height_margin,
+        xmax=x1 + width_margin,
+        ymax=y1 + height_margin)
     return result
 
 

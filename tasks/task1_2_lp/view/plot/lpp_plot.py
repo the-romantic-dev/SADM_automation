@@ -14,7 +14,7 @@ from tasks.task1_2_lp.view.plot.util.annotation_rectangle import AnnotationRecta
 from tasks.task1_2_lp.view.plot.util.constraint_line import ConstraintLine
 from tasks.task1_2_lp.view.plot.util.constraint_plot_data import ConstraintPlotData
 from tasks.task1_2_lp.view.plot.dataclasses.ax_bounds import AxBounds
-from tasks.task1_2_lp.view.plot.util.ellipse import Ellipse
+from tasks.task1_2_lp.view.plot.util.contur import Contur
 from tasks.task1_2_lp.view.plot.plot import Plot
 
 
@@ -22,7 +22,7 @@ class LPPPlot(Plot):
     def __init__(self, lpp: LPProblem, solutions: list[BasisSolution]):
         if lpp.var_count != 2:
             raise ValueError("Нельзя отобразить на графике ЗЛП где количество переменных не равно 2")
-        self.ax_bounds = AxBounds.get_from_solutions(solutions, padding=5.0)
+        self.ax_bounds = AxBounds.get_from_solutions(solutions, padding=7.0)
         self.lpp = lpp
         self.solutions = solutions
         super().__init__(self.ax_bounds)
@@ -45,19 +45,18 @@ class LPPPlot(Plot):
     def _adjust_annotations(self, annotations: list[Annotation], offset_radius: float):
         constraints = self.lpp.constraints + Constraint.get_non_negative_constraints(vars_count=2)
         lines = [ConstraintLine(constraint).line_string(self.ax_bounds) for constraint in constraints]
-        rectangles = [AnnotationRectangle(annotations[i], self.ax, margin=1) for i in range(len(annotations))]
+        rectangles = [AnnotationRectangle(annotations[i], self.ax, margin=1.5) for i in range(len(annotations))]
         for i in range(len(rectangles)):
             curr_rect = rectangles[i]
             other_rectangles = rectangles[:i] + rectangles[i + 1:]
-            ellipse = Ellipse(
-                center=curr_rect.anchor_point,
-                width=curr_rect.width + offset_radius * 2,
-                height=curr_rect.height + offset_radius * 2,
+            contur = Contur(
+                rectangle=curr_rect,
+                radius=offset_radius,
             )
-
+            # self.add_points(contur.points(resolution=100), size=10, color='r', z_order=10, line_color='r')
             objects = lines + other_rectangles
             point_to_area = dict()
-            for p in ellipse.points(resolution=100):
+            for p in contur.points(resolution=100):
                 curr_rect.center = p
                 area = 0
                 for obj in objects:

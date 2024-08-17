@@ -83,7 +83,7 @@ class LPPPlot(Plot):
             mid_y = float(pd.y[mid_point])
             data = self.add_annotation(
                 text=pd.constraint.pretty_str(),
-                point=Position(x=mid_x, y=mid_y),
+                point=Point(mid_x, mid_y),
                 ha="center", va="bottom",
                 text_offset=(0, 10),
                 angle=pd.angle(self.aspect),

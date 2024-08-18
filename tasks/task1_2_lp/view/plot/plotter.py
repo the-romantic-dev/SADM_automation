@@ -48,7 +48,7 @@ def set_ax_limits(ax: Axes, box: AxBounds, square_grid: bool, figure_size: tuple
         ax.set_ylim(box.bottom_y, box.top_y)
 
 
-class Plot:
+class Plotter:
     def __init__(self,
                  ax_bounds: AxBounds,
                  figure_size: tuple[int, int] = (16, 10),

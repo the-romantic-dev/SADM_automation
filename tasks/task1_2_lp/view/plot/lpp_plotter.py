@@ -16,12 +16,12 @@ from tasks.task1_2_lp.view.plot.util.constraint_line import ConstraintLine
 from tasks.task1_2_lp.view.plot.util.constraint_plot_data import ConstraintPlotData
 from tasks.task1_2_lp.view.plot.dataclasses.ax_bounds import AxBounds
 from tasks.task1_2_lp.view.plot.util.contur import Contur
-from tasks.task1_2_lp.view.plot.plot import Plot
+from tasks.task1_2_lp.view.plot.plotter import Plotter
 from tasks.task1_2_lp.view.plot.util.objective_line import ObjectiveLine
 from tasks.task1_2_lp.view.plot.util.objective_plot_data import ObjectivePlotData
 
 
-class LPPPlot(Plot):
+class LPPPlotter(Plotter):
     def __init__(self, lpp: LPProblem, solutions: list[BasisSolution]):
         if lpp.var_count != 2:
             raise ValueError("Нельзя отобразить на графике ЗЛП где количество переменных не равно 2")
@@ -51,7 +51,6 @@ class LPPPlot(Plot):
         self._add_solution_points()
         self._add_objective()
         self._add_points_annotation()
-
 
     def _adjust_annotations(self, annotations: list[Annotation], offset_radius: float):
         constraints = self.lpp.constraints + Constraint.get_non_negative_constraints(vars_count=2)

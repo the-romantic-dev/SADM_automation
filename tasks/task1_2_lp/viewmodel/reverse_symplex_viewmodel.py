@@ -1,5 +1,5 @@
 from report.model.elements.formula import Formula
-from report.model.report_prettifier import expression_latex, rational_latex
+from report.model.report_prettifier import expr_latex, rational_latex
 from tasks.task1_2_lp.model.lp_problem.constraint.constraint import Constraint
 
 
@@ -11,7 +11,7 @@ class ReverseSymplexViewModel:
     @property
     def new_constraint_formula(self):
         formula_data = [
-            expression_latex(self.new_constraint.coeffs, self.new_constraint.variables),
+            expr_latex(self.new_constraint.coeffs, self.new_constraint.variables),
             "\\le",
             rational_latex(self.new_constraint.const)
         ]
@@ -21,7 +21,7 @@ class ReverseSymplexViewModel:
     def new_constraint_canonical_formula(self):
         eq_constraint = self.new_constraint.eq_form(self.new_var)
         formula_data = [
-            expression_latex(eq_constraint.coeffs, eq_constraint.variables),
+            expr_latex(eq_constraint.coeffs, eq_constraint.variables),
             "=",
             rational_latex(eq_constraint.const)
         ]

@@ -1,6 +1,6 @@
 from sympy import latex
 
-from report.model.report_prettifier import expression_latex
+from report.model.report_prettifier import expr_latex
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 
 
@@ -28,7 +28,7 @@ class BasisSolutionViewModel:
         free_variables = self.basis_solution.free_variables
         basis_values = self.basis_solution.basis_values
         for coeffs, constant, variable in zip(basis_coeffs, basis_values, basis_variables):
-            result.append(f"{latex(variable)} = {expression_latex(coeffs, free_variables, constant)}")
+            result.append(f"{latex(variable)} = {expr_latex(coeffs, free_variables, constant)}")
         return result
 
     @property
@@ -36,4 +36,4 @@ class BasisSolutionViewModel:
         coeffs = self.basis_solution.objective_coeffs
         variables = self.basis_solution.free_variables
         const = self.basis_solution.objective_value
-        return f"f = {expression_latex(coeffs, variables, const)}"
+        return f"f = {expr_latex(coeffs, variables, const)}"

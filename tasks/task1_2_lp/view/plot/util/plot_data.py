@@ -1,3 +1,4 @@
+from abc import abstractmethod, ABC
 from dataclasses import dataclass
 from functools import cached_property
 
@@ -10,14 +11,16 @@ from tasks.task1_2_lp.view.plot.dataclasses.ax_bounds import AxBounds
 
 
 @dataclass
-class LinearPlotData:
+class LinearPlotData(ABC):
     coeffs: list[Rational]
     const: float
     ax_bounds: AxBounds
     resolution: int
-    expr: Expr
-    variables: list[Symbol]
     color: str
+
+    def __post_init__(self):
+        if len(self.coeffs) != 2:
+            raise ValueError("Incorrect LPP size")
 
     def y_value(self, x: float | np.ndarray):
         ax, ay = self.coeffs
@@ -37,32 +40,24 @@ class LinearPlotData:
     def y(self):
         return self.y_value(self.x)
 
-    def angle(self, aspect: float) -> float:
-        """ Угол графика в градусах. Зависит от размерности aspect всего plot-a"""
-        dx = self.x[-1] - self.x[0]
-        dy = self.y[-1] - self.y[0]
-        return np.degrees(np.arctan2(dy * aspect, dx))
-
-    def get_belonging_solutions(self, solutions: list[BasisSolution]) -> list[BasisSolution]:
-        def is_sol_belonging(_sol: BasisSolution):
+    def get_belonging_intersections(self, intersections: list[Point]) -> list[Point]:
+        def is_point_belonging(_p: Point):
             tol = 1e-3
-            solution = _sol.solution
-            variables = self.variables
-            expr: Expr = self.expr
-            result_value = float(expr.subs({variables[i]: solution[i] for i in range(len(variables))}))
+            point_coords = [_p.x, _p.y]
+            result_value = sum([float(c_i) * p_i for c_i, p_i in zip(self.coeffs, point_coords)])
             expected_value = self.const
             diff = expected_value - result_value
             return abs(diff) < tol
 
         result = []
 
-        for sol in solutions:
-            if is_sol_belonging(sol):
-                result.append(sol)
+        for p in intersections:
+            if is_point_belonging(p):
+                result.append(p)
         return result
 
-    def get_widest_section_indices(self, belonging_solutions: list[BasisSolution]) -> tuple[int, int]:
-        points = [Point(sol.solution[0], sol.solution[1]) for sol in belonging_solutions]
+    def get_widest_section_indices(self, belonging_points: list[Point]) -> tuple[int, int]:
+        points = belonging_points
         constraint_ends = [
             Point(float(self.x[0]), float(self.y[0])),
             Point(float(self.x[-1]), float(self.y[-1]))
@@ -95,3 +90,8 @@ class LinearPlotData:
         section_sols = widest_section_positions()
         result = (find_nearest_pos_index(section_sols[0]), find_nearest_pos_index(section_sols[1]))
         return result
+
+    @property
+    @abstractmethod
+    def annotation_text(self):
+        pass

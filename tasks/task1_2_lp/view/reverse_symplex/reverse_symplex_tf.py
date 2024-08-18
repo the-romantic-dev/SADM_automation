@@ -4,7 +4,7 @@ from pathlib import Path
 from report.model.elements.formula import Formula
 from report.model.elements.paragraph import Paragraph
 from report.model.elements.plain_text import PlainText
-from report.model.report_prettifier import expression_latex
+from report.model.report_prettifier import expr_latex
 from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import formula, elements_list
 from report.model.template.template_filler import TemplateFiller
@@ -57,7 +57,7 @@ class ReverseSymplexTF(SolutionTF):
             basis=self.new_basis,
             free=old_opt_sol.free
         )
-        new_constraint_expression = expression_latex(
+        new_constraint_expression = expr_latex(
             coeffs=old_opt_ext_basis_sol.basis_coeffs[-1],
             variables=old_opt_ext_basis_sol.free_variables,
             constant=old_opt_ext_basis_sol.basis_values[-1]

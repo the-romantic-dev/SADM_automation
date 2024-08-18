@@ -6,21 +6,20 @@ from scipy.spatial import ConvexHull
 from shapely import Point
 from sympy import pretty
 
-from report.model.report_prettifier import rational_str, expression_latex
+from report.model.report_prettifier import rational_str, expr_latex
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 from tasks.task1_2_lp.model.lp_problem.constraint.constraint import Constraint
 from tasks.task1_2_lp.model.lp_problem.lp_problem import LPProblem
 from tasks.task1_2_lp.view.plot.plotters.constraints_plotter import ConstraintsPlotter
+from tasks.task1_2_lp.view.plot.plotters.linear_annotations_plotter import LinearAnnotationsPlotter
 from tasks.task1_2_lp.view.plot.plotters.objective_plotter import ObjectivePlotter
 
 from tasks.task1_2_lp.view.plot.util.annotation_rectangle import AnnotationRectangle
 from tasks.task1_2_lp.view.plot.util.constraint_line import ConstraintLine
-from tasks.task1_2_lp.view.plot.util.constraint_plot_data import ConstraintPlotData
 from tasks.task1_2_lp.view.plot.dataclasses.ax_bounds import AxBounds
 from tasks.task1_2_lp.view.plot.util.contur import Contur
 from tasks.task1_2_lp.view.plot.plotter import Plotter
 from tasks.task1_2_lp.view.plot.util.objective_line import ObjectiveLine
-from tasks.task1_2_lp.view.plot.util.objective_plot_data import ObjectivePlotData
 
 
 class LPPPlotter(Plotter):
@@ -35,24 +34,18 @@ class LPPPlotter(Plotter):
 
         self.constraints_plotter = ConstraintsPlotter(constraints=lpp.constraints)
         self.objective_plotter = ObjectivePlotter(objective=lpp.objective, opt_sol=self.opt_sol)
-
-    @cached_property
-    def constraints_plot_data(self):
-        result = []
-        for constraint in self.lpp.constraints:
-            cpd = ConstraintPlotData(constraint, resolution=1000, ax_bounds=self.ax_bounds)
-            result.append(cpd)
-        return result
-
-    @cached_property
-    def objective_plot_data(self):
-        return ObjectivePlotData(self.lpp.objective, opt_sol=self.opt_sol, ax_bounds=self.ax_bounds, resolution=100)
+        self.linear_annotations_plotter = LinearAnnotationsPlotter([
+            *self.constraints_plotter.plot_data(self.ax_bounds, resolution=100),
+            self.objective_plotter.plot_data(self.ax_bounds, resolution=100),
+        ])
 
     def add_all(self):
         self.constraints_plotter.plot(self.ax, self.ax_bounds, resolution=100)
         self.objective_plotter.plot(self.ax, self.ax_bounds, resolution=100)
-        self._add_constraints_annotations()
-        self._add_objective_annotation()
+        self.linear_annotations_plotter.plot(
+            self.ax, self.aspect,
+            intersections=[Point(sol.solution[0], sol.solution[1]) for sol in self.solutions])
+
         self._add_acceptable_field_fill()
         self._add_solution_points()
 
@@ -83,55 +76,6 @@ class LPPPlotter(Plotter):
             annotations[i].anncoords = 'data'
             annotations[i].set_position((best_point.x, best_point.y))
             curr_rect.center = best_point
-
-    # def _add_constraints(self):
-    #     plot_data = self.constraints_plot_data
-    #     for pd in plot_data:
-    #         self.add_plot(x=pd.x, y=pd.y, color=pd.color)
-
-    # def _add_objective(self):
-    #     plot_data = ObjectivePlotData(
-    #         self.lpp.objective,
-    #         opt_sol=self.opt_sol,
-    #         ax_bounds=self.ax_bounds,
-    #         resolution=1000
-    #     )
-    #     self.add_plot(x=plot_data.x, y=plot_data.y, color=plot_data.color, line_style='--')
-
-    def _add_constraints_annotations(self):
-        plot_data = self.constraints_plot_data
-        for pd in plot_data:
-            belonging_solutions = pd.get_belonging_solutions(self.solutions)
-            annotated_section = pd.get_widest_section_indices(belonging_solutions)
-            mid_point = (annotated_section[0] + annotated_section[1]) // 2
-            mid_x = float(pd.x[mid_point])
-            mid_y = float(pd.y[mid_point])
-            self.add_annotation(
-                text=pd.constraint.pretty_str(),
-                point=Point(mid_x, mid_y),
-                ha="center", va="bottom",
-                text_offset=(0, 10),
-                angle=pd.angle(self.aspect),
-                fill_color=pd.color,
-                alpha=0.3
-            )
-
-    def _add_objective_annotation(self):
-        pd = self.objective_plot_data
-        belonging_solutions = pd.get_belonging_solutions(self.solutions)
-        annotated_section = pd.get_widest_section_indices(belonging_solutions)
-        mid_point = (annotated_section[0] + annotated_section[1]) // 2
-        mid_x = float(pd.x[mid_point])
-        mid_y = float(pd.y[mid_point])
-        self.add_annotation(
-            text=f"max({expression_latex(coeffs=pd.coeffs, variables=pd.variables)})",
-            point=Point(mid_x, mid_y),
-            ha="center", va="bottom",
-            text_offset=(0, 10),
-            angle=pd.angle(self.aspect),
-            fill_color=pd.color,
-            alpha=0.3
-        )
 
     def _add_acceptable_field_fill(self):
         acceptable_sols = filter(lambda sol: sol.is_acceptable, self.solutions)

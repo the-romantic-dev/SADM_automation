@@ -10,6 +10,8 @@ from report.model.report_prettifier import rational_str, expression_latex
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 from tasks.task1_2_lp.model.lp_problem.constraint.constraint import Constraint
 from tasks.task1_2_lp.model.lp_problem.lp_problem import LPProblem
+from tasks.task1_2_lp.view.plot.plotters.constraints_plotter import ConstraintsPlotter
+from tasks.task1_2_lp.view.plot.plotters.objective_plotter import ObjectivePlotter
 
 from tasks.task1_2_lp.view.plot.util.annotation_rectangle import AnnotationRectangle
 from tasks.task1_2_lp.view.plot.util.constraint_line import ConstraintLine
@@ -31,6 +33,9 @@ class LPPPlotter(Plotter):
         self.opt_sol = [sol for sol in solutions if sol.is_opt][0]
         super().__init__(self.ax_bounds)
 
+        self.constraints_plotter = ConstraintsPlotter(constraints=lpp.constraints)
+        self.objective_plotter = ObjectivePlotter(objective=lpp.objective, opt_sol=self.opt_sol)
+
     @cached_property
     def constraints_plot_data(self):
         result = []
@@ -44,12 +49,13 @@ class LPPPlotter(Plotter):
         return ObjectivePlotData(self.lpp.objective, opt_sol=self.opt_sol, ax_bounds=self.ax_bounds, resolution=100)
 
     def add_all(self):
-        self._add_constraints()
+        self.constraints_plotter.plot(self.ax, self.ax_bounds, resolution=100)
+        self.objective_plotter.plot(self.ax, self.ax_bounds, resolution=100)
         self._add_constraints_annotations()
         self._add_objective_annotation()
         self._add_acceptable_field_fill()
         self._add_solution_points()
-        self._add_objective()
+
         self._add_points_annotation()
 
     def _adjust_annotations(self, annotations: list[Annotation], offset_radius: float):
@@ -78,19 +84,19 @@ class LPPPlotter(Plotter):
             annotations[i].set_position((best_point.x, best_point.y))
             curr_rect.center = best_point
 
-    def _add_constraints(self):
-        plot_data = self.constraints_plot_data
-        for pd in plot_data:
-            self.add_plot(x=pd.x, y=pd.y, color=pd.color)
+    # def _add_constraints(self):
+    #     plot_data = self.constraints_plot_data
+    #     for pd in plot_data:
+    #         self.add_plot(x=pd.x, y=pd.y, color=pd.color)
 
-    def _add_objective(self):
-        plot_data = ObjectivePlotData(
-            self.lpp.objective,
-            opt_sol=self.opt_sol,
-            ax_bounds=self.ax_bounds,
-            resolution=1000
-        )
-        self.add_plot(x=plot_data.x, y=plot_data.y, color=plot_data.color, line_style='--')
+    # def _add_objective(self):
+    #     plot_data = ObjectivePlotData(
+    #         self.lpp.objective,
+    #         opt_sol=self.opt_sol,
+    #         ax_bounds=self.ax_bounds,
+    #         resolution=1000
+    #     )
+    #     self.add_plot(x=plot_data.x, y=plot_data.y, color=plot_data.color, line_style='--')
 
     def _add_constraints_annotations(self):
         plot_data = self.constraints_plot_data

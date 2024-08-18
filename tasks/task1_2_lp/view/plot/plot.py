@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
@@ -65,9 +67,9 @@ class Plot:
 
     def add_plot(self,
                  x: np.ndarray, y: np.ndarray,
-                 color: str = "#000000", width: int = 2
+                 color: str = "#000000", width: int = 2, line_style: str = '-'
                  ) -> list[Line2D]:
-        return self.ax.plot(x, y, color=color, linewidth=width)
+        return self.ax.plot(x, y, color=color, linewidth=width, linestyle=line_style)
 
     def add_annotation(self,
                        text: str,
@@ -80,7 +82,8 @@ class Plot:
                        alpha: float = 0.5,
                        font_size: int = 9,
                        arrow_properties: dict | None = None,
-                       z_order: int = 4):
+                       z_order: int = 4,
+                       font_color='black'):
         if angle > 90:
             angle -= 180
         elif angle < -90:
@@ -97,7 +100,8 @@ class Plot:
             bbox=dict(boxstyle='round,pad=0.5', fc=fill_color, ec=border_color, alpha=alpha),
             fontsize=font_size,
             arrowprops=arrow_properties,
-            zorder=z_order
+            zorder=z_order,
+            color=font_color
         )
 
     def add_fill(self, x: np.ndarray, y: np.ndarray, color: str, alpha: float, z_order=3):
@@ -113,6 +117,10 @@ class Plot:
         self.add_all()
         self.fig.show()
         plt.show()
+
+    def save(self, path: Path):
+        self.add_all()
+        self.fig.savefig(path.as_posix())
 
     def add_all(self):
         pass

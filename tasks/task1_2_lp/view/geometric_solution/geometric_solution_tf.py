@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from report.model.template.document_template import DocumentTemplate
-from report.model.template.filler_decorators import formula
+from report.model.template.filler_decorators import formula, image
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 from tasks.task1_2_lp.view.solution_tf import SolutionTF
 
@@ -13,6 +13,11 @@ class GeometricSolutionTF(SolutionTF):
         template = DocumentTemplate(template_path)
         super().__init__(template)
         self.opt_solution = opt_solution
+
+    @image
+    def _fill_solution_img(self):
+        pass
+
 
     @formula
     def _fill_result(self):

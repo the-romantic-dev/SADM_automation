@@ -39,10 +39,6 @@ def rational_latex(rational: Rational):
     return _rational_pretty(rational, frac_str=frac_str)
 
 
-# def rational_coeff_term_latex(coeff: Rational, var: Symbol):
-#     return _rational_coeff_term(coeff, var, is_latex=True)
-
-
 def _rational_coeff_term(coeff: Rational, var: Symbol, is_latex: bool):
     result = ""
     var_func = latex if is_latex else pretty
@@ -68,12 +64,15 @@ def _rational_coeff_term(coeff: Rational, var: Symbol, is_latex: bool):
     return result
 
 
-def _expression_pretty(coeffs: list[Rational | Expr], variables: list[Symbol], constant: Rational, is_latex: bool):
+def _expression_pretty(coeffs: list[float | int | Rational | Expr], variables: list[Symbol], constant: Rational,
+                       is_latex: bool):
     terms = []
 
     for coeff, var in zip(coeffs, variables):
         if isinstance(coeff, Rational):
             terms.append(_rational_coeff_term(coeff, var, is_latex))
+        elif isinstance(coeff, float | int):
+            terms.append(_rational_coeff_term(Rational(coeff), var, is_latex))
         elif isinstance(coeff, Expr):
             if is_latex:
                 terms.append(f"{latex(coeff)}{latex(var)}")
@@ -95,9 +94,9 @@ def _expression_pretty(coeffs: list[Rational | Expr], variables: list[Symbol], c
     return result
 
 
-def expr_str(coeffs: list[Rational | Expr], variables: list[Symbol], constant: Rational = Rational(0)):
+def expr_str(coeffs: list[float | int | Rational | Expr], variables: list[Symbol], constant: Rational = Rational(0)):
     return _expression_pretty(coeffs, variables, constant, is_latex=False)
 
 
-def expr_latex(coeffs: list[Rational | Expr], variables: list[Symbol], constant: Rational = Rational(0)):
+def expr_latex(coeffs: list[float | int | Rational | Expr], variables: list[Symbol], constant: Rational = Rational(0)):
     _expression_pretty(coeffs, variables, constant, is_latex=True)

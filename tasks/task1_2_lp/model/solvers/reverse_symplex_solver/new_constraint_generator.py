@@ -1,7 +1,7 @@
 from sympy import Rational, Matrix, gcd
 
-from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
-from tasks.task1_2_lp.model.lp_problem.constraint.constraint import Constraint
+from tasks.task1_2_lp.model import BasisSolution
+from tasks.task1_2_lp.model import Constraint
 
 
 def __constraint_value(coeffs, sol):

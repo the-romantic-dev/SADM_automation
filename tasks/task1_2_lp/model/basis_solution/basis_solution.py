@@ -1,7 +1,7 @@
 from functools import cached_property
 
 from sympy import symbols, solve, Expr, Symbol, Rational
-from tasks.task1_2_lp.model.lp_problem.lp_problem import LPProblem
+from tasks.task1_2_lp.model import LPProblem
 
 
 class BasisSolution:

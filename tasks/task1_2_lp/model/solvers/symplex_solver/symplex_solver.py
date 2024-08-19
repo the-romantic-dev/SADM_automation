@@ -1,5 +1,5 @@
-from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
-from tasks.task1_2_lp.model.lp_problem.lp_problem import LPProblem
+from tasks.task1_2_lp.model import BasisSolution
+from tasks.task1_2_lp.model import LPProblem
 
 
 def is_opt(sol: BasisSolution, is_reversed: bool) -> bool:

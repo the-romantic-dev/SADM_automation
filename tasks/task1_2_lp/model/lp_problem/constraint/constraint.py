@@ -2,7 +2,7 @@ from copy import deepcopy
 from typing import Type
 
 from sympy import Rational, Eq, symbols, pretty, Equality, Le, GreaterThan, LessThan, Ge, Symbol
-from tasks.task1_2_lp.model.lp_problem.enums.comp_operator import CompOperator
+from tasks.task1_2_lp.model import CompOperator
 
 
 class Constraint:

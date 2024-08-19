@@ -2,10 +2,10 @@ from copy import deepcopy
 
 from sympy import Matrix, Expr, Rational
 
-from tasks.task1_2_lp.model.lp_problem.constraint.constraint import Constraint
-from tasks.task1_2_lp.model.lp_problem.enums.comp_operator import CompOperator
-from tasks.task1_2_lp.model.lp_problem.enums.objective_type import ObjectiveType
-from tasks.task1_2_lp.model.lp_problem.objective.objective import Objective
+from tasks.task1_2_lp.model import Constraint
+from tasks.task1_2_lp.model import CompOperator
+from tasks.task1_2_lp.model import ObjectiveType
+from tasks.task1_2_lp.model import Objective
 
 
 def eye_row_to_cols(matrix: Matrix) -> dict[int, list[int]]:

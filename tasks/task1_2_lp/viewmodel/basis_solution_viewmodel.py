@@ -1,7 +1,7 @@
 from sympy import latex
 
 from report.model.report_prettifier import expr_latex
-from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
+from tasks.task1_2_lp.model import BasisSolution
 
 
 def variables_to_latex(variables):

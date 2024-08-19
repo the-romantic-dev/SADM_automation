@@ -8,8 +8,7 @@ from report.model.elements.plain_text import PlainText
 from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import formula, elements_list
 from report.model.template.template_filler import TemplateFiller
-from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
-from tasks.task1_2_lp.model.lp_problem.lp_problem import LPProblem
+from tasks.task1_2_lp.model import BasisSolution
 from tasks.task1_2_lp.view.symplex.table_symplex_solution.symplex_table import SymplexTable
 from tasks.task1_2_lp.viewmodel.basis_solution_viewmodel import BasisSolutionViewModel
 from tasks.task1_2_lp.viewmodel.lp_problem_viewmodel import LPProblemViewModel

@@ -2,7 +2,7 @@ from pathlib import Path
 
 from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import elements_list, formula
-from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
+from tasks.task1_2_lp.model import BasisSolution
 from tasks.task1_2_lp.view.bruteforce_solution.bruteforce_step.bruteforce_step_tf import BruteforceStepTF
 from tasks.task1_2_lp.view.solution_tf import SolutionTF
 

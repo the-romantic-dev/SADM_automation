@@ -1,5 +1,6 @@
 from enum import Enum, auto
 from functools import wraps
+from pathlib import Path
 
 from docx.document import Document
 
@@ -44,7 +45,9 @@ def _insert(template: DocumentTemplate, key: str, data, insert_type: InsertType)
                 raise ValueError("For InsertType.TEXT insert data must be str type")
             template.insert_text(key=key, text=data)
         case InsertType.IMAGE:
-            raise ValueError("TODO: сделай вставку изображения")
+            if not isinstance(data, Path):
+                raise ValueError("For InsertType.IMAGE insert data must be Path type")
+            template.insert_picture(key=key, picture_path=data)
         case InsertType.DOCUMENT:
             if not isinstance(data, Document):
                 raise ValueError("For InsertType.DOCUMENT insert data must be Document type")

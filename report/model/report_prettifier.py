@@ -99,4 +99,4 @@ def expr_str(coeffs: list[float | int | Rational | Expr], variables: list[Symbol
 
 
 def expr_latex(coeffs: list[float | int | Rational | Expr], variables: list[Symbol], constant: Rational = Rational(0)):
-    _expression_pretty(coeffs, variables, constant, is_latex=True)
+    return _expression_pretty(coeffs, variables, constant, is_latex=True)

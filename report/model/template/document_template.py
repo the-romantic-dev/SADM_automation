@@ -5,6 +5,8 @@ from docx.document import Document as DocumentType
 from docx.text.paragraph import Paragraph
 from docx2pdf import convert
 from collections.abc import Callable
+
+from report.docx.core import add_picture
 from report.model.elements.paragraph import Paragraph as MyParagraph
 from lxml.etree import _Element
 
@@ -33,6 +35,14 @@ def get_document_elements(document: DocumentType):
             continue
         result.append(child)
     return result
+
+
+def get_image_dimensions(image_path: str):
+    from PIL import Image
+    # Используем библиотеку PIL для получения размеров изображения
+    with Image.open(image_path) as img:
+        width, height = img.size
+    return width, height
 
 
 class DocumentTemplate:
@@ -133,6 +143,12 @@ class DocumentTemplate:
             replace_paragraph_with_elements(ik.paragraph, [table_element])
 
         self._insert(key=key, insert_func=insert_func, report="TABLE")
+
+    def insert_picture(self, key: str, picture_path: Path):
+        def insert_func(ik: InsertKey):
+            add_picture(picture_path.as_posix(), ik.run)
+
+        self._insert(key=key, insert_func=insert_func, report="PICTURE")
 
     def insert_elements_list(self, key: str, elements_list: list[Table | Formula | MyParagraph | DocumentType]):
         def insert_func(ik: InsertKey):

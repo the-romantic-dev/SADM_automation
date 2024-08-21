@@ -1,3 +1,6 @@
+import math
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.text import Annotation
@@ -6,7 +9,7 @@ from shapely import Point, LineString
 from sympy import pretty
 
 from report.model.report_prettifier import rational_str, expr_str
-from tasks.task1_2_lp.model import BasisSolution, Constraint, LPProblem, Objective
+from tasks.task1_2_lp.model import BasisSolution, Constraint, LPProblem, Objective, ObjectiveType
 from tasks.task1_2_lp.view.plot import PlotData, LinearFunction, PlotColors, AxesBounds
 
 from tasks.task1_2_lp.view.plot.util import (AnnotationRectangle, Contur, find_intersections,
@@ -18,6 +21,11 @@ def show_lpp_plot(lpp: LPProblem, solutions: list[BasisSolution], colors: PlotCo
     plot_data = lpp_plot_data(lpp, solutions, colors)
     plot_data.figure.show()
     plt.show()
+
+
+def save_lpp_plot(lpp: LPProblem, solutions: list[BasisSolution], colors: PlotColors, path: Path):
+    plot_data = lpp_plot_data(lpp, solutions, colors)
+    plot_data.figure.savefig(path.as_posix())
 
 
 def lpp_plot_data(lpp: LPProblem, solutions: list[BasisSolution], colors: PlotColors) -> PlotData:
@@ -38,7 +46,9 @@ def lpp_plot_data(lpp: LPProblem, solutions: list[BasisSolution], colors: PlotCo
     filtered_intersections = list(filter(plot_data.axes_bounds.contains, all_intersections))
 
     plot_constraints_annotations(lpp.constraints, filtered_intersections, colors.constraints_color, plot_data)
-    plot_objective_annotation(lpp.objective, opt_sol, filtered_intersections, colors.objective_color, plot_data)
+    obj_annotation_point = plot_objective_annotation(lpp.objective, opt_sol, filtered_intersections,
+                                                     colors.objective_color, plot_data)
+    plot_objective_arrow(lpp.objective, opt_sol, obj_annotation_point, plot_data, colors.objective_color)
 
     plot_solutions(solutions, plot_data, colors.solutions_color)
 
@@ -57,7 +67,7 @@ def plot_constraints(constraints: list[Constraint], plot_data: PlotData, color: 
 def plot_objective(objective: Objective, opt_sol: BasisSolution, plot_data: PlotData, color: str, resolution=100):
     linear_function = LinearFunction.from_objective(objective, opt_sol)
     x, y = linear_function.plot_values(plot_data, resolution=resolution)
-    plot_data.axes.plot(x, y, color=color, linewidth=2, linestyle='--')
+    plot_data.axes.plot(x, y, color=color, linewidth=2, linestyle='--', zorder=2)
 
 
 def get_all_lfs(constraints: list[Constraint], objective: Objective, opt_sol: BasisSolution, axes_bounds: AxesBounds):
@@ -108,24 +118,34 @@ def plot_objective_annotation(objective: Objective, opt_sol: BasisSolution, tota
         coeffs = objective.coeffs
         variables = objective.variables
         const = objective.const
-        return f'max({expr_str(coeffs, variables, const)})'
+        func_sym = 'max' if objective.type == ObjectiveType.MAX else 'min'
+        return f'{func_sym}({expr_str(coeffs, variables, const)})'
 
     lf = LinearFunction.from_objective(objective, opt_sol)
     on_line_points = filter_intersections_on_line(lf, total_intersections)
     widest_segment = find_widest_line_segment(on_line_points)
     mid_x = (widest_segment[0].x + widest_segment[1].x) / 2
     mid_y = (widest_segment[0].y + widest_segment[1].y) / 2
+
+    angle = lf.angle(plot_data.aspect)
+    text_offset = 10
+    va = 'bottom'
+    if (lf.y_coeff > 0 and objective.type == ObjectiveType.MAX or
+            lf.y_coeff < 0 and objective.type == ObjectiveType.MIN):
+        text_offset *= -1
+        va = 'top'
     plot_data.axes.annotate(
         text=annotation_text(),
         xy=(mid_x, mid_y),
-        xytext=(0, 10),
+        xytext=(0, text_offset),
         textcoords='offset points',
-        ha='center', va='bottom',
+        ha='center', va=va,
         rotation=lf.angle(plot_data.aspect),
         rotation_mode='anchor',
         bbox=dict(boxstyle='round,pad=0.5', fc=color, ec='gray', alpha=0.5),
         fontsize=9
     )
+    return Point(mid_x, mid_y)
 
 
 def plot_acceptable_field_fill(solutions: list[BasisSolution], plot_data: PlotData):
@@ -185,6 +205,28 @@ def plot_solution_annotations(solutions: list[BasisSolution], plot_data: PlotDat
     )
     annotations.append(opt_annotation)
     return annotations
+
+
+def plot_objective_arrow(objective: Objective, opt_sol: BasisSolution, obj_annotation_point: Point,
+                         plot_data: PlotData, color: str):
+    start = obj_annotation_point
+
+    lf = LinearFunction.from_objective(objective, opt_sol)
+    angle = lf.angle(1) + 90
+    if (lf.y_coeff > 0 and objective.type == ObjectiveType.MIN or
+            lf.y_coeff < 0 and objective.type == ObjectiveType.MAX):
+        angle += 180
+    angle_rad = angle * math.pi / 180
+    arrow_len = 1
+    offset = 0.1
+    end = Point(start.x + arrow_len * math.cos(angle_rad) * plot_data.aspect,
+                start.y + arrow_len * math.sin(angle_rad) / plot_data.aspect)
+    start = Point(start.x + offset * math.cos(angle_rad) * plot_data.aspect,
+                  start.y + offset * math.sin(angle_rad) / plot_data.aspect)
+    plot_data.axes.annotate(
+        text='', xy=(end.x, end.y), xytext=(start.x, start.y),
+        arrowprops=dict(width=15, headwidth=25, color=color, alpha=0.7, ec='black', zorder=1, lw=2)
+    )
 
 
 def adjust_annotations(annotations: list[Annotation],

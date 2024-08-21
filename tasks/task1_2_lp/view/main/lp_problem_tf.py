@@ -58,7 +58,7 @@ class LPProblemTF(TemplateFiller):
     @template_filler
     def _fill_geometric_solution_part(self):
         opt_solution = self.symplex_solution[-1]
-        return GeometricSolutionTF(opt_solution=opt_solution)
+        return GeometricSolutionTF(solutions=self.bruteforce_solution, opt_sol=opt_solution)
 
     @template_filler
     def _fill_bruteforce_solution_part(self):

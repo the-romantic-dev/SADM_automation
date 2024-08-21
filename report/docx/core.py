@@ -7,7 +7,7 @@ from docx.document import Document as DocumentType
 def add_picture(picture_path: str, run: Run):
     from util.common import get_image_dimensions
 
-    run.element.text = ''
+    run.clear()
     pic = run.add_picture(picture_path)
     original_width, original_height = get_image_dimensions(picture_path)
     pic.width = Pt(612)

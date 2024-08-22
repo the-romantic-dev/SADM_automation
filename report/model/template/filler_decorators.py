@@ -55,12 +55,9 @@ def _insert(template: DocumentTemplate, key: str, data, insert_type: InsertType)
         case InsertType.TEMPLATE_FILLER:
             if not isinstance(data, TemplateFiller):
                 raise ValueError("For InsertType.TEMPLATE_FILLER insert data must be TemplateFiller type")
-            tf = data
-            insert_template = tf.template
-            template.replace_with_template(key, insert_template)
-            # data.fill()
-            # doc = data.template.document
-            # template.insert_data_from_document(key=key, document=doc)
+            data.fill()
+            doc = data.template.document
+            template.insert_data_from_document(key=key, document=doc)
         case InsertType.TABLE:
             if not isinstance(data, Table):
                 raise ValueError("For InsertType.TABLE insert data must be Table type")
@@ -79,10 +76,7 @@ def _insert(template: DocumentTemplate, key: str, data, insert_type: InsertType)
 
 
 def filler(func, insert_type: InsertType):
-    if insert_type == InsertType.TEMPLATE_FILLER:
-        func.is_template_filler = True
-    else:
-        func._is_filler = True
+    func._is_filler = True
     key = _get_key(func)
 
     @wraps(func)

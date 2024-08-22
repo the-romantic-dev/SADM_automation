@@ -2,6 +2,7 @@ from pathlib import Path
 
 from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import elements_list, formula
+from report.model.template.tf_decorators import sub_tf
 from tasks.task1_2_lp.model import BasisSolution
 from tasks.task1_2_lp.view.bruteforce_solution.bruteforce_step.bruteforce_step_tf import BruteforceStepTF
 from tasks.task1_2_lp.view.solution_tf import SolutionTF
@@ -9,6 +10,7 @@ from tasks.task1_2_lp.view.solution_tf import SolutionTF
 template_path = Path(Path(__file__).parent, "bruteforce_solution.docx")
 
 
+@sub_tf
 class BruteforceSolutionTF(SolutionTF):
     def __init__(self, all_solutions: list[BasisSolution], opt_solution_index: int):
         template = DocumentTemplate(template_path)

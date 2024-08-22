@@ -55,7 +55,7 @@ def _insert(template: DocumentTemplate, key: str, data, insert_type: InsertType)
         case InsertType.TEMPLATE_FILLER:
             if not isinstance(data, TemplateFiller):
                 raise ValueError("For InsertType.TEMPLATE_FILLER insert data must be TemplateFiller type")
-            data.fill()
+            # data.fill()
             doc = data.template.document
             template.insert_data_from_document(key=key, document=doc)
         case InsertType.TABLE:

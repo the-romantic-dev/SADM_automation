@@ -1,5 +1,5 @@
 from docx.oxml import CT_P
-from docx.shared import Pt
+from docx.shared import Pt, Length
 from docx.text.run import Run
 from docx.document import Document as DocumentType
 
@@ -8,10 +8,19 @@ def add_picture(picture_path: str, run: Run):
     from util.common import get_image_dimensions
 
     run.clear()
-    pic = run.add_picture(picture_path)
+    doc: DocumentType = run._parent._parent._parent
+
     original_width, original_height = get_image_dimensions(picture_path)
-    pic.width = Pt(612)
-    pic.height = Pt(int((612 / original_width) * original_height))
+    left_margin = doc.sections[0].left_margin
+    right_margin = doc.sections[0].right_margin
+
+    width = Length(doc.sections[0].page_width - left_margin - right_margin)
+    height = Length(int((width / original_width) * original_height))
+
+    pic = run.add_picture(picture_path, width=width, height=height)
+
+    # pic.width = width
+    # pic.height = height
 
 
 def add_text(text: str, run: Run):

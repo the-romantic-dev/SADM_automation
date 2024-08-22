@@ -25,7 +25,7 @@ def show_lpp_plot(lpp: LPProblem, solutions: list[BasisSolution], colors: PlotCo
 
 def save_lpp_plot(lpp: LPProblem, solutions: list[BasisSolution], colors: PlotColors, path: Path):
     plot_data = lpp_plot_data(lpp, solutions, colors)
-    plot_data.figure.savefig(path.as_posix())
+    plot_data.figure.savefig(path.as_posix(), bbox_inches='tight')
 
 
 def lpp_plot_data(lpp: LPProblem, solutions: list[BasisSolution], colors: PlotColors) -> PlotData:

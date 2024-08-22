@@ -9,7 +9,7 @@ from tasks.task1_2_lp.view.plot.plotter import save_lpp_plot
 from tasks.task1_2_lp.view.solution_tf import SolutionTF
 
 template_path = Path(Path(__file__).parent, "geometric_solution.docx")
-pic_path = Path(r'D:\Desktop\test', "sol_pic.jpg")
+pic_path = Path(Path(__file__).parent, "sol_pic.png")
 
 
 @sub_tf

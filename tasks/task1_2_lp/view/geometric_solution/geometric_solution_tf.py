@@ -2,6 +2,7 @@ from pathlib import Path
 
 from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import formula, image
+from report.model.template.tf_decorators import sub_tf
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 from tasks.task1_2_lp.view.plot import PlotColors
 from tasks.task1_2_lp.view.plot.plotter import save_lpp_plot
@@ -11,6 +12,7 @@ template_path = Path(Path(__file__).parent, "geometric_solution.docx")
 pic_path = Path(r'D:\Desktop\test', "sol_pic.jpg")
 
 
+@sub_tf
 class GeometricSolutionTF(SolutionTF):
     def __init__(self, solutions: list[BasisSolution], opt_sol: BasisSolution):
         self.opt_sol = opt_sol

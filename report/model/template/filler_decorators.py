@@ -84,6 +84,8 @@ def filler(func, insert_type: InsertType):
         data = func(self)
         if not isinstance(self, TemplateFiller):
             raise TypeError(f"Object {self} is not TemplateFiller")
+        # if isinstance(data, TemplateFiller):
+        #     data.template.root_template = self.template.root_template
         _insert(template=self.template, key=key, data=data, insert_type=insert_type)
         return data
 

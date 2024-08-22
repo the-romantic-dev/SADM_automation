@@ -5,6 +5,7 @@ from report.model.elements.paragraph import Paragraph
 from report.model.elements.plain_text import PlainText
 from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import elements_list, formula
+from report.model.template.tf_decorators import sub_tf
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 from tasks.task1_2_lp.model.lp_problem.lp_problem import LPProblem
 from tasks.task1_2_lp.view.solution_tf import SolutionTF
@@ -14,6 +15,7 @@ from tasks.task1_2_lp.viewmodel.basis_solution_viewmodel import BasisSolutionVie
 template_path = Path(Path(__file__).parent, "table_symplex_solution.docx")
 
 
+@sub_tf
 class TableSymplexSolutionTF(SolutionTF):
     def __init__(self, solutions: list[BasisSolution], swaps: list[tuple[int, int]],
                  start_basis_index: int):

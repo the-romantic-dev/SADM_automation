@@ -8,6 +8,7 @@ from report.model.report_prettifier import expr_latex
 from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import formula, elements_list
 from report.model.template.template_filler import TemplateFiller
+from report.model.template.tf_decorators import sub_tf
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 from tasks.task1_2_lp.model.lp_problem.constraint.constraint import Constraint
 from tasks.task1_2_lp.model.lp_problem.lp_problem import LPProblem
@@ -21,6 +22,7 @@ package_path = Path(os.path.dirname(os.path.abspath(__file__)))
 template_path = Path(package_path, "reverse_symplex.docx")
 
 
+@sub_tf
 class ReverseSymplexTF(SolutionTF):
     def __init__(self, opt_sol: BasisSolution, new_constraint: Constraint):
         template = DocumentTemplate(template_path)

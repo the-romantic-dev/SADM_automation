@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pathlib import Path
 
 from report.model.template.document_template import DocumentTemplate

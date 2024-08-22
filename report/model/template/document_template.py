@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 from docx import Document
-from docx.document import Document as DocumentType
+from docx.document import Document as DocumentType, _Body
 from docx.text.paragraph import Paragraph
 from docx2pdf import convert
 from collections.abc import Callable
@@ -50,6 +50,7 @@ class DocumentTemplate:
         self.document: DocumentType = Document(path.as_posix())
         self.name = path.name
         self._insert_keys = None
+        self.root_template: DocumentTemplate | None = None
 
     def save(self, save_path: Path, document_name: str = "output.docx", add_pdf: bool = True):
         docx_path = save_path.joinpath(document_name)
@@ -146,6 +147,10 @@ class DocumentTemplate:
 
     def insert_picture(self, key: str, picture_path: Path):
         def insert_func(ik: InsertKey):
+            para: Paragraph = ik.paragraph
+            root = self.root_template.document
+            body = _Body(root.element.body, parent=root)
+            para._parent = body
             add_picture(picture_path.as_posix(), ik.run)
 
         self._insert(key=key, insert_func=insert_func, report="PICTURE")

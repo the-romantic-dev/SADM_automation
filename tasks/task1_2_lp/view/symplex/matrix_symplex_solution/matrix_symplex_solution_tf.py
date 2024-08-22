@@ -4,6 +4,7 @@ from report.docx.pretty_omml import sympy_matrix_to_omml
 from report.model.elements.formula import Formula
 from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import formula, elements_list
+from report.model.template.tf_decorators import sub_tf
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 from tasks.task1_2_lp.model.lp_problem.lp_problem import LPProblem
 from tasks.task1_2_lp.view.solution_tf import SolutionTF
@@ -14,6 +15,7 @@ from tasks.task1_2_lp.view.symplex.step_data import SymplexStepData
 template_path = Path(Path(__file__).parent, "matrix_symplex_solution.docx")
 
 
+@sub_tf
 class MatrixSymplexSolutionTF(SolutionTF):
     def __init__(self, lpp: LPProblem, solutions: list[BasisSolution], swaps: list[tuple[int, int]],
                  start_basis_index: int):

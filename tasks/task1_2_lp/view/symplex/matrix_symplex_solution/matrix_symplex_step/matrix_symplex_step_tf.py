@@ -5,6 +5,7 @@ from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import text, formula, elements_list, document
 from report.model.elements.formula import Formula
 from report.model.template.template_filler import TemplateFiller
+from report.model.template.tf_decorators import sub_tf
 from tasks.task1_2_lp.view.symplex.matrix_symplex_solution.non_opt_part.non_opt_part_tf import NonOptPartTF
 from tasks.task1_2_lp.view.symplex.matrix_symplex_solution.opt_part.opt_part_tf import OptPartTF
 from tasks.task1_2_lp.view.symplex.step_data import SymplexStepData
@@ -15,6 +16,7 @@ package_path = Path(os.path.dirname(os.path.abspath(__file__)))
 template_path = Path(package_path, "matrix_symplex_step.docx")
 
 
+@sub_tf
 class MatrixSymplexStepTF(TemplateFiller):
     def __init__(self, step_data: SymplexStepData):
         template = DocumentTemplate(template_path)

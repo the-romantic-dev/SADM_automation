@@ -4,6 +4,7 @@ from pathlib import Path
 from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import template_filler
 from report.model.template.template_filler import TemplateFiller
+from report.model.template.tf_decorators import root_tf
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 from tasks.task1_2_lp.model.solvers.reverse_symplex_solver.new_constraint_generator import generate_new_constraint
 from tasks.task1_2_lp.view.auxiliary_task.auxiliary_task_tf import AuxiliaryTaskTF
@@ -24,6 +25,7 @@ package_path = Path(os.path.dirname(os.path.abspath(__file__)))
 template_path = Path(package_path, "lp_problem.docx")
 
 
+@root_tf
 class LPProblemTF(TemplateFiller):
     def __init__(self, variant: int, lpp: LPProblem):
         self.variant = variant
@@ -46,6 +48,7 @@ class LPProblemTF(TemplateFiller):
 
         template = DocumentTemplate(template_path)
         super().__init__(template)
+        self.root_tf = self
 
     @template_filler
     def _fill_problem(self):

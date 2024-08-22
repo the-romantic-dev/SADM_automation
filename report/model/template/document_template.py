@@ -1,11 +1,14 @@
+from __future__ import annotations
+
 import os
 from pathlib import Path
 from docx import Document
 from docx.document import Document as DocumentType
 from docx.text.paragraph import Paragraph
+from docx.text.run import Run
 from docx2pdf import convert
 from collections.abc import Callable
-
+from docx.document import _Body
 from report.docx.core import add_picture
 from report.model.elements.paragraph import Paragraph as MyParagraph
 from lxml.etree import _Element
@@ -50,6 +53,23 @@ class DocumentTemplate:
         self.document: DocumentType = Document(path.as_posix())
         self.name = path.name
         self._insert_keys = None
+        self._last_key_index = 0
+
+    def replace_with_template(self, key: str, document_template: DocumentTemplate):
+        other_iks = list(document_template.insert_keys.values())
+        self.insert_data_from_document(key, document_template.document)
+
+        start_i = self._last_key_index
+        # other_iks = list(document_template.insert_keys.values())
+        end_i = len(other_iks) + start_i
+
+        new_body = _Body(self.document.element.body, parent=self.document)
+
+        for new_ik_index, old_ik in zip(range(start_i, end_i), other_iks):
+            para: Paragraph = old_ik.paragraph
+            para._parent = new_body
+            self._insert_keys[new_ik_index] = old_ik
+        self._last_key_index = end_i
 
     def save(self, save_path: Path, document_name: str = "output.docx", add_pdf: bool = True):
         docx_path = save_path.joinpath(document_name)
@@ -87,6 +107,7 @@ class DocumentTemplate:
         for i, key in enumerate(result):
             dict_result[i] = key
         self._insert_keys = dict_result
+        self._last_key_index = len(result)
         return dict_result
 
     def _find_insert_keys(self, key: str) -> dict[int, InsertKey]:

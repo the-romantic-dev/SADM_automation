@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 from pathlib import Path
 from docx import Document
@@ -5,7 +7,6 @@ from docx.document import Document as DocumentType, _Body
 from docx.text.paragraph import Paragraph
 from docx2pdf import convert
 from collections.abc import Callable
-
 from report.docx.core import add_picture
 from report.model.elements.paragraph import Paragraph as MyParagraph
 from lxml.etree import _Element
@@ -49,8 +50,8 @@ class DocumentTemplate:
     def __init__(self, path: Path):
         self.document: DocumentType = Document(path.as_posix())
         self.name = path.name
+        self.root_template = None
         self._insert_keys = None
-        self.root_template: DocumentTemplate | None = None
 
     def save(self, save_path: Path, document_name: str = "output.docx", add_pdf: bool = True):
         docx_path = save_path.joinpath(document_name)

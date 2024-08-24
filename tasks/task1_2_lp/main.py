@@ -13,7 +13,7 @@ from tasks.task1_2_lp.model.lp_problem.objective.objective import Objective
 from tasks.teacher import Teacher
 
 if __name__ == '__main__':
-    template_path = Path("view/main/lp_problem.docx")
+    template_path = Path("view/main/sabonis_main.docx")
     document_template = DocumentTemplate(template_path)
 
     start_time = time()

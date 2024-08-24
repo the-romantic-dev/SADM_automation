@@ -5,16 +5,21 @@ from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import text, elements_list
 from report.model.template.template_filler import TemplateFiller
 from report.model.template.tf_decorators import sub_tf
-from tasks.task1_2_lp.model.lp_problem.lp_problem import LPProblem
 from tasks.task1_2_lp.viewmodel.lp_problem_viewmodel import LPProblemViewModel
+from tasks.teacher import Teacher
 
-template_path = Path(Path(__file__).parent, "problem.docx")
+sabonis_template_path = Path(Path(__file__).parent, "sabonis_problem.docx")
+sidnev_template_path = Path(Path(__file__).parent, "sidnev_problem.docx")
 
 
 @sub_tf
 class ProblemTF(TemplateFiller):
-    def __init__(self, variant: int, lpp_vm: LPProblemViewModel):
-        template = DocumentTemplate(template_path)
+    def __init__(self, variant: int, lpp_vm: LPProblemViewModel, teacher: Teacher):
+        curr_path = sabonis_template_path
+        if teacher == Teacher.SIDNEV:
+            curr_path = sidnev_template_path
+        template = DocumentTemplate(curr_path)
+
         super().__init__(template)
         self.variant = variant
         self.lpp_vm = lpp_vm

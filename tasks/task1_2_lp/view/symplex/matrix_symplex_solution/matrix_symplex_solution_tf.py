@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from report.model.elements.math.matrix import sympy_matrix_to_omml
+from report.model.elements.math.matrix import matrix_from_sympy
 from report.model.docx_parts.formula import Formula
 from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import formula, elements_list
@@ -31,13 +31,13 @@ class MatrixSymplexSolutionTF(SolutionTF):
         canonical_matrices = self.lpp.canonical_form.matrices
         formula_elements = [
             "A = ",
-            sympy_matrix_to_omml(canonical_matrices[0]),
+            matrix_from_sympy(canonical_matrices[0]),
             ", ",
             f"b = ",
-            sympy_matrix_to_omml(canonical_matrices[1]),
+            matrix_from_sympy(canonical_matrices[1]),
             ", ",
             f"C^T = ",
-            sympy_matrix_to_omml(canonical_matrices[2].T),
+            matrix_from_sympy(canonical_matrices[2].T),
         ]
         return Formula(formula_elements)
 

@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from report.model.elements.math.matrix import elements_list_to_matrix_element
+from report.model.elements.math.matrix import matrix_from_elements
 from report.model.elements.math.braces import BraceType, braces
 from report.model.docx_parts.formula import Formula
 from report.model.docx_parts.paragraph import Paragraph
@@ -19,7 +19,7 @@ from tasks.task1_2_lp.viewmodel.lp_problem_viewmodel import LPProblemViewModel
 def problem_element(problem_latex: list[str]):
     problem_formulas = [Formula(l) for l in problem_latex]
     problem_omml = [f.oMath for f in problem_formulas]
-    problem_problem_as_matrix = elements_list_to_matrix_element([[e] for e in problem_omml], alignment="left")
+    problem_problem_as_matrix = matrix_from_elements([[e] for e in problem_omml], alignment="left")
     result = braces(problem_problem_as_matrix, BraceType.LEFT_CURLY)
     return result
 

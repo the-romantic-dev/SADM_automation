@@ -3,7 +3,7 @@ from sympy import sign
 import tasks.task1_2_lp.view.symplex.matrix_symplex_solution.util.latex as ms_latex
 import tasks.task1_2_lp.view.symplex.matrix_symplex_solution.util.matrices as ms_matrices
 import tasks.task1_2_lp.view.symplex.matrix_symplex_solution.util.elements as ms_elements
-from report.model.elements.math.matrix import sympy_matrix_to_omml
+from report.model.elements.math.matrix import matrix_from_sympy
 from report.model.report_prettifier import rational_latex
 from tasks.task1_2_lp.view.symplex.step_data import SymplexStepData
 
@@ -11,21 +11,21 @@ from tasks.task1_2_lp.view.symplex.step_data import SymplexStepData
 def CTB_equation(step_data):
     return [
         f"{ms_latex.CTB(step_data.current_index)} = ",
-        sympy_matrix_to_omml(ms_matrices.CTB(step_data.current_solution))
+        matrix_from_sympy(ms_matrices.CTB(step_data.current_solution))
     ]
 
 
 def P_equation(step_data: SymplexStepData):
     return [
         f"{ms_latex.P(step_data.current_index)} = ",
-        sympy_matrix_to_omml(ms_matrices.P(step_data.current_solution))
+        matrix_from_sympy(ms_matrices.P(step_data.current_solution))
     ]
 
 
 def P_inv_equation(step_data: SymplexStepData):
     return [
         f"{ms_latex.P_inv(step_data.current_index)} = ",
-        sympy_matrix_to_omml(ms_matrices.P_inv(step_data.current_solution))
+        matrix_from_sympy(ms_matrices.P_inv(step_data.current_solution))
     ]
 
 
@@ -44,9 +44,9 @@ def delta_equation(step_data: SymplexStepData, free_var_index: int):
         ms_latex.P_inv(step_data.current_index),
         f"{ms_latex.A_column(free_var_index)} - ",
         f"{ms_latex.C_element(free_var_index)} = ",
-        sympy_matrix_to_omml(ctb_vector),
-        sympy_matrix_to_omml(p_matrix),
-        sympy_matrix_to_omml(a_column),
+        matrix_from_sympy(ctb_vector),
+        matrix_from_sympy(p_matrix),
+        matrix_from_sympy(a_column),
         f" {c_sign} {c_elem * sign(c_elem)} = ",
         f"{rational_latex(result)}"
     ]
@@ -60,10 +60,10 @@ def basis_value_expression(step_data: SymplexStepData):
     formula_data = [
         ms_elements.basis_value(step_data.current_index),
         f" = {ms_latex.P_inv(step_data.current_index)}b = ",
-        sympy_matrix_to_omml(P_inv),
-        sympy_matrix_to_omml(b),
+        matrix_from_sympy(P_inv),
+        matrix_from_sympy(b),
         " = ",
-        sympy_matrix_to_omml(result)
+        matrix_from_sympy(result)
     ]
     return formula_data
 
@@ -76,10 +76,10 @@ def Z_column_expression(step_data: SymplexStepData):
         f"{ms_latex.Z(step_data.in_var)} = ",
         ms_latex.P_inv(step_data.current_index),
         f"{ms_latex.A_column(step_data.in_var)} = ",
-        sympy_matrix_to_omml(P_inv),
-        sympy_matrix_to_omml(A),
+        matrix_from_sympy(P_inv),
+        matrix_from_sympy(A),
         " = ",
-        sympy_matrix_to_omml(result)
+        matrix_from_sympy(result)
 
     ]
     return data
@@ -122,9 +122,9 @@ def F_expression(step_data: SymplexStepData):
         ms_latex.CTB(step_data.current_index),
         ms_latex.P_inv(step_data.current_index),
         "b = ",
-        sympy_matrix_to_omml(ctb),
-        sympy_matrix_to_omml(P),
-        sympy_matrix_to_omml(b),
+        matrix_from_sympy(ctb),
+        matrix_from_sympy(P),
+        matrix_from_sympy(b),
         f" = {string}"
     ]
     return formula_data

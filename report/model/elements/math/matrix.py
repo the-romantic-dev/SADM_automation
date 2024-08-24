@@ -1,5 +1,3 @@
-import re
-
 import lxml.etree
 from lxml import etree as lxml_etree
 from lxml.etree import _Element
@@ -12,7 +10,7 @@ from report.model.elements.util import element_from_xml, is_math_element
 from report.model.report_prettifier import rational_latex
 
 
-def elements_list_to_matrix_element(elements: list[list[_Element]], alignment: str):
+def matrix_from_elements(elements: list[list[_Element]], alignment: str):
     oMath = lxml_etree.Element(f"{{{m_ns}}}oMath")
     m = lxml_etree.SubElement(oMath, f"{{{m_ns}}}m")
 
@@ -52,15 +50,7 @@ def elements_list_to_matrix_element(elements: list[list[_Element]], alignment: s
     return oMath
 
 
-def sympy_matrix_to_omml(matrix: Matrix, brace_type: BraceType = BraceType.PARENTHESES) -> _Element:
-    def delete_square_brackets(matrix_latex: str) -> str:
-        # Используем регулярное выражение для поиска текста в квадратных скобках
-        pattern = r'\\left\[(.*?)\\right\]'
-        # Находим все вхождения текста в квадратных скобках
-        matches = re.findall(pattern, matrix_latex)
-
-        return matches[0]
-
+def matrix_from_sympy(matrix: Matrix, brace_type: BraceType = BraceType.PARENTHESES) -> _Element:
     def matrix_latex(_matrix: Matrix):
         matrix_as_list = _matrix.tolist()
 

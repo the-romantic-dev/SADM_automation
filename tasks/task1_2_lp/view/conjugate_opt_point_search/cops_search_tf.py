@@ -3,7 +3,7 @@ from pathlib import Path
 from sympy import latex, Matrix
 
 from report.docx.omml import latex2omml
-from report.model.elements.math.matrix import sympy_matrix_to_omml
+from report.model.elements.math.matrix import matrix_from_sympy
 from report.model.elements.math.braces import braces
 from report.model.docx_parts.formula import Formula
 from report.model.template.document_template import DocumentTemplate
@@ -38,7 +38,7 @@ class COPSSearchTF(TemplateFiller):
         A_i = Matrix.hstack(A.col(basis[0]), A.col(basis[1]))
         formula_data = [
             f"A_i = ",
-            sympy_matrix_to_omml(A_i)
+            matrix_from_sympy(A_i)
         ]
         return Formula(formula_data)
 
@@ -49,6 +49,6 @@ class COPSSearchTF(TemplateFiller):
         C_i = Matrix([C[basis[0], 0], C[basis[1], 0]])
         formula_data = [
             f"C_i = ",
-            sympy_matrix_to_omml(C_i)
+            matrix_from_sympy(C_i)
         ]
         return Formula(formula_data)

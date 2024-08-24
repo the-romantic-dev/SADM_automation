@@ -12,6 +12,7 @@ from tasks.task1_2_lp.model.solvers.reverse_symplex_solver.new_constraint_genera
 from tasks.task1_2_lp.view.auxiliary_task.auxiliary_task_tf import AuxiliaryTaskTF
 from tasks.task1_2_lp.view.bruteforce_solution.bruteforce_solution_tf import BruteforceSolutionTF
 from tasks.task1_2_lp.view.canonical_problem.canonical_problem_tf import CanonicalProblemTF
+from tasks.task1_2_lp.view.conjugate_opt_point_search.cops_search_tf import COPSSearchTF
 from tasks.task1_2_lp.view.dual_problem.dual_problem_tf import DualProblemTF
 from tasks.task1_2_lp.view.geometric_solution.geometric_solution_tf import GeometricSolutionTF
 from tasks.task1_2_lp.view.problem.problem_tf import ProblemTF
@@ -22,15 +23,18 @@ from tasks.task1_2_lp.model.solvers.bruteforce_solver.bruteforce_solver import B
 from tasks.task1_2_lp.model.solvers.symplex_solver.symplex_solver import SymplexSolver
 from tasks.task1_2_lp.view.symplex.table_symplex_solution.table_symplex_solution_tf import TableSymplexSolutionTF
 from tasks.task1_2_lp.viewmodel.lp_problem_viewmodel import LPProblemViewModel
+from tasks.teacher import Teacher
 
 package_path = Path(os.path.dirname(os.path.abspath(__file__)))
-template_path = Path(package_path, "lp_problem.docx")
+sabonis_template_path = Path(package_path, "sabonis_main.docx")
+sidnev_template_path = Path(package_path, "sidnev_main.docx")
 
 
 @root_tf
 class LPProblemTF(TemplateFiller):
-    def __init__(self, variant: int, lpp: LPProblem):
+    def __init__(self, variant: int, lpp: LPProblem, teacher: Teacher):
         self.variant = variant
+        self.teacher = teacher
         self.lpp = lpp
         self.lpp_vm = LPProblemViewModel(lpp)
         bruteforce_solver = BruteforceSolver(lp_problem=lpp)
@@ -48,13 +52,16 @@ class LPProblemTF(TemplateFiller):
 
         self.symplex_solution, self.symplex_swaps = symplex_solver.solve(start_basis)
 
-        template = DocumentTemplate(template_path)
+        curr_path = sabonis_template_path
+        if teacher == Teacher.SIDNEV:
+            curr_path = sidnev_template_path
+        template = DocumentTemplate(curr_path)
         super().__init__(template)
         self.root_tf = self
 
     @template_filler
     def _fill_problem(self):
-        return ProblemTF(variant=self.variant, lpp_vm=self.lpp_vm)
+        return ProblemTF(variant=self.variant, lpp_vm=self.lpp_vm, teacher=self.teacher)
 
     @template_filler
     def _fill_canonical_problem_part(self):
@@ -95,3 +102,9 @@ class LPProblemTF(TemplateFiller):
     @template_filler
     def _fill_dual_problem_part(self):
         return DualProblemTF(lpp=self.lpp)
+
+    @template_filler
+    def _fill_conjugate_opt_point_search(self):
+        if self.teacher == Teacher.SABONIS:
+            return None
+        return COPSSearchTF(self.symplex_solution[-1])

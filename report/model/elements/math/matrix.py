@@ -6,7 +6,7 @@ from sympy import Matrix
 from report.docx.docx_namespaces import m as m_ns, w as w_ns
 from report.docx.omml import latex2omml
 from report.model.elements.math.braces import BraceType, braces
-from report.model.elements.util import element_from_xml, is_math_element
+from report.model.elements.util import elements_from_xml, is_math_element
 from report.model.report_prettifier import rational_latex
 
 
@@ -15,7 +15,7 @@ def matrix_from_elements(elements: list[list[_Element]], alignment: str, brace_t
     m = lxml_etree.SubElement(oMath, f"{{{m_ns}}}m")
 
     cols = len(elements[0])
-    mPr = element_from_xml(
+    mPr = elements_from_xml(
         xml=f"""
             <m:mPr>
                 <m:mcs>

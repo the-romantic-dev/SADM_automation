@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from report.docx.docx_namespaces import m, w
-from report.model.elements.util import element_from_xml, replace_in_xml
+from report.model.elements.util import elements_from_xml, replace_in_xml
 from tasks.task1_2_lp.local_definitions import TASK_DIR
 
 ELEMENTS_XML_DIR = Path(TASK_DIR, "view/symplex/matrix_symplex_solution/elements_xml")
@@ -24,7 +24,7 @@ def _get_element_from_xml_template(filename: str, keys: str | list[str], replace
         raise ValueError("Число ключей не совпадает с числом вставок")
     for i in range(len(keys)):
         xml = replace_in_xml(xml, key=keys[i], data=replacements[i])
-    element = element_from_xml(xml, {"m": m, "w": w})[0]
+    element = elements_from_xml(xml, {"m": m, "w": w})[0]
     return element
 
 

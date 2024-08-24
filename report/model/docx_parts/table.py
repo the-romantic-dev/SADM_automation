@@ -4,7 +4,7 @@ import lxml.etree as letree
 from lxml.etree import _Element
 
 from report.docx.docx_namespaces import w, w14
-from report.model.elements.util import element_from_xml
+from report.model.elements.util import elements_from_xml
 from report.model.docx_parts.formula import Formula
 
 
@@ -22,7 +22,7 @@ rsidTr = rand_hex()
 
 def create_col_element(data: str | Formula, color: str = None):
     tc = create_element(tag=f"{{{w}}}tc")
-    tcPr = element_from_xml(
+    tcPr = elements_from_xml(
         xml="""
                             <w:tcPr>
                                 <w:tcW w:w="0" w:type="auto" />
@@ -50,7 +50,7 @@ def create_col_element(data: str | Formula, color: str = None):
     )
     tc.append(p)
     if isinstance(data, str):
-        run_elem = element_from_xml(
+        run_elem = elements_from_xml(
             xml=f"""
                 <w:r>
                     <w:rPr>
@@ -87,7 +87,7 @@ class Table:
                 f"{{{w}}}rsidTr": rsidTr
             }
         )
-        trPr = element_from_xml(
+        trPr = elements_from_xml(
             xml="""
                         <w:trPr>
                             <w:jc w:val="center" />
@@ -107,7 +107,7 @@ class Table:
     def table_element(self):
         default_width = 200
         tbl: _Element = create_element(tag=f"{{{w}}}tbl")
-        tblPr = element_from_xml(
+        tblPr = elements_from_xml(
             xml="""
                 <w:tblPr>
                     <w:tblStyle w:val="Table Grid" w:type="table" />

@@ -4,7 +4,7 @@ from lxml import etree as lxml_etree
 from lxml.etree import _Element
 
 from report.docx.docx_namespaces import m, w
-from report.model.elements.util import is_math_element, element_from_xml
+from report.model.elements.util import is_math_element, elements_from_xml
 
 
 class BraceType(Enum):
@@ -19,7 +19,7 @@ def braces(math_element: _Element, brace_type: BraceType = BraceType.PARENTHESES
     if not is_math_element(math_element):
         raise ValueError("Элемент не является частью уравнения Word")
 
-    brace_elements = element_from_xml(
+    brace_elements = elements_from_xml(
         xml="""
         <m:begChr/>
         <m:endChr/>""",
@@ -44,7 +44,7 @@ def braces(math_element: _Element, brace_type: BraceType = BraceType.PARENTHESES
     md: _Element = lxml_etree.Element(f'{{{m}}}d')
     me: _Element = lxml_etree.Element(f'{{{m}}}e')
     omath: _Element = lxml_etree.Element(f'{{{m}}}oMath')
-    dPr = element_from_xml(
+    dPr = elements_from_xml(
         xml="""
             <m:dPr>
                 <m:ctrlPr>

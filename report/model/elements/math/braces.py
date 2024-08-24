@@ -3,7 +3,7 @@ from enum import Enum
 from lxml import etree as lxml_etree
 from lxml.etree import _Element
 
-from report.docx.docx_namespaces import m as m_ns, w as w_ns
+from report.docx.docx_namespaces import m, w
 from report.model.elements.util import is_math_element, element_from_xml
 
 
@@ -23,27 +23,27 @@ def braces(math_element: _Element, brace_type: BraceType = BraceType.PARENTHESES
         xml="""
         <m:begChr/>
         <m:endChr/>""",
-        namespaces={'m': m_ns}
+        namespaces={'m': m}
     )
     match brace_type:
         case BraceType.BRACKETS:
-            brace_elements[0].set(f"{{{m_ns}}}val", "[")
-            brace_elements[1].set(f"{{{m_ns}}}val", "]")
+            brace_elements[0].set(f"{{{m}}}val", "[")
+            brace_elements[1].set(f"{{{m}}}val", "]")
         case BraceType.STRAIGHT:
-            brace_elements[0].set(f"{{{m_ns}}}val", "|")
-            brace_elements[1].set(f"{{{m_ns}}}val", "|")
+            brace_elements[0].set(f"{{{m}}}val", "|")
+            brace_elements[1].set(f"{{{m}}}val", "|")
         case BraceType.CURLY:
-            brace_elements[0].set(f"{{{m_ns}}}val", "{")
-            brace_elements[1].set(f"{{{m_ns}}}val", "}")
+            brace_elements[0].set(f"{{{m}}}val", "{")
+            brace_elements[1].set(f"{{{m}}}val", "}")
         case BraceType.LEFT_CURLY:
-            brace_elements[0].set(f"{{{m_ns}}}val", "{")
-            brace_elements[1].set(f"{{{m_ns}}}val", "")
+            brace_elements[0].set(f"{{{m}}}val", "{")
+            brace_elements[1].set(f"{{{m}}}val", "")
         case _:
             brace_elements = []
 
-    md: _Element = lxml_etree.Element(f'{{{m_ns}}}d')
-    me: _Element = lxml_etree.Element(f'{{{m_ns}}}e')
-    omath: _Element = lxml_etree.Element(f'{{{m_ns}}}oMath')
+    md: _Element = lxml_etree.Element(f'{{{m}}}d')
+    me: _Element = lxml_etree.Element(f'{{{m}}}e')
+    omath: _Element = lxml_etree.Element(f'{{{m}}}oMath')
     dPr = element_from_xml(
         xml="""
             <m:dPr>
@@ -55,7 +55,7 @@ def braces(math_element: _Element, brace_type: BraceType = BraceType.PARENTHESES
                 </m:ctrlPr>
             </m:dPr>
         """,
-        namespaces={'m': m_ns, 'w': w_ns}
+        namespaces={'m': m, 'w': w}
     )[0]
     if len(brace_elements) > 0:
         dPr.insert(0, brace_elements[1])

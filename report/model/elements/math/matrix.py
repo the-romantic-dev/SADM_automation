@@ -10,7 +10,7 @@ from report.model.elements.util import element_from_xml, is_math_element
 from report.model.report_prettifier import rational_latex
 
 
-def matrix_from_elements(elements: list[list[_Element]], alignment: str):
+def matrix_from_elements(elements: list[list[_Element]], alignment: str, brace_type: BraceType = None):
     oMath = lxml_etree.Element(f"{{{m_ns}}}oMath")
     m = lxml_etree.SubElement(oMath, f"{{{m_ns}}}m")
 
@@ -47,7 +47,10 @@ def matrix_from_elements(elements: list[list[_Element]], alignment: str):
                 me.extend(children)
             else:
                 raise ValueError("It is not oMath element")
-    return oMath
+    if brace_type is None:
+        return oMath
+    else:
+        return braces(oMath, brace_type)
 
 
 def matrix_from_sympy(matrix: Matrix, brace_type: BraceType = BraceType.PARENTHESES) -> _Element:

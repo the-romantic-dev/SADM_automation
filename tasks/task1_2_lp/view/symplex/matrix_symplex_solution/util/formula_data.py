@@ -3,7 +3,7 @@ from sympy import sign
 import tasks.task1_2_lp.view.symplex.matrix_symplex_solution.util.latex as ms_latex
 import tasks.task1_2_lp.view.symplex.matrix_symplex_solution.util.matrices as ms_matrices
 import tasks.task1_2_lp.view.symplex.matrix_symplex_solution.util.elements as ms_elements
-from report.model.elements.pretty_elements import sympy_matrix_to_omml
+from report.model.elements.math.matrix import sympy_matrix_to_omml
 from report.model.report_prettifier import rational_latex
 from tasks.task1_2_lp.view.symplex.step_data import SymplexStepData
 

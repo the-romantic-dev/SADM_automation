@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from report.docx.pretty_omml import sympy_matrix_to_omml
-from report.model.elements.formula import Formula
+from report.model.elements.pretty_elements import sympy_matrix_to_omml
+from report.model.docx_parts.formula import Formula
 from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import formula, elements_list
 from report.model.template.tf_decorators import sub_tf

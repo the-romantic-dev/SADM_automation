@@ -1,10 +1,10 @@
 import os
 from pathlib import Path
 
-from report.docx.pretty_omml import braces, elements_list_to_matrix_element, BraceType
-from report.model.elements.formula import Formula
-from report.model.elements.paragraph import Paragraph
-from report.model.elements.plain_text import PlainText
+from report.model.elements.pretty_elements import braces, elements_list_to_matrix_element, BraceType
+from report.model.docx_parts.formula import Formula
+from report.model.docx_parts.paragraph import Paragraph
+from report.model.docx_parts.plain_text import PlainText
 from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import formula, elements_list
 from report.model.template.template_filler import TemplateFiller

@@ -3,7 +3,7 @@ from pathlib import Path
 
 from report.model.report_prettifier import rational_latex
 from report.model.template.document_template import DocumentTemplate
-from report.model.elements.formula import Formula
+from report.model.docx_parts.formula import Formula
 from report.model.template.filler_decorators import text, elements_list, formula, document
 from report.model.template.template_filler import TemplateFiller
 from report.model.template.tf_decorators import sub_tf

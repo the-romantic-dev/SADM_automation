@@ -8,14 +8,14 @@ from docx.text.paragraph import Paragraph
 from docx2pdf import convert
 from collections.abc import Callable
 from report.docx.core import add_picture
-from report.model.elements.paragraph import Paragraph as MyParagraph
+from report.model.docx_parts.paragraph import Paragraph as MyParagraph
 from lxml.etree import _Element
 
 from report.model.element_creator import copy_paragraph
-from report.model.elements.formula import Formula
+from report.model.docx_parts.formula import Formula
 from report.model.template.insert_key import InsertKey
 from report.model.template.isolate_key_runs import isolate_key_runs
-from report.model.elements.table import Table
+from report.model.docx_parts.table import Table
 from report.model.template.template_util import short_tag, keys_in_run, can_replace_paragraph
 
 

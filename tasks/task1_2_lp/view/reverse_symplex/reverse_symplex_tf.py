@@ -1,13 +1,12 @@
 import os
 from pathlib import Path
 
-from report.model.elements.formula import Formula
-from report.model.elements.paragraph import Paragraph
-from report.model.elements.plain_text import PlainText
+from report.model.docx_parts.formula import Formula
+from report.model.docx_parts.paragraph import Paragraph
+from report.model.docx_parts.plain_text import PlainText
 from report.model.report_prettifier import expr_latex
 from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import formula, elements_list
-from report.model.template.template_filler import TemplateFiller
 from report.model.template.tf_decorators import sub_tf
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 from tasks.task1_2_lp.model.lp_problem.constraint.constraint import Constraint

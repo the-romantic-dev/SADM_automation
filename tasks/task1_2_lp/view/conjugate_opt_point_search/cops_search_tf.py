@@ -3,11 +3,8 @@ from pathlib import Path
 from sympy import latex, Matrix
 
 from report.docx.omml import latex2omml
-from report.docx.pretty_omml import braces, sympy_matrix_to_omml
-from report.model.elements.formula import Formula
-# from report.model.elements.math import braces
-# from report.model.elements.math.matrix import matrix_from_sympy
-# from report.model.document_parts.formula import Formula
+from report.model.elements.pretty_elements import braces, sympy_matrix_to_omml
+from report.model.docx_parts.formula import Formula
 from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import formula
 from report.model.template.template_filler import TemplateFiller

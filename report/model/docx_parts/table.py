@@ -4,8 +4,8 @@ import lxml.etree as letree
 from lxml.etree import _Element
 
 from report.docx.docx_namespaces import w, w14
-from report.docx.pretty_omml import element_from_string_with_namespaces
-from report.model.elements.formula import Formula
+from report.model.elements.pretty_elements import element_from_string_with_namespaces
+from report.model.docx_parts.formula import Formula
 
 
 def create_element(tag: str, nsmap: dict = {"w": w}, attr: dict = {}) -> _Element:

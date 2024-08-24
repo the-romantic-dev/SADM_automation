@@ -1,7 +1,7 @@
 from sympy import latex
 
-from report.model.elements.formula import Formula
-from report.model.elements.table import Table
+from report.model.docx_parts.formula import Formula
+from report.model.docx_parts.table import Table
 from report.model.report_prettifier import rational_latex
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 

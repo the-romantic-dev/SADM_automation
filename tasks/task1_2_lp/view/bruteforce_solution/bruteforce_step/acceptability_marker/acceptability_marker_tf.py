@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 from report.model.template.document_template import DocumentTemplate
-from report.model.elements.formula import Formula
+from report.model.docx_parts.formula import Formula
 from report.model.template.template_filler import TemplateFiller
 
 package_path = Path(os.path.dirname(os.path.abspath(__file__)))

@@ -3,7 +3,7 @@ from pathlib import Path
 
 from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import formula, elements_list
-from report.model.elements.formula import Formula
+from report.model.docx_parts.formula import Formula
 from report.model.template.template_filler import TemplateFiller
 from report.model.template.tf_decorators import sub_tf
 from tasks.task1_2_lp.view.symplex.step_data import SymplexStepData

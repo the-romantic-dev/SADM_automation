@@ -1,4 +1,4 @@
-from report.model.elements.formula import Formula
+from report.model.docx_parts.formula import Formula
 from report.model.report_prettifier import expr_latex, rational_latex
 from tasks.task1_2_lp.model.lp_problem.constraint.constraint import Constraint
 

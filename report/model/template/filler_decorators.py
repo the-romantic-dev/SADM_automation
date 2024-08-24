@@ -5,10 +5,10 @@ from pathlib import Path
 from docx.document import Document
 
 from report.model.template.document_template import DocumentTemplate
-from report.model.elements.formula import Formula
-from report.model.elements.table import Table
+from report.model.docx_parts.formula import Formula
+from report.model.docx_parts.table import Table
 from report.model.template.template_filler import TemplateFiller
-from report.model.elements.paragraph import Paragraph as MyParagraph
+from report.model.docx_parts.paragraph import Paragraph as MyParagraph
 from docx.document import Document as DocumentType
 
 

@@ -2,8 +2,8 @@ import lxml.etree
 from lxml.etree import _Element
 
 from report.docx.docx_namespaces import w
-from report.model.elements.formula import Formula
-from report.model.elements.plain_text import PlainText
+from report.model.docx_parts.formula import Formula
+from report.model.docx_parts.plain_text import PlainText
 
 
 def create_run(plain_text: PlainText) -> _Element:

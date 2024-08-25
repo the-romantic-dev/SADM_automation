@@ -11,7 +11,7 @@ from tasks.task1_3_nlp_unlimited.view.common_iterations.nlpu_common_iterations_t
 from tasks.task1_3_nlp_unlimited.view.problem.nlpu_problem_tf import NLPUProblemTF
 from tasks.teacher import Teacher
 
-sabonis_template_path = Path(Path(__file__).parent, "nlp_unlimited_main.docx")
+sabonis_template_path = Path(Path(__file__).parent, "sabonis_main.docx")
 sidnev_template_path = None
 
 

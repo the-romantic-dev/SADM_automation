@@ -1,3 +1,5 @@
+from copy import copy
+
 import lxml.etree
 from lxml import etree
 from lxml.etree import _Element
@@ -109,7 +111,7 @@ class Formula:
             if isinstance(part, str):
                 omml_parts.append(latex2omml(part))
             elif isinstance(part, _Element):
-                omml_parts.append(part)
+                omml_parts.append(copy(part))
         return omml_parts
 
     @property

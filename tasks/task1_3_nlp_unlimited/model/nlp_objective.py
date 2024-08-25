@@ -17,9 +17,11 @@ class NLPObjective:
         C = self.coeffs
         return C[0] * x1 ** 2 + C[1] * x2 ** 2 + C[2] * x1 * x2 + C[3] * x1 + C[4] * x2
 
-    def grad(self, point: list[Rational] = None):
+    def grad(self, point: list[Rational] | Matrix = None):
         result = [diff(self.expr, x) for x in self.variables]
         if point is not None:
+            if isinstance(point, Matrix):
+                point = point.T.tolist()[0]
             x1, x2 = self.variables
             if len(point) != len(self.variables):
                 raise ValueError("Incorrect point")

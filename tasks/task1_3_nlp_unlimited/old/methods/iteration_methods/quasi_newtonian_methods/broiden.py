@@ -1,8 +1,8 @@
 """Файл с классом для метода Бройдена"""
 import sympy as sp
 
-from tasks.task1_3_nlp_unlimited.methods.iteration_methods.quasi_newtonian_methods.quasi_newtonian import QuasiNewtonian
-from tasks.task1_3_nlp_unlimited.other.operators import def_gradient
+from tasks.task1_3_nlp_unlimited.old.methods.iteration_methods.quasi_newtonian_methods.quasi_newtonian import QuasiNewtonian
+from tasks.task1_3_nlp_unlimited.model.operators import def_gradient
 
 
 class BroidenMethod(QuasiNewtonian):

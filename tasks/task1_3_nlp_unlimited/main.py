@@ -34,7 +34,7 @@ if __name__ == '__main__':
     objective = NLPObjective(coeffs=[
         Rational(-13), Rational(-22), Rational(12), Rational(30), Rational(40)
     ])
-    tf = NLPUnlimitedMainTF(teacher=Teacher.SABONIS, variant=4, objective=objective)
+    tf = NLPUnlimitedMainTF(teacher=Teacher.SABONIS, variant=4, objective=objective, nickname="TheRomantic20")
     tf.fill()
 
     tf.template.save(report_path, add_pdf=False)

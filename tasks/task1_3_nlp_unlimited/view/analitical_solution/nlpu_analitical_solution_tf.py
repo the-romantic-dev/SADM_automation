@@ -11,16 +11,9 @@ from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import formula
 from report.model.template.template_filler import TemplateFiller
 from tasks.task1_3_nlp_unlimited.model.nlp_objective import NLPObjective
+from tasks.task1_3_nlp_unlimited.model.util import solution_matrix
 
 template_path = Path(Path(__file__).parent, "nlpu_analitical_solution.docx")
-
-
-def solution_matrix(objective: NLPObjective) -> Matrix:
-    grad = objective.grad()
-    equations = (Eq(grad[0], 0), Eq(grad[1], 0))
-    solution = solve(equations, objective.variables)
-    solution_matrix = Matrix([solution[x] for x in objective.variables])
-    return solution_matrix
 
 
 class NLPUAnalyticalSolutionTF(TemplateFiller):
@@ -84,10 +77,9 @@ class NLPUAnalyticalSolutionTF(TemplateFiller):
 
     @formula
     def _fill_opt_objective_value(self):
-        solution = solution_matrix(self.objective).T.tolist()[0]
-        subs = {x: sol for x, sol in zip(self.objective.variables, solution)}
+        opt_X = solution_matrix(self.objective)
         formula_data = [
             "f(X^*) = ",
-            rational_latex(self.objective.expr.subs(subs))
+            rational_latex(self.objective.value(opt_X))
         ]
         return Formula(formula_data)

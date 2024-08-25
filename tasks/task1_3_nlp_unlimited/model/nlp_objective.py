@@ -1,6 +1,6 @@
 from functools import cached_property
 
-from sympy import Rational, symbols, diff
+from sympy import Rational, symbols, diff, Matrix
 
 
 class NLPObjective:
@@ -31,6 +31,9 @@ class NLPObjective:
         result = [
             [diff(item, x) for x in self.variables] for item in grad
         ]
-        # return [[diff(grad[0], x1), diff(grad[0], x2)],
-        #         [diff(grad[1], x1), diff(grad[1], x2)]]
         return result
+
+    def value(self, point_vector: Matrix):
+        solution = point_vector.T.tolist()[0]
+        subs = {x: sol for x, sol in zip(self.variables, solution)}
+        return self.expr.subs(subs)

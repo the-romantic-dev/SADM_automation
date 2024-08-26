@@ -18,19 +18,20 @@ class UnivariateStepSizeFinder:
         return self.objective.value(next_point)
 
     @property
-    def start_interval_steps(self) -> list[tuple[float, float]]:
+    def start_interval_steps(self) -> list[float]:
         t0 = 0
         t1 = 1
         t2 = t1 + golden_section * (t1 - t0)
 
+        f0 = self.f(t0)
         f1 = self.f(t1)
         f2 = self.f(t2)
-        result = [(t0, t2)]
+        result = [t0, t1, t2]
         while f1 <= f2:
             t0 = t1
             t1 = t2
             t2 = t1 + golden_section * (t1 - t0)
-            result.append((t0, t2))
+            result.append(t2)
             f1 = f2
             f2 = self.f(t2)
         return result

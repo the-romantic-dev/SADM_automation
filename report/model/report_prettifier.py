@@ -103,9 +103,15 @@ def _expression_pretty(coeffs: list[float | int | Rational | Expr], variables: l
     return result
 
 
-def expr_str(coeffs: list[float | int | Rational | Expr], variables: list[Symbol | str], constant: Rational = Rational(0)):
+def expr_str(coeffs: list[float | int | Rational | Expr], variables: list[Symbol | str],
+             constant: Rational = Rational(0)):
     return _expression_pretty(coeffs, variables, constant, is_latex=False)
 
 
-def expr_latex(coeffs: list[float | int | Rational | Expr], variables: list[Symbol | str], constant: Rational = Rational(0)):
+def expr_latex(coeffs: list[float | int | Rational | Expr], variables: list[Symbol | str],
+               constant: Rational = Rational(0)):
     return _expression_pretty(coeffs, variables, constant, is_latex=True)
+
+
+def float_str(num: float, rounding: int):
+    return f"{num:.{rounding}f}".rstrip('0').rstrip('.')

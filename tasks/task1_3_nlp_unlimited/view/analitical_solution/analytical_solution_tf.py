@@ -13,10 +13,10 @@ from report.model.template.template_filler import TemplateFiller
 from tasks.task1_3_nlp_unlimited.model.nlp_objective import NLPObjective
 from tasks.task1_3_nlp_unlimited.model.util import solution_matrix
 
-template_path = Path(Path(__file__).parent, "nlpu_analitical_solution.docx")
+template_path = Path(Path(__file__).parent, "analytical_solution.docx")
 
 
-class NLPUAnalyticalSolutionTF(TemplateFiller):
+class AnalyticalSolutionTF(TemplateFiller):
     def __init__(self, objective: NLPObjective):
         self.objective = objective
         template = DocumentTemplate(template_path)

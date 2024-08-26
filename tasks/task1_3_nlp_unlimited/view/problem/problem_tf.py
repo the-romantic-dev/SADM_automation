@@ -8,11 +8,11 @@ from tasks.task1_3_nlp_unlimited.model.nlp_objective import NLPObjective
 from tasks.task1_3_nlp_unlimited.viewmodel.nlp_objective_vm import nlp_objective_element
 from tasks.teacher import Teacher
 
-sabonis_template_path = Path(Path(__file__).parent, "sabonis_nlpu_problem.docx")
-sidnev_template_path = Path()
+sabonis_template_path = Path(Path(__file__).parent, "sabonis_problem.docx")
+sidnev_template_path = Path(Path(__file__).parent, "sidnev_problem.docx")
 
 
-class NLPUProblemTF(TemplateFiller):
+class ProblemTF(TemplateFiller):
     def __init__(self, teacher: Teacher, objective: NLPObjective, variant: int):
         self.variant = variant
         self.objective = objective

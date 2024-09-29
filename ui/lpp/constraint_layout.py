@@ -8,7 +8,7 @@ from kivy.uix.widget import Widget
 from ui.lpp.util import generate, height
 
 
-def constraint_layout() -> tuple[BoxLayout, list[Callable]]:
+def constraint_layout(x1:str= None, x2:str=None, const:str=None) -> tuple[BoxLayout, list[Callable]]:
     box = BoxLayout(
         orientation="horizontal",
         spacing=2,
@@ -18,8 +18,14 @@ def constraint_layout() -> tuple[BoxLayout, list[Callable]]:
     )
     input_width = 40
     x1_text_input: TextInput = generate(TextInput, hint_text="", multiline=False, width=input_width)
+    if x1 is not None:
+        x1_text_input.text = x1
     x2_text_input: TextInput = generate(TextInput, hint_text="", multiline=False, width=input_width)
+    if x2 is not None:
+        x2_text_input.text = x2
     const_text_input: TextInput = generate(TextInput, hint_text="", multiline=False, width=input_width)
+    if const is not None:
+        const_text_input.text = const
     data_sources = [
         lambda: x1_text_input.text,
         lambda: x2_text_input.text,

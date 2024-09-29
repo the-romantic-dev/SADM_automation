@@ -1,6 +1,6 @@
 from functools import cached_property
 
-from sympy import symbols, solve, Expr, Symbol, Rational
+from sympy import symbols, solve, Expr, Symbol, Rational, pretty
 from tasks.task1_2_lp.model import LPProblem
 
 
@@ -146,3 +146,6 @@ class BasisSolution:
             reps.append((x, basis_expressions[i]))
         result = expr.subs(reps)
         return result
+
+    def __str__(self):
+        return ', '.join([f'{pretty(x)} = {v}' for x, v in zip(self.basis_variables, self.basis_values)])

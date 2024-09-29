@@ -25,7 +25,7 @@ def get_swap_indices(sol: BasisSolution, is_reversed: bool):
         out_var_row = coeffs[out_var_index]
 
         column_criteria = [c[i] / -out_var_row[i] for i in range(len(c))]
-        filtered_criteria = list(filter(lambda elem: elem > 0, column_criteria))
+        filtered_criteria = list(filter(lambda elem: elem >= 0, column_criteria))
         in_var_index = column_criteria.index(min(filtered_criteria))
     else:
         in_var_index = c.index(max(c))

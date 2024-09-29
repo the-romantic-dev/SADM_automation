@@ -9,7 +9,7 @@ from kivy.uix.widget import Widget
 from ui.lpp.util import generate, height
 
 
-def teacher_layout() -> tuple[BoxLayout, list[Callable]]:
+def teacher_layout(name:str=None) -> tuple[BoxLayout, list[Callable]]:
     box = BoxLayout(
         orientation="horizontal",
         spacing=2,
@@ -19,6 +19,8 @@ def teacher_layout() -> tuple[BoxLayout, list[Callable]]:
     )
     input_width = 100
     spinner: Spinner = generate(Spinner, text="Сабонис", values=("Сабонис", "Сиднев"), width=input_width)
+    if name is not None:
+        spinner.text = name
     data_sources = [
         lambda: spinner.text
     ]

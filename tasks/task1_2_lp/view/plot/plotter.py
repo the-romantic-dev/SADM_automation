@@ -37,7 +37,7 @@ def lpp_plot_data(lpp: LPProblem, solutions: list[BasisSolution], colors: PlotCo
     plot_constraints(lpp.constraints, plot_data, color=colors.constraints_color)
     plot_acceptable_field_fill(solutions, plot_data)
 
-    opt_sol_index = [i for i in range(len(solutions)) if solutions[i].is_opt][0]
+    opt_sol_index = [i for i in range(len(solutions)) if solutions[i].is_opt and solutions[i].is_acceptable][0]
     opt_sol = solutions[opt_sol_index]
     plot_objective(lpp.objective, opt_sol, plot_data, color=colors.objective_color)
 
@@ -158,7 +158,7 @@ def plot_acceptable_field_fill(solutions: list[BasisSolution], plot_data: PlotDa
 
 def plot_solutions(solutions: list[BasisSolution], plot_data: PlotData, color: str):
     solutions_num = len(solutions)
-    opt_sol_index = [i for i in range(solutions_num) if solutions[i].is_opt][0]
+    opt_sol_index = [i for i in range(solutions_num) if solutions[i].is_opt and solutions[i].is_acceptable][0]
     x = [float(sol.solution[0]) for sol in solutions]
     y = [float(sol.solution[1]) for sol in solutions]
 
@@ -192,7 +192,7 @@ def plot_solution_annotations(solutions: list[BasisSolution], plot_data: PlotDat
             arrowprops=dict(arrowstyle='-')
         )
         annotations.append(annotation)
-    opt_sol_index = [i for i in range(len(solutions)) if solutions[i].is_opt][0]
+    opt_sol_index = [i for i in range(len(solutions)) if solutions[i].is_opt and solutions[i].is_acceptable][0]
     opt_point = points[opt_sol_index]
     opt_annotation = plot_data.axes.annotate(
         text='OPT',

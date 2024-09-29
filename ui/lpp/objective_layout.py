@@ -14,7 +14,10 @@ def generate(fabric: Callable, *args, **kwargs):
     return fabric(*args, **kwargs, size_hint=(None, None), size=(width, height), pos_hint={'center_y': 0.5})
 
 
-def objective_layout() -> tuple[BoxLayout, list[Callable]]:
+def objective_layout(
+        obj_type_txt: str = None,
+        obj_x1: str = None,
+        obj_x2: str = None) -> tuple[BoxLayout, list[Callable]]:
     box = BoxLayout(
         orientation="horizontal",
         spacing=2,
@@ -24,8 +27,14 @@ def objective_layout() -> tuple[BoxLayout, list[Callable]]:
     )
     input_width = 40
     spinner: Spinner = generate(Spinner, text="max", values=("min", "max"), width=50)
+    if obj_type_txt is not None:
+        spinner.text = obj_type_txt
     x1_text_input: TextInput = generate(TextInput, hint_text="", multiline=False, width=input_width)
+    if obj_x1 is not None:
+        x1_text_input.text = obj_x1
     x2_text_input: TextInput = generate(TextInput, hint_text="", multiline=False, width=input_width)
+    if obj_x2 is not None:
+        x2_text_input.text = obj_x2
     data_sources = [
         lambda: spinner.text,
         lambda: x1_text_input.text,

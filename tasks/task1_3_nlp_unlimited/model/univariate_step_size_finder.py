@@ -1,7 +1,6 @@
 from math import sqrt
 
 from sympy import Matrix
-
 from tasks.task1_3_nlp_unlimited.model import NLPObjective
 
 golden_section = (1 + sqrt(5)) / 2

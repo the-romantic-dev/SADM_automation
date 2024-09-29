@@ -25,7 +25,8 @@ def problem_latex(lp_problem: LPProblem) -> list[str]:
     obj = lp_problem.objective
     constraints = lp_problem.constraints
     result = []
-    obj_latex = f"max({expr_latex(obj.coeffs, obj.variables, obj.const)})"
+    func_name = 'max' if lp_problem.objective.type == ObjectiveType.MAX else 'min'
+    obj_latex = f"{func_name}({expr_latex(obj.coeffs, obj.variables, obj.const)})"
     result.append(obj_latex)
     for constraint in constraints:
         constraint_expression_latex = expr_latex(constraint.coeffs, constraint.variables)

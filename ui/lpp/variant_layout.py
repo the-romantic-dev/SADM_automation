@@ -8,7 +8,7 @@ from kivy.uix.widget import Widget
 from ui.lpp.util import generate, height
 
 
-def variant_layout() -> tuple[BoxLayout, list[Callable]]:
+def variant_layout(variant: str = None) -> tuple[BoxLayout, list[Callable]]:
     box = BoxLayout(
         orientation="horizontal",
         spacing=2,
@@ -18,6 +18,8 @@ def variant_layout() -> tuple[BoxLayout, list[Callable]]:
     )
     input_width = 40
     text_input: TextInput = generate(TextInput, hint_text="", multiline=False, width=input_width)
+    if variant is not None:
+        text_input.text = variant
     data_sources = [
         lambda: text_input.text
     ]

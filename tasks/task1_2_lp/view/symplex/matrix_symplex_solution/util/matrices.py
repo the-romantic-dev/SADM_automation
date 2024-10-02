@@ -28,7 +28,7 @@ def C_element(current_solution: BasisSolution, var_index: int) -> float | int | 
 
 
 def b(current_solution: BasisSolution):
-    return current_solution.lp_problem.matrices[1]
+    return current_solution.lp_problem.canonical_form.matrices[1]
 
 
 def Z(current_solution: BasisSolution, var_index: int) -> Matrix:

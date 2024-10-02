@@ -6,7 +6,7 @@ from report.model.docx_parts.paragraph import Paragraph
 from report.model.docx_parts.plain_text import PlainText
 from report.model.report_prettifier import expr_latex
 from report.model.template.document_template import DocumentTemplate
-from report.model.template.filler_decorators import formula, elements_list
+from report.model.template.filler_decorators import formula, elements_list, table
 from report.model.template.tf_decorators import sub_tf
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 from tasks.task1_2_lp.model.lp_problem.constraint.constraint import Constraint
@@ -35,6 +35,11 @@ class ReverseSymplexTF(SolutionTF):
         self.rsvm = ReverseSymplexViewModel(new_var=self.new_var, new_constraint=self.new_constraint)
         solver = SymplexSolver(lp_problem=self.new_lpp)
         self.solution_steps, self.swaps = solver.solve(start_basis=self.new_basis, is_reversed=True)
+
+    @table
+    def _fill_opt_symplex_table(self):
+        symplex_table = SymplexTable(basis_solution=self.opt_sol, swap=None)
+        return symplex_table.symplex_table
 
     @formula
     def _fill_new_constraint(self):

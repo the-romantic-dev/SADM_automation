@@ -1,8 +1,8 @@
-from sympy import latex
+from sympy import latex, Rational
 
 from report.model.docx_parts.formula import Formula
 from report.model.docx_parts.table import Table
-from report.model.report_prettifier import rational_latex
+from report.model.report_prettifier import rational_latex, coeff_with_symbol_latex
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 
 in_col_color = "BDD6EE"
@@ -54,8 +54,18 @@ class SymplexTable:
         row = [Formula("f")]
         coeffs = self.sol.objective_coeffs
         value = self.sol.objective_value
-        row.extend([Formula(rational_latex(c)) for c in coeffs])
-        row.append(Formula(rational_latex(value)))
+        row.extend([
+            Formula(rational_latex(c)) if isinstance(c, Rational)
+            else Formula(coeff_with_symbol_latex(c))
+            for c in coeffs])
+        a = [rational_latex(c) if isinstance(c, Rational)
+            else coeff_with_symbol_latex(c)
+            for c in coeffs]
+        row.append(
+            Formula(rational_latex(value)) if isinstance(value, Rational)
+            else Formula(coeff_with_symbol_latex(value))
+        )
+        b = rational_latex(value) if isinstance(value, Rational) else coeff_with_symbol_latex(value)
         if self.swap is not None and not self.is_reversed:
             row.append("")
         return row

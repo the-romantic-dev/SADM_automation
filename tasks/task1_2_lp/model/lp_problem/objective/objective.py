@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from sympy import Rational, symbols, pretty, Expr
+from sympy import Rational, symbols, pretty, Expr, Symbol
 
 from tasks.task1_2_lp.model.lp_problem.enums.objective_type import ObjectiveType
 
@@ -8,7 +8,7 @@ from tasks.task1_2_lp.model.lp_problem.enums.objective_type import ObjectiveType
 class Objective:
     """ Класс, представляющий целевую функцию задачи линейного программирования """
 
-    def __init__(self, obj_type: ObjectiveType, coeffs: list[Rational], const: Rational = Rational(0),
+    def __init__(self, obj_type: ObjectiveType, coeffs: list[Rational | Symbol], const: Rational = Rational(0),
                  variable_symbol: str = "x"):
         """
         :param obj_type: Тип задачи линейного программирования (максимизация или минимизация)

@@ -21,6 +21,8 @@ from tasks.task1_2_lp.view.symplex.matrix_symplex_solution.matrix_symplex_soluti
 from tasks.task1_2_lp.model.lp_problem.lp_problem import LPProblem
 from tasks.task1_2_lp.model.solvers.bruteforce_solver.bruteforce_solver import BruteforceSolver
 from tasks.task1_2_lp.model.solvers.symplex_solver.symplex_solver import SymplexSolver
+from tasks.task1_2_lp.view.symplex.table_symplex_solution.modified_task_symplex.modified_symplex_solution_tf import \
+    ModifiedSymplexSolutionTF
 from tasks.task1_2_lp.view.symplex.table_symplex_solution.table_symplex_solution_tf import TableSymplexSolutionTF
 from tasks.task1_2_lp.viewmodel.lp_problem_viewmodel import LPProblemViewModel
 from tasks.teacher import Teacher
@@ -43,9 +45,14 @@ class LPProblemTF(TemplateFiller):
         symplex_solver = SymplexSolver(lpp)
         self.auxiliary_solution: list[BasisSolution] | None = None
         self.auxiliary_swaps: list[tuple[int, int]] | None = None
+        self.modified_solution: list[BasisSolution] | None = None
+        self.modified_swaps: list[tuple[int, int]] | None = None
+
         if self.lpp.has_simple_start_basis:
             start_basis = self.lpp.start_basis
         else:
+            self.modified_solution, self.modified_swaps = symplex_solver.modified_solve()
+
             self.auxiliary_solution, self.auxiliary_swaps = symplex_solver.auxiliary_solve()
             start_basis = self.auxiliary_solution[-1].basis
             self.symplex_start_basis_index = len(self.auxiliary_solution) - 1
@@ -88,6 +95,10 @@ class LPProblemTF(TemplateFiller):
     def _fill_matrix_symplex_solution_part(self):
         return MatrixSymplexSolutionTF(lpp=self.lpp, solutions=self.symplex_solution, swaps=self.symplex_swaps,
                                        start_basis_index=self.symplex_start_basis_index)
+
+    @template_filler
+    def _fill_modified_symplex_solution_part(self):
+        return ModifiedSymplexSolutionTF(solutions=self.modified_solution, swaps=self.modified_swaps)
 
     @template_filler
     def _fill_table_symplex_solution_part(self):

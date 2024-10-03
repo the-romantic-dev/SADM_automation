@@ -9,11 +9,16 @@ from report.model.docx_parts.formula import Formula
 from report.model.elements.math.sup import sup
 from report.model.report_prettifier import expr_latex, rational_latex
 from report.model.template.document_template import DocumentTemplate
-from report.model.template.filler_decorators import formula
+from report.model.template.filler_decorators import formula, image
 from report.model.template.template_filler import TemplateFiller
 from tasks.task1_2_lp.model import BasisSolution, Objective
+from tasks.task1_2_lp.model.solvers import BruteforceSolver
+from tasks.task1_2_lp.view.plot import PlotColors
+from tasks.task1_2_lp.view.plot.plotter import save_lpp_plot
 
 template_path = Path(Path(__file__).parent, "conjugate_opt_point_search.docx")
+
+pic_path = Path(Path(__file__).parent, "dual_sol_pic.png")
 
 
 class COPSSearchTF(TemplateFiller):
@@ -28,6 +33,7 @@ class COPSSearchTF(TemplateFiller):
         self.A_b: Matrix = Matrix.hstack(A.col(basis[0]), A.col(basis[1]))
         self.C_b: Matrix = Matrix([C[basis[0], 0], C[basis[1], 0]])
         self.yopt = self.A_b.T.inv() * self.C_b
+        self.dual_lpp = self.opt_sol.lp_problem.canonical_form.get_dual_problem(variable_symbol="y")
         super().__init__(template)
 
     @formula
@@ -73,13 +79,6 @@ class COPSSearchTF(TemplateFiller):
         step_3_data = [
             matrix_from_sympy(self.yopt),
         ]
-        # step_1_latexs = [
-        #     f"{expr_latex(coeffs=list(self.A_b.row(i)), variables=basis_variables)} = {rational_latex(self.C_b[i, 0])}"
-        #     for i in range(self.C_b.rows)
-        # ]
-        # step_1 = matrix_from_elements([
-        #     [latex2omml(l)] for l in step_1_latexs
-        # ], alignment='left', brace_type=BraceType.LEFT_CURLY)
         formula_data = [
             "Y_{opt} = ",
             *step_1_data,
@@ -93,11 +92,10 @@ class COPSSearchTF(TemplateFiller):
 
     @formula
     def _fill_objective_value(self):
-        dual_lpp = self.opt_sol.lp_problem.get_dual_problem(variable_symbol="y")
-        objective_coeffs = dual_lpp.objective.coeffs
-        objective_variables = dual_lpp.objective.variables
+        objective_coeffs = self.dual_lpp.objective.coeffs
+        objective_variables = self.dual_lpp.objective.variables
 
-        C = dual_lpp.matrices[2]
+        C = self.dual_lpp.matrices[2]
         formula_data = [
             'F = ',
             expr_latex(objective_coeffs, objective_variables),
@@ -108,8 +106,15 @@ class COPSSearchTF(TemplateFiller):
 
     @formula
     def _fill_result(self):
-
         formula_data = [
             f"y_1 = {rational_latex(self.yopt[0, 0])}, y_2 = {rational_latex(self.yopt[1, 0])}"
         ]
         return Formula(formula_data)
+
+    # @image
+    # def _fill_cops_plot(self):
+    #     lpp = self.opt_sol.lp_problem.get_dual_problem(variable_symbol="y")
+    #     solutions = BruteforceSolver(lp_problem=lpp).solve()[0]
+    #     colors = PlotColors(constraints_color='#2D70B3', objective_color='#FA6501', solutions_color='#BAFFC9')
+    #     save_lpp_plot(lpp, solutions, colors, pic_path)
+    #     return pic_path

@@ -28,6 +28,7 @@ def get_swap_indices(sol: BasisSolution, is_reversed: bool):
         filtered_criteria = list(filter(lambda elem: elem >= 0, column_criteria))
         in_var_index = column_criteria.index(min(filtered_criteria))
     else:
+        c = [elem.subs({LPProblem.M: 1000}) for elem in c]
         in_var_index = c.index(max(c))
         in_var_column = [row[in_var_index] for row in coeffs]
 
@@ -77,10 +78,11 @@ class SymplexSolver:
         curr_basis_solution = BasisSolution(auxiliary_form, auxiliary_form.start_basis)
         result = [curr_basis_solution]
         swaps = []
+        canonical_var_count = self.lp_problem.canonical_form.var_count
 
         def does_basis_contains_art_var(basis: list[int]):
             for b in basis:
-                if b >= self.lp_problem.canonical_form.var_count:
+                if b >= canonical_var_count:
                     return True
             return False
 
@@ -90,4 +92,18 @@ class SymplexSolver:
             curr_basis_solution = BasisSolution(auxiliary_form, new_basis, new_free)
             result.append(curr_basis_solution)
 
+        return result, swaps
+
+    def modified_solve(self):
+        modified_form = self.lp_problem.modified_form
+        curr_basis_solution = BasisSolution(modified_form, modified_form.start_basis)
+        result = [curr_basis_solution]
+        swaps = []
+        canonical_var_count = self.lp_problem.canonical_form.var_count
+
+        while not is_opt(curr_basis_solution, is_reversed=False):
+            new_basis, new_free, swap = get_next_basis(curr_basis_solution, is_reversed=False)
+            swaps.append(swap)
+            curr_basis_solution = BasisSolution(modified_form, new_basis, new_free)
+            result.append(curr_basis_solution)
         return result, swaps

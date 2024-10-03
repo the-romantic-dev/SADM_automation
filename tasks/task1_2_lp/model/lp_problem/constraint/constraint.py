@@ -8,7 +8,7 @@ from tasks.task1_2_lp.model import CompOperator
 class Constraint:
     """ Класс представляет ограничение задачи линейного программирования """
 
-    def __init__(self, coeffs: list[Rational], const: Rational, comp_operator: CompOperator = CompOperator.LE,
+    def __init__(self, coeffs: list[Rational | Symbol], const: Rational, comp_operator: CompOperator = CompOperator.LE,
                  variable_symbol: str = "x"):
         """
         :param coeffs: коэффициенты при переменных левой части ограничения

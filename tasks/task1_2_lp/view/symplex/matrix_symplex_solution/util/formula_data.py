@@ -112,11 +112,11 @@ def basis_exclude_criteria_expression(step_data: SymplexStepData):
 
 def F_expression(step_data: SymplexStepData):
     ctb = ms_matrices.CTB(step_data.current_solution)
-    P = ms_matrices.P(step_data.current_solution)
+    P = ms_matrices.P_inv(step_data.current_solution)
     b = ms_matrices.b(step_data.current_solution)
     result = (ctb * P * b)[0, 0]
-    decimal = result.evalf()
-    string = f"{decimal:.15f}".rstrip('0').rstrip('.')
+    # decimal = result.evalf()
+    # string = f"{decimal:.15f}".rstrip('0').rstrip('.')
     formula_data = [
         "F = ",
         ms_latex.CTB(step_data.current_index),
@@ -125,6 +125,6 @@ def F_expression(step_data: SymplexStepData):
         matrix_from_sympy(ctb),
         matrix_from_sympy(P),
         matrix_from_sympy(b),
-        f" = {string}"
+        f" = {rational_latex(result)}"
     ]
     return formula_data

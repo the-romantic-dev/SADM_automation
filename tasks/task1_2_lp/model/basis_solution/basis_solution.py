@@ -41,8 +41,10 @@ class BasisSolution:
     @property
     def objective_coeffs(self) -> list[Rational]:
         """ Коэффициенты целевой функции, выраженной через свободные переменные """
-        e = self._express_objective_through_free
-        coeffs = [e.coeff(x) for x in self.free_variables]
+        from sympy import collect, expand
+        expr = self._express_objective_through_free
+        expanded_expr = collect(expand(expr), self.free_variables)
+        coeffs = [expanded_expr.coeff(x) for x in self.free_variables]
         return coeffs
 
     @property
@@ -116,6 +118,7 @@ class BasisSolution:
         #     return False
         result = True
         for c in obj_coeffs:
+            c = c.subs({self.lp_problem.M: Rational(1000)})
             if c > 0:
                 result = False
                 break

@@ -12,7 +12,7 @@ def get_non_negative_vars_latex(vars_count: int, variable_symbol: str = "x"):
     return ",".join(result)
 
 
-def problem_latex(lp_problem: LPProblem) -> list[str]:
+def problem_latex(lp_problem: LPProblem, add_non_negative: bool = True) -> list[str]:
     def comp_operator_sign(operator: CompOperator):
         match operator:
             case CompOperator.LE:
@@ -32,7 +32,8 @@ def problem_latex(lp_problem: LPProblem) -> list[str]:
         constraint_expression_latex = expr_latex(constraint.coeffs, constraint.variables)
         constraint_latex = f"{constraint_expression_latex}{comp_operator_sign(constraint.comp_operator)}{rational_latex(constraint.const)}"
         result.append(constraint_latex)
-    result.append(get_non_negative_vars_latex(lp_problem.var_count, variable_symbol=obj.variable_symbol))
+    if add_non_negative:
+        result.append(get_non_negative_vars_latex(lp_problem.var_count, variable_symbol=obj.variable_symbol))
     return result
 
 
@@ -46,8 +47,11 @@ class LPProblemViewModel:
     def canonical_problem_latex(self) -> list[str]:
         return problem_latex(self.lp_problem.canonical_form)
 
-    def dual_problem_latex(self) -> list[str]:
-        return problem_latex(self.lp_problem.get_dual_problem(variable_symbol="y"))
+    def dual_problem_latex(self, from_canonical: bool = False) -> list[str]:
+        problem = self.lp_problem
+        if from_canonical:
+            problem = self.lp_problem.canonical_form
+        return problem_latex(problem.get_dual_problem(variable_symbol="y"), add_non_negative=not from_canonical)
 
     def auxiliary_form_latex(self) -> list[str]:
         return problem_latex(self.lp_problem.auxiliary_form)

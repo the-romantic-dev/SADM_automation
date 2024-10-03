@@ -24,4 +24,4 @@ class DualProblemTF(TemplateFiller):
 
     @elements_list
     def _fill_dual_problem(self):
-        return [Formula(data) for data in self.lppvm.dual_problem_latex()]
+        return [Formula(data) for data in self.lppvm.dual_problem_latex(from_canonical=True)]

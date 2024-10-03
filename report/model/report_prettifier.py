@@ -1,4 +1,4 @@
-from sympy import Rational, primefactors, latex, Symbol, sign, Expr, pretty
+from sympy import Rational, primefactors, latex, Symbol, sign, Expr, pretty, Add, Mul
 
 from tasks.task1_2_lp.model.lp_problem.lp_problem import LPProblem
 
@@ -37,6 +37,22 @@ def rational_latex(rational: Rational):
 
     frac_str = f"{op} \\frac{{{abs(rational.p)}}}{{{abs(rational.q)}}}"
     return _rational_pretty(rational, frac_str=frac_str)
+
+
+def coeff_with_symbol_latex(coeff: Expr):
+    const = Rational(0)
+    M_coeff = 0
+    if isinstance(coeff, Add):
+        for t in coeff.args:
+            if isinstance(t, Rational):
+                const += t
+            elif isinstance(t, Symbol):
+                M_coeff = 1
+            elif isinstance(t, Mul):
+                M_coeff = t.args[0]
+    elif isinstance(coeff, Mul):
+        M_coeff = coeff.args[0]
+    return expr_latex(coeffs=[M_coeff], variables=[LPProblem.M], constant=const)
 
 
 def _rational_coeff_term(coeff: Rational, var: Symbol | str, is_latex: bool):

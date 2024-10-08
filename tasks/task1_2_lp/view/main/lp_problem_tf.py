@@ -98,6 +98,8 @@ class LPProblemTF(TemplateFiller):
 
     @template_filler
     def _fill_modified_symplex_solution_part(self):
+        if self.modified_solution is None:
+            return None
         return ModifiedSymplexSolutionTF(solutions=self.modified_solution, swaps=self.modified_swaps)
 
     @template_filler

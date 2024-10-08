@@ -20,7 +20,7 @@ class BruteforceSolver:
         for i, basis in enumerate(reversed(basises)):
             solution = BasisSolution(lp_problem=self.lp_problem, basis=basis)
             result.append(solution)
-            if solution.is_opt:
+            if solution.is_opt and solution.is_acceptable:
                 opt_index = i
         self._solution = result, opt_index
         return result, opt_index

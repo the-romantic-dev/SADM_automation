@@ -10,12 +10,14 @@ from report.model.report_prettifier import rational_latex
 from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import formula
 from report.model.template.template_filler import TemplateFiller
+from report.model.template.tf_decorators import sub_tf
 from tasks.task1_3_nlp_unlimited.model.nlp_objective import NLPObjective
 from tasks.task1_3_nlp_unlimited.model.util import solution_matrix
 
 template_path = Path(Path(__file__).parent, "analytical_solution.docx")
 
 
+@sub_tf
 class AnalyticalSolutionTF(TemplateFiller):
     def __init__(self, objective: NLPObjective):
         self.objective = objective

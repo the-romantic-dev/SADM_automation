@@ -31,12 +31,12 @@ class BasisSolution:
     @property
     def free_variables(self) -> list[Symbol]:
         """ Список символов (:class:`sympy.Symbol`) свободных переменных """
-        return list(symbols(" ".join([f"x{i + 1}" for i in self.free])))
+        return list(symbols(" ".join([f"{self.lp_problem.objective.variable_symbol}{i + 1}" for i in self.free])))
 
     @property
     def basis_variables(self) -> list[Symbol]:
         """ Список символов (:class:`sympy.Symbol`) базисных переменных """
-        return list(symbols(" ".join([f"x{i + 1}" for i in self.basis])))
+        return list(symbols(" ".join([f"{self.lp_problem.objective.variable_symbol}{i + 1}" for i in self.basis])))
 
     @property
     def objective_coeffs(self) -> list[Rational]:

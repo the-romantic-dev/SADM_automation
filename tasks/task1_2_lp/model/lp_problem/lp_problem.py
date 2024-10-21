@@ -93,7 +93,18 @@ def inverse_comp_operator(comp_operator: CompOperator, obj_type: ObjectiveType):
 class LPProblem:
     M: Symbol = symbols('M')
 
-    def __init__(self, constraints: list[Constraint], objective: Objective):
+    def __init__(self, constraints: list[Constraint], objective: Objective,
+                 var_value_constraints: list[Constraint] = None):
+        if var_value_constraints is None:
+            coeff_len = len(objective.coeffs)
+            self.var_value_constraints = [
+                Constraint([
+                    Rational(0) if i != j else Rational(1) for i in range(coeff_len)
+                ], const=Rational(0), comp_operator=CompOperator.GE)
+                for j in range(coeff_len)
+            ]
+        else:
+            self.var_value_constraints = var_value_constraints
         self._constraints = constraints
         self._objective = objective
 
@@ -228,9 +239,15 @@ class LPProblem:
         else:
             A, b, C = self.matrices
 
+        new_constr = new_constraints(A, C)
+        if len(new_constr) > 2:
+            val_constr = new_constr[2:]
+        else:
+            val_constr = None
         result = LPProblem(
-            constraints=new_constraints(A, C),
-            objective=new_objective(b)
+            constraints=new_constr[:2],
+            objective=new_objective(b),
+            var_value_constraints=val_constr
         )
         return result
 
@@ -259,7 +276,9 @@ class LPProblem:
         for c in new_constraints:
             c.expand_coefs(total_vars)
 
-        new_objective = deepcopy(self._objective)
+        new_objective = Objective(obj_type=self._objective.type, coeffs=self._objective.coeffs,
+                                  const=self._objective.const,
+                                  variable_symbol=self._objective.variable_symbol)
         new_objective.expand_coefs(total_vars)
         if new_objective.type == ObjectiveType.MIN:
             new_objective = -new_objective
@@ -281,6 +300,16 @@ class LPProblem:
                 result = False
                 break
         return result
+
+    def accept(self, point: list[Rational], non_negative=True):
+        for c in self.constraints:
+            if not c.accept(point):
+                return False
+        if non_negative:
+            for p in point:
+                if p < 0:
+                    return False
+        return True
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):

@@ -1,6 +1,6 @@
 import numpy as np
 import sympy as sp
-from .const import x1, x2
+from tasks.task1_3_nlp_unlimited.old.other.const import x1, x2
 
 def level_lines(plt, expr, bounds):
     width = bounds["max"][0] - bounds["min"][0]

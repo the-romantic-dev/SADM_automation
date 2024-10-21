@@ -10,11 +10,12 @@ from report.model.report_prettifier import rational_latex
 from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import formula
 from report.model.template.template_filler import TemplateFiller
+from report.model.template.tf_decorators import sub_tf
 from tasks.task1_3_nlp_unlimited.model.nlp_objective import NLPObjective
 
 template_path = Path(Path(__file__).parent, "common_iterations.docx")
 
-
+@sub_tf
 class CommonIterationsTF(TemplateFiller):
     def __init__(self, objective: NLPObjective, start_X: tuple[Rational, Rational]):
         self.objective = objective

@@ -27,7 +27,7 @@ class IterativeMethod(ABC):
         step_num = 0
         direction = self.step_direction(point, None, step_num)
         size = self.step_size(point, direction)
-        result = [self.solution_step(point)]
+        result = []
         while not self.is_stop(point):
             step_num += 1
             next_point = point + size * direction
@@ -35,7 +35,7 @@ class IterativeMethod(ABC):
             direction = self.step_direction(next_point, point, step_num)
             size = self.step_size(next_point, direction)
             point = next_point
-
+        result.append(self.solution_step(point))
         return result
 
     @abstractmethod

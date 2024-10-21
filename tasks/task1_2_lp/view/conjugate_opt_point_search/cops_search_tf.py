@@ -111,10 +111,10 @@ class COPSSearchTF(TemplateFiller):
         ]
         return Formula(formula_data)
 
-    # @image
-    # def _fill_cops_plot(self):
-    #     lpp = self.opt_sol.lp_problem.get_dual_problem(variable_symbol="y")
-    #     solutions = BruteforceSolver(lp_problem=lpp).solve()[0]
-    #     colors = PlotColors(constraints_color='#2D70B3', objective_color='#FA6501', solutions_color='#BAFFC9')
-    #     save_lpp_plot(lpp, solutions, colors, pic_path)
-    #     return pic_path
+    @image
+    def _fill_cops_plot(self):
+        lpp = self.opt_sol.lp_problem.canonical_form.get_dual_problem(variable_symbol="y")
+        solutions = BruteforceSolver(lp_problem=lpp).solve()[0]
+        colors = PlotColors(constraints_color='#2D70B3', objective_color='#FA6501', solutions_color='#BAFFC9')
+        save_lpp_plot(lpp, solutions, colors, pic_path)
+        return pic_path

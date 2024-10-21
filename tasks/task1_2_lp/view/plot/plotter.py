@@ -6,10 +6,11 @@ import numpy as np
 from matplotlib.text import Annotation
 from scipy.spatial import ConvexHull
 from shapely import Point, LineString
-from sympy import pretty
+from sympy import pretty, Rational
 
 from report.model.report_prettifier import rational_str, expr_str
-from tasks.task1_2_lp.model import BasisSolution, Constraint, LPProblem, Objective, ObjectiveType
+from tasks.task1_2_lp.model import BasisSolution, Constraint, LPProblem, Objective, ObjectiveType, CompOperator
+from tasks.task1_2_lp.model.solvers import BruteforceSolver
 from tasks.task1_2_lp.view.plot import PlotData, LinearFunction, PlotColors, AxesBounds
 
 from tasks.task1_2_lp.view.plot.util import (AnnotationRectangle, Contur, find_intersections,
@@ -149,10 +150,26 @@ def plot_objective_annotation(objective: Objective, opt_sol: BasisSolution, tota
 
 
 def plot_acceptable_field_fill(solutions: list[BasisSolution], plot_data: PlotData):
+    lpp = solutions[0].lp_problem
     acceptable_sols = filter(lambda sol: sol.is_acceptable, solutions)
-    positions = np.array([(float(sol.solution[0]), float(sol.solution[1])) for sol in acceptable_sols])
-    hull = ConvexHull(positions)
-    hull_points = positions[hull.vertices]
+    positions = [(float(sol.solution[0]), float(sol.solution[1])) for sol in acceptable_sols]
+    axes_bounds_constraint = [
+        Constraint([Rational(1), Rational(0)], const=Rational(plot_data.axes_bounds.left_x).round() - 1,
+                   comp_operator=CompOperator.GE),
+        Constraint([Rational(1), Rational(0)], const=Rational(plot_data.axes_bounds.right_x).round() + 1,
+                   comp_operator=CompOperator.LE),
+        Constraint([Rational(0), Rational(1)], const=Rational(plot_data.axes_bounds.bottom_y).round() - 1,
+                   comp_operator=CompOperator.GE),
+        Constraint([Rational(0), Rational(1)], const=Rational(plot_data.axes_bounds.top_y).round() + 1,
+                   comp_operator=CompOperator.LE),
+    ]
+    bound_intersections = [c1.intersection(c2) for c1 in lpp.constraints for c2 in axes_bounds_constraint if
+                           len(c1.intersection(c2)) > 0]
+    accepted_bi = [[float(bi[0]), float(bi[1])] for bi in bound_intersections if lpp.accept(bi)]
+
+    total_points = np.array(positions + accepted_bi)
+    hull = ConvexHull(total_points)
+    hull_points = total_points[hull.vertices]
     plot_data.axes.fill(hull_points[:, 0], hull_points[:, 1], '#FFB4BB', alpha=0.9)
 
 

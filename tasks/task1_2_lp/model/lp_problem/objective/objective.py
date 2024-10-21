@@ -28,7 +28,7 @@ class Objective:
 
         coefs = [i * -1 for i in self.coeffs]
         const = self._const * -1
-        return Objective(new_type, coefs, const)
+        return Objective(new_type, coefs, const, variable_symbol=self.variable_symbol)
 
     @property
     def type(self):

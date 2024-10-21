@@ -1,7 +1,7 @@
 """Наводит красоту и удобство в выводе"""
 from sympy import Rational, pretty
 from tabulate import tabulate
-from .util import is_rational_finite_decimal
+from tasks.task1_3_nlp_unlimited.view.plot.util import is_rational_finite_decimal
 from .const import x1, x2
 
 

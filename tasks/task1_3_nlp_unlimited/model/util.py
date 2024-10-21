@@ -1,5 +1,6 @@
 import hashlib
 import random
+from enum import Enum, auto
 
 from sympy import Rational, Matrix, Eq, solve, sign
 
@@ -22,3 +23,11 @@ def solution_matrix(objective: NLPObjective) -> Matrix:
     equations = (Eq(grad[0], 0), Eq(grad[1], 0))
     solution = solve(equations, objective.variables)
     return Matrix([solution[x] for x in objective.variables])
+
+
+class UnivariateMethod(Enum):
+    RapidAscent = auto()
+    Relaxation = auto()
+    ConjugateGradient = auto()
+    DFP = auto()
+    Broyden = auto

@@ -1,9 +1,10 @@
 import re
+from pathlib import Path
 
 from lxml import etree as lxml_etree
 from lxml.etree import _Element
 
-from report.docx.docx_namespaces import m as m_ns
+from report.docx.docx_namespaces import m as m_ns, m, w
 
 
 def is_math_element(element):
@@ -34,3 +35,23 @@ def replace_in_xml(xml: str, key: str, data: str) -> str:
 
     pattern = f'>[^<>]*{re.escape(key)}[^<>]*</'
     return re.sub(pattern, replace_func, xml)
+
+
+def get_xml_from_file(txt_path: Path):
+    with open(txt_path, 'r', encoding='utf-8') as file:
+        formula_xml = file.read()
+    return formula_xml
+
+
+def get_element_from_xml_template(txt_path: Path, keys: str | list[str], replacements: str | list[str]):
+    xml = get_xml_from_file(txt_path)
+    if not isinstance(keys, list):
+        keys = [keys]
+    if not isinstance(replacements, list):
+        replacements = [replacements]
+    if len(keys) != len(replacements):
+        raise ValueError("Число ключей не совпадает с числом вставок")
+    for i in range(len(keys)):
+        xml = replace_in_xml(xml, key=keys[i], data=replacements[i])
+    element = elements_from_xml(xml, {"m": m, "w": w})[0]
+    return element

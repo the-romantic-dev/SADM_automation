@@ -13,6 +13,7 @@ class BraceType(Enum):
     STRAIGHT = 2
     CURLY = 3
     LEFT_CURLY = 4
+    UP_ROUND = 5
 
 
 def braces(math_element: _Element, brace_type: BraceType = BraceType.PARENTHESES) -> _Element:
@@ -38,6 +39,9 @@ def braces(math_element: _Element, brace_type: BraceType = BraceType.PARENTHESES
         case BraceType.LEFT_CURLY:
             brace_elements[0].set(f"{{{m}}}val", "{")
             brace_elements[1].set(f"{{{m}}}val", "")
+        case BraceType.UP_ROUND:
+            brace_elements[0].set(f"{{{m}}}val", "⌈")
+            brace_elements[1].set(f"{{{m}}}val", "⌉")
         case _:
             brace_elements = []
 

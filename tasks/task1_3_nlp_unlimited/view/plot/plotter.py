@@ -51,7 +51,15 @@ class NLPMethodPlotter:
         X1, X2 = np.meshgrid(x1_vals, x2_vals)
         Z = lambdify((x1, x2), expr, 'numpy')
         Z_values = Z(X1, X2)
-        contours = plt.contour(X1, X2, Z_values, levels=200)  # levels - количество линий равного уровня
+
+        min_levels_num = 20
+        base_levels = np.linspace(Z_values.min(), Z_values.max(), min_levels_num)
+        levels = np.sort(
+            np.hstack(
+                [base_levels, np.array([sol.value for sol in self.solution])]
+            )
+        )
+        contours = plt.contour(X1, X2, Z_values, levels=levels)  # levels - количество линий равного уровня
 
         # Добавляем подписи к осям и заголовок
         plt.xlabel('x1')

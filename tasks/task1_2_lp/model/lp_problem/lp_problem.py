@@ -240,14 +240,14 @@ class LPProblem:
             A, b, C = self.matrices
 
         new_constr = new_constraints(A, C)
-        if len(new_constr) > 2:
-            val_constr = new_constr[2:]
-        else:
-            val_constr = None
+        # if len(new_constr[0].variable_symbol) > 2:
+        #     val_constr = new_constr[2:]
+        # else:
+        #     val_constr = None
         result = LPProblem(
-            constraints=new_constr[:2],
+            constraints=new_constr,
             objective=new_objective(b),
-            var_value_constraints=val_constr
+            var_value_constraints=None
         )
         return result
 

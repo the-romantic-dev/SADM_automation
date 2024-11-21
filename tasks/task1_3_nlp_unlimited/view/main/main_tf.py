@@ -50,17 +50,17 @@ class MainTF(TemplateFiller):
 
     @template_filler
     def _fill_relaxation_method(self):
-        is_step_univariate = self.univariate_method == UnivariateMethod.Relaxation
+        is_step_univariate = self.univariate_method == UnivariateMethod.Relaxation and self.teacher==Teacher.SIDNEV
         return RelaxationMethodTF(self.objective, Matrix(self.start_X), is_step_univariate)
 
     @template_filler
     def _fill_rapid_ascent_method(self):
-        is_step_univariate = self.univariate_method == UnivariateMethod.RapidAscent
+        is_step_univariate = self.univariate_method == UnivariateMethod.RapidAscent and self.teacher==Teacher.SIDNEV
         return RapidAscentMethodTF(self.objective, Matrix(self.start_X), is_step_univariate)
 
     @template_filler
     def _fill_conjugate_gradient_method(self):
-        is_step_univariate = self.univariate_method == UnivariateMethod.ConjugateGradient
+        is_step_univariate = self.univariate_method == UnivariateMethod.ConjugateGradient and self.teacher==Teacher.SIDNEV
         return ConjugateGradientMethodTF(self.objective, Matrix(self.start_X), is_step_univariate)
 
     @template_filler
@@ -69,7 +69,7 @@ class MainTF(TemplateFiller):
 
     @template_filler
     def _fill_broyden_method(self):
-        is_step_univariate = self.univariate_method == UnivariateMethod.Broyden
+        is_step_univariate = self.univariate_method == UnivariateMethod.Broyden and self.teacher==Teacher.SIDNEV
         return BroydenMethodTF(self.objective, Matrix(self.start_X), is_step_univariate)
 
     # @template_filler

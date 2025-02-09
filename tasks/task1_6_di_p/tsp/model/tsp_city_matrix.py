@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from tasks.task1_6_di_p.tsp.util import find_segments
+from tasks.task1_6_di_p.tsp.old.util import find_segments
 
 INFINITE = 2 ** 32
 

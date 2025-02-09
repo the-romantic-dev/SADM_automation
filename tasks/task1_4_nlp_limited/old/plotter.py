@@ -61,7 +61,6 @@ def get_linear_limits_intersects(linear_limits) -> list:
 
 
 def get_limits_degree(limits):
-    degree = None
     if simplify(limits[0]).is_polynomial():
         degree = simplify(limits[0]).as_poly().degree()
     else:

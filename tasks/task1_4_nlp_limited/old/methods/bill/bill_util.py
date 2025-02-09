@@ -44,6 +44,7 @@ def build_start_table(x, limitations, expr) -> list:
     return result, free, base
 
 u = []
+
 def build_table_2(table1, free):
     """Строит таблицу 2 на основе таблицы 1"""
     # u.append(symbols(f"u{len(u)+1}"))
@@ -57,8 +58,13 @@ def build_table_2(table1, free):
 
     u_value = half_grad.subs({var: 0 for var in free})
     u_coefs.append(Rational(u_value))
-    u.append(symbols(f"u{len(u)+1}"))
-    table2 = table1[ : len(table1) - 2] + [u_coefs]
+    table2 = table1[:len(table1) - 2] + [u_coefs]
+    opt_row = find_opt_row(table2, opt_col)
+    if opt_row != len(table2) - 1:
+        del table2[-1]
+        half_grad = None
+    else:
+        u.append(symbols(f"u{len(u) + 1}"))
     return table2, opt_col, half_grad
 
 def opt_column(table1):
@@ -90,18 +96,18 @@ def transition_to_new_base(base, free, opt_row, opt_col):
     free[opt_col] = temp
     return free, base
 
-def build_table_1(table2, opt_col, free, base, expr) -> list:
+def build_table_1(table2, opt_col, free, base, expr, new_u) -> list:
     """Строит таблицу 1"""
     table2 = [row.copy() for row in table2]
     base = base.copy()
     free = free.copy()
     opt_row = find_opt_row(table2=table2, opt_col=opt_col)
-    if opt_row == len(table2) - 1:
+    if new_u is not None:
         # new_u = symbols(f'u{len(u)+1}')
         # u.append(new_u)
         base += [u[-1]]
-    else:
-        del table2[-1]
+    # else:
+    #     del table2[-1]
     new_expr = recalculate_expression(expr, free, base, table2, opt_row, opt_col)
     free, base = transition_to_new_base(free=free, base=base, opt_row=opt_row, opt_col=opt_col)
     result = recalculate_table2(table2=table2, opt_row=opt_row, opt_col=opt_col)
@@ -118,7 +124,7 @@ def build_table_1(table2, opt_col, free, base, expr) -> list:
     return result, free, base, new_expr, opt_row
 
 def recalculate_expression(expr, free, base, table2, opt_row, opt_col):
-    """Перечитывает выражение после замены переменных"""
+    """Пересчитывает выражение после замены переменных"""
     var_out_of_free = free[opt_col]
     var_out_of_base = base[opt_row]
     new_var_expr = table2[opt_row][0] * free[0] + table2[opt_row][1] * free[1] +  table2[opt_row][2]

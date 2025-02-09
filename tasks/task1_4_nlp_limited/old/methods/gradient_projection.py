@@ -1,4 +1,6 @@
 import sympy as sp
+from sympy import Matrix
+
 # from task import Task
 import util
 from .npp_method import NPPMethod
@@ -19,10 +21,9 @@ class GradientProjection(NPPMethod):
         self.limits = limitations
         # Шаг 0. Подходит ли градиент как начальное направление
         X, A0, A, b, gradient, direction = self._gp_step_0(f, limitations)
-
         while True:
             # Шаг 1. Определение длины шага
-            X, limit_index, limitation__step_sizes_num = self._gp_step_1(direction, A0, b, X)
+            X, limit_indices, limitation__step_sizes_num, limits_matrix = self._gp_step_1(direction, A0, b, X)
 
             self.track.append(X)
             self.values_track.append(f.subs({x1: X[0, 0], x2: X[1, 0]}))
@@ -35,7 +36,7 @@ class GradientProjection(NPPMethod):
                 self.report_data.append(report_6)
             else:
                 # Шаг 2. Формирование новой матрицы активных ограничений
-                projection, A = self._gp_step_2(X, A, A0, limit_index)
+                projection, A = self._gp_step_2(X, A, A0, limit_indices, limits_matrix)
 
                 # Шаг 3. Проверка останова
                 if self.is_projection_zero(projection):
@@ -77,18 +78,20 @@ class GradientProjection(NPPMethod):
 
     def _gp_step_1(self, direction, A0, b, X):
         report_1 = {"step": 1}
-        step_size, limit_index, limitation__step_sizes_num = self.step_size(direction, A0, b, X, report_1)  # step_size reported
+        step_size, limitation__step_sizes_num = self.step_size(direction, A0, b, X, report_1)  # step_size reported
         report_1["result_step_size"] = step_size
         X = X + step_size * direction  # reported
+        active_limits = [i for i, elem in enumerate(A0 * X - b) if elem == 0]
         report_1["Xi+1"] = X
         self.report_data.append(report_1)
-        return X, limit_index, limitation__step_sizes_num
+        return X, active_limits, limitation__step_sizes_num, A0 * X - b
 
-    def _gp_step_2(self, X, A, A0, limit_index):
+    def _gp_step_2(self, X, A, A0: Matrix, limit_indices, limits_matrix):
         report_2 = {'step': 2}
-        report_2['limit_index'] = limit_index
-        if limit_index >= 0:
-            A = A0.row(limit_index)
+        report_2['limit_index'] = limit_indices
+        report_2['limits_matrix'] = limits_matrix
+        if len(limit_indices) > 0:
+            A = Matrix([A0.row(i) for i in limit_indices])
         # A reported
         report_2['newA'] = A
         gradient = util.gradient(X)  # reported
@@ -195,12 +198,13 @@ class GradientProjection(NPPMethod):
 
         step_sizes[-1] = default_step_size
         min_step_size = 10000000
-        min_step_size_index = -2
+        # min_step_size_index = -2
         for i, size in step_sizes.items():
             if size < min_step_size:
                 min_step_size = size
-                min_step_size_index = i
-        return (min_step_size, min_step_size_index, limitations_steps_sizes_num)
+                # min_step_size_index = i
+
+        return min_step_size, limitations_steps_sizes_num
 
     def default_step_size(self, X, direction):
         gradient = util.gradient(X)

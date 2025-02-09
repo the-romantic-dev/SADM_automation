@@ -109,7 +109,8 @@ class LPProblemTF(TemplateFiller):
 
     @template_filler
     def _fill_reverse_symplex_part(self):
-        new_constraint = generate_new_constraint(self.bruteforce_solution)
+        opt_sol = self.bruteforce_solution[self.best_bruteforce_solution_index]
+        new_constraint = generate_new_constraint(opt_sol, self.bruteforce_solution)
         return ReverseSymplexTF(opt_sol=self.symplex_solution[-1], new_constraint=new_constraint)
 
     @template_filler

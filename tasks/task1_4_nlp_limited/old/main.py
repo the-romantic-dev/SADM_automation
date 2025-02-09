@@ -42,8 +42,8 @@ if __name__ == '__main__':
     bill.solve(f=Task.f, limitations=Task.lim1234)
     gradient_projection.solve(f=Task.f, limitations=Task.lim1234)
     possible_directions.solve(f=Task.f, limits_le=Task.lim67)
-    barrier_function.solve(f=Task.f, limitations=Task.lim67, start=sp.Matrix([2, 1]))
-    penalty_function.solve(f=Task.f, limitations=Task.lim67, start=Matrix([-6, 8]))
+    barrier_function.solve(f=Task.f, limitations=Task.lim1234, start=sp.Matrix([2, 1]))
+    penalty_function.solve(f=Task.f, limitations=Task.lim1234, start=Matrix([5, 8]))
     frank_wolfe.solve(f=Task.f, limitations=Task.lim1234)
 
     lagrange.show_plot()

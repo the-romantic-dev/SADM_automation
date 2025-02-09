@@ -163,7 +163,7 @@ def plot_acceptable_field_fill(solutions: list[BasisSolution], plot_data: PlotDa
         Constraint([Rational(0), Rational(1)], const=Rational(plot_data.axes_bounds.top_y).round() + 1,
                    comp_operator=CompOperator.LE),
     ]
-    bound_intersections = [c1.intersection(c2) for c1 in lpp.constraints for c2 in axes_bounds_constraint if
+    bound_intersections = [c1.intersection(c2) for c1 in lpp.constraints + lpp.var_value_constraints for c2 in axes_bounds_constraint if
                            len(c1.intersection(c2)) > 0]
     accepted_bi = [[float(bi[0]), float(bi[1])] for bi in bound_intersections if lpp.accept(bi)]
 

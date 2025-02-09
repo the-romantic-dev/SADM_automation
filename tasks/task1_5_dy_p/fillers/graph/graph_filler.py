@@ -7,7 +7,7 @@ from report.docx.omml import latex2omml
 from tasks.task1_5_dy_p.solvers.graph_solver import GraphSolver
 
 
-class GraphDocxFiller(DocxFiller):
+    class GraphDocxFiller(DocxFiller):
     def __init__(self, graph_solver: GraphSolver, start, end):
         self.graph_solver = graph_solver
         self.start = start

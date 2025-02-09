@@ -39,20 +39,20 @@ def rational_latex(rational: Rational):
     return _rational_pretty(rational, frac_str=frac_str)
 
 
-def coeff_with_symbol_latex(coeff: Expr):
-    const = Rational(0)
-    M_coeff = 0
-    if isinstance(coeff, Add):
-        for t in coeff.args:
-            if isinstance(t, Rational):
-                const += t
-            elif isinstance(t, Symbol):
-                M_coeff = 1
-            elif isinstance(t, Mul):
-                M_coeff = t.args[0]
-    elif isinstance(coeff, Mul):
-        M_coeff = coeff.args[0]
-    return expr_latex(coeffs=[M_coeff], variables=[LPProblem.M], constant=const)
+# def coeff_with_symbol_latex(coeff: Expr):
+#     const = Rational(0)
+#     M_coeff = 0
+#     if isinstance(coeff, Add):
+#         for t in coeff.args:
+#             if isinstance(t, Rational):
+#                 const += t
+#             elif isinstance(t, Symbol):
+#                 M_coeff = 1
+#             elif isinstance(t, Mul):
+#                 M_coeff = t.args[0]
+#     elif isinstance(coeff, Mul):
+#         M_coeff = coeff.args[0]
+#     return expr_latex(coeffs=[M_coeff], variables=[LPProblem.M], constant=const)
 
 
 def _rational_coeff_term(coeff: Rational, var: Symbol | str, is_latex: bool):
@@ -129,5 +129,5 @@ def expr_latex(coeffs: list[float | int | Rational | Expr], variables: list[Symb
     return _expression_pretty(coeffs, variables, constant, is_latex=True)
 
 
-def float_str(num: float, rounding: int):
-    return f"{num:.{rounding}f}".rstrip('0').rstrip('.')
+# def float_str(num: float, rounding: int):
+#     return f"{num:.{rounding}f}".rstrip('0').rstrip('.')

@@ -7,6 +7,10 @@ from docx.document import Document as DocumentType
 from methods.gradient_projection import GradientProjection
 from my_docx.docx_output import sympy2omml, latex2omml, fill_paragraph
 
+from report.model.docx_parts.formula import Formula
+from report.model.elements.math.braces import braces, BraceType
+from report.model.elements.math.matrix import matrix_from_sympy
+
 
 class GradientProjectionDocxFiller:
     def __init__(self, gradient_projection):
@@ -91,19 +95,28 @@ class GradientProjectionDocxFiller:
                           latex(data['Xi+1']))
 
     def _create_step_2_label(self, data, solution_index):
-        text1 = ["Так как предыдущее направление было ", "{{t_pred}}", ", то мы находимся на границе ", "{{limit}}"]
+        # text1 = ["Так как предыдущее направление было ", "{{t_pred}}", ", то мы находимся на границе ", "{{limit}}"]
+        text1 = ['Найдем текущие активные ограничения: ', "{{active_limits_formula}}",
+                 ". Видим, что активные ограничения это ", "{{active_limits}}"]
         text2 = ["В точке ", "{{current_solution}}",
                  " матрица активных ограничений A и оператор проекции P остаются прежними"]
         doc = Document()
         paragraph = doc.add_paragraph()
 
-        if data['limit_index'] != -1:
+        # if data['limit_index'] != -1:
+        if len(data['limit_index']) > 0:
             for part in text1:
                 run = paragraph.add_run()
                 run.text = part
+            active_limits_formula = Formula([
+                f"A_0 \\cdot X^{{({solution_index})}} - b = ",
+                matrix_from_sympy(data['limits_matrix'], brace_type=BraceType.BRACKETS)
+            ])
             fill_paragraph(paragraph, {
-                't_pred': lambda: latex2omml("t_{пред_i}".replace('i', str(data['limit_index'] + 1))),
-                'limit': lambda: latex2omml("a_i".replace('i', str(data['limit_index'] + 1)))
+                # '{{active_limits_formula}}': lambda: latex2omml("t_{пред_i}".replace('i', str(data['limit_index'] + 1))),
+                'active_limits_formula': lambda: active_limits_formula.oMath,
+                # 'active_limits': lambda: latex2omml("a_i".replace('i', str(data['limit_index'] + 1)))
+                'active_limits': lambda: Formula(','.join([f'a_{i + 1}' for i in data['limit_index']])).oMath
             })
         else:
             for part in text2:
@@ -132,15 +145,31 @@ class GradientProjectionDocxFiller:
         )
 
     def _create_lamb_direction(self, data, solution_index):
-        return latex2omml(
-            (r"K^{(i)} = \arg \underset{\underset{\lambda_k>0}{k}}{\max}\left\{" +
-            r" \left\| \widetilde{P}_k\nabla f(X^{(i)}) \right\| \right\}=").
-            replace("(i)", f"({solution_index})") + latex(data["lamb_direction"])
-        )
+        # return latex2omml(
+        #     (r"K^{(i)} = \arg \underset{\underset{\lambda_k>0}{k}}{\max}\left\{" +
+        #     r" \left\| \widetilde{P}_k\nabla f(X^{(i)}) \right\| \right\}=").
+        #     replace("(i)", f"({solution_index})") + latex(data["lamb_direction"])
+        # )
+        i = solution_index
+        formula_data = [
+            f'K^{{({i})}} = ',
+            '\\underset{\\underset{\\lambda_k>0}{k}}{argmax}',
+            braces(
+                braces(
+                    latex2omml(f'\\widetilde{{P}}_k\\nabla f(X^{{({i})}})'),
+                    brace_type=BraceType.DOUBLE_STRAIGHT
+                ),
+                brace_type=BraceType.CURLY
+            ),
+            '=',
+            matrix_from_sympy(data["lamb_direction"], brace_type=BraceType.BRACKETS)
+        ]
+        return Formula(formula_data).oMath
 
     def _create_gradient_direction(self, data, solution_index):
         return latex2omml(r"K^{(i)}=\nabla f(X^{(i)})=".
                           replace("(i)", f'({solution_index})') + latex(data["gradient_direction"]))
+
     def _generate_steps(self):
         from ..docx_output import fill_paragraph
 

@@ -69,7 +69,7 @@ def calc_t(X, K, f, limits):
             x2: new_X[1]
         })
         sol_t = solve(lim_t, sym_t)
-        if not sol_t[0].has(I):
+        if  not sol_t[0].has(I):
             t_preds.append(max(sol_t))
     return min([default_t] + t_preds)
 
@@ -105,6 +105,8 @@ class PossibleDirections(NPPMethod):
             if len(active_limits) == 0:
                 self.u_track.append('-')
                 K = -gesse(X=X, expr=f).inv() * gradient(X=X, expr=f)
+                if K.norm() == 0:
+                    break
             else:
                 pd_limits = build_possible_directions_task(f=f, active_limits=active_limits, X=X)
                 KU = optimize_u(pd_limits)

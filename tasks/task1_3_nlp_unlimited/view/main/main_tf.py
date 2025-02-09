@@ -72,6 +72,6 @@ class MainTF(TemplateFiller):
         is_step_univariate = self.univariate_method == UnivariateMethod.Broyden and self.teacher==Teacher.SIDNEV
         return BroydenMethodTF(self.objective, Matrix(self.start_X), is_step_univariate)
 
-    # @template_filler
-    # def _fill_dfp_method(self):
-    #     return DFPMethodTF(self.objective, Matrix(self.start_X), self.teacher)
+    @template_filler
+    def _fill_dfp_method(self):
+        return DFPMethodTF(self.objective, Matrix(self.start_X),False)

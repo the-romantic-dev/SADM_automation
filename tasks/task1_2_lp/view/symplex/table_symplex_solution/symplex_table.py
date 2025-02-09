@@ -1,14 +1,31 @@
-from sympy import latex, Rational
+from sympy import latex, Rational, Expr, Add, Symbol, Mul
 
 from report.model.docx_parts.formula import Formula
 from report.model.docx_parts.table import Table
-from report.model.report_prettifier import rational_latex, coeff_with_symbol_latex
+from report.model.report_prettifier import rational_latex, expr_latex
+from tasks.task1_2_lp.model import LPProblem
 from tasks.task1_2_lp.model.basis_solution.basis_solution import BasisSolution
 
 in_col_color = "BDD6EE"
 out_row_color = "FFE599"
 cross_cell_color = "DEDEC4"
 black_color = "000000"
+
+
+def coeff_with_symbol_latex(coeff: Expr):
+    const = Rational(0)
+    M_coeff = 0
+    if isinstance(coeff, Add):
+        for t in coeff.args:
+            if isinstance(t, Rational):
+                const += t
+            elif isinstance(t, Symbol):
+                M_coeff = 1
+            elif isinstance(t, Mul):
+                M_coeff = t.args[0]
+    elif isinstance(coeff, Mul):
+        M_coeff = coeff.args[0]
+    return expr_latex(coeffs=[M_coeff], variables=[LPProblem.M], constant=const)
 
 
 class SymplexTable:
@@ -59,8 +76,8 @@ class SymplexTable:
             else Formula(coeff_with_symbol_latex(c))
             for c in coeffs])
         a = [rational_latex(c) if isinstance(c, Rational)
-            else coeff_with_symbol_latex(c)
-            for c in coeffs]
+             else coeff_with_symbol_latex(c)
+             for c in coeffs]
         row.append(
             Formula(rational_latex(value)) if isinstance(value, Rational)
             else Formula(coeff_with_symbol_latex(value))

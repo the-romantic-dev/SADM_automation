@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 from functools import cached_property
 
-from sympy import symbols, solve, Expr, Symbol, Rational, pretty
-from tasks.task1_2_lp.model import LPProblem
+import numpy as np
+from sympy import symbols, solve, Expr, Symbol, Rational, pretty, Matrix, sqrt
+from tasks.task1_2_lp.model import LPProblem, Constraint
 
 
 class BasisSolution:
@@ -150,5 +153,58 @@ class BasisSolution:
         result = expr.subs(reps)
         return result
 
+    def is_neighbor(self, basis_sol: BasisSolution) -> bool:
+        """
+        Проверяет, являются ли базисы соседними, т.е. имеют ли общее ограничение
+        :param basis_sol: Другой базис
+        :return: True - базисы соседние, иначе False
+        """
+        basis_1 = self.basis
+        basis_2 = basis_sol.basis
+
+        if len(basis_1) != len(basis_2):
+            return False
+        basis_2 = set(basis_2)
+        diff_count = 0
+        for b1 in basis_1:
+            if b1 in basis_2:
+                diff_count += 1
+            if diff_count > 1:
+                return False
+        return diff_count == 1
+
+    def distance(self, sol: BasisSolution):
+        x1, y1 = self.solution[:2]
+        x2, y2 = sol.solution[:2]
+        dx = x2 - x1
+        dy = y2 - y1
+        return sqrt(dx ** 2 + dy ** 2)
+
+    @cached_property
+    def active_constraints(self) -> list[Constraint]:
+        """
+        Активные ограничения в данном базисном решении
+        :return: Список активных ограничений
+        """
+        result = []
+
+        sol = self.solution
+        # Проверяем пересечение с ограничениями на неотрицательность переменных
+        if sol[0] == 0:
+            result.append(self.lp_problem.var_value_constraints[0])
+        if sol[1] == 0:
+            result.append(self.lp_problem.var_value_constraints[1])
+
+        # Проверяем остальные ограничения
+        tol = 0.01
+        A, b, _ = self.lp_problem.matrices
+        constraint_values = A @ Matrix(sol[:2])
+        active_constraints_indices = np.where(np.abs(constraint_values - b) <= tol)[0]
+        active_constraints = [self.lp_problem.constraints[i] for i in active_constraints_indices]
+        result.extend(active_constraints)
+        return result
+
     def __str__(self):
         return ', '.join([f'{pretty(x)} = {v}' for x, v in zip(self.basis_variables, self.basis_values)])
+
+

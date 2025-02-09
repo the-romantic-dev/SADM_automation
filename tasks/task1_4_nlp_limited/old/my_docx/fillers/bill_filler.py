@@ -29,6 +29,7 @@ class BillDocxFiller:
     def _create_bill_tables(self):
         doc: DocumentType = Document()
         f = symbols('f')
+        total_skips = 0
         for i in range(len(self.bill.tables_1)):
             base_latexs = [latex(var) for var in self.bill.all_base[i]]
             header_paragraph = doc.add_paragraph()
@@ -52,17 +53,22 @@ class BillDocxFiller:
             docx_output.paint_table_cell(table1, 0, 0, color='000000')
             docx_output.paint_table_cell(table1, -1, -1, color='000000')
             docx_output.paint_table_cell(table1, -2, -1, color='000000')
+
             if i < len(self.bill.tables_2):
                 docx_output.paint_table_column(table1, self.bill.all_opt_cols[i] + 1)
                 data2 = merge_symplex_table_and_vars(
                     symplex_table=self.bill.tables_2[i],
                     free=self.bill.all_free[i],
                     base=self.bill.all_base[i] + (
-                        [f'u_{i + 1}'] if len(self.bill.tables_2[i]) > len(self.bill.all_base[i]) else [])
+                        [f'u_{i + 1 - total_skips}'] if len(self.bill.tables_2[i]) > len(self.bill.all_base[i]) else [])
                 )
+                if self.bill.u_expressions[i] is None:
+                    total_skips += 1
+                    doc.add_paragraph().add_run()
+                else:
+                    doc.add_paragraph().add_run().element.append(
+                        sympy2omml(Eq(symbols(f'u{i + 1 - total_skips}'), self.bill.u_expressions[i])))
 
-                doc.add_paragraph().add_run().element.append(
-                    sympy2omml(Eq(symbols(f'u{i + 1}'), self.bill.u_expressions[i])))
                 table2 = docx_output.create_table_filled(
                     document=doc,
                     data=data2

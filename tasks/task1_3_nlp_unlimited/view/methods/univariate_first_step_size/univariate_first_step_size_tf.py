@@ -8,7 +8,6 @@ from report.docx.omml import latex2omml
 from report.model.docx_parts.formula import Formula
 from report.model.elements.math.braces import braces, BraceType
 from report.model.elements.util import get_element_from_xml_template
-from report.model.report_prettifier import float_str
 from report.model.template.document_template import DocumentTemplate
 from report.model.template.filler_decorators import elements_list, formula
 from report.model.template.template_filler import TemplateFiller
@@ -18,6 +17,10 @@ from tasks.task1_3_nlp_unlimited.model.univariate_step_size_finder import Univar
 template_path = Path(Path(__file__).parent, "univariate_first_step_size.docx")
 
 steps_number_formula_xml_path = Path(Path(__file__).parent, "steps_number_formula_element.txt")
+
+
+def float_str(num: float, rounding: int):
+    return f"{num:.{rounding}f}".rstrip('0').rstrip('.')
 
 
 class UnivariateFirstStepSizeTF(TemplateFiller):

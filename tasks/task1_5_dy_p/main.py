@@ -1,5 +1,3 @@
-from itertools import combinations
-
 from docx import Document
 from docx.document import Document as DocumentType
 from igraph import Graph
@@ -16,38 +14,35 @@ from tasks.task1_5_dy_p.solvers.troubleshooting_solver import TroubleshootingSol
 def fill_graph_docx():
     edges = [
         # Горизонтальные ребра
-        (1, 2, 2), (1, 3, 5), (1, 4, 7),
-        (2, 5, 8),
-        (3, 5, 3), (3, 6, 1),
-        (4, 6, 3), (4, 7, 6), (4, 8, 1), (4, 9, 4),
-        (5, 11, 6), (5, 9, 10),
-        (6, 10, 6),
-        (7, 12, 3),
-        (8, 7, 8), (8, 9, 4), (8, 12, 5),
-        (9, 10, 1), (9, 11, 1),
-        (10, 12, 2),
-        (11, 10, 5), (11, 12, 4)
+        (1, 2, 10), (1, 3, 10), (1, 4, 19),
+        (2, 3, 3), (2, 5, 3),
+        (3, 5, 18),
+        (4, 5, 6), (4, 8, 3),
+        (5, 6, 10), (5, 7, 3), (5, 8, 12), (5, 9, 5),
+        (6, 8, 12), (6, 9, 6),
+        (7, 8, 18), (7, 9, 3),
+        (8, 9, 17),
     ]
     graph_solver = GraphSolver(edges)
     graph_solver.show_graph()
-    graph_data_producer = GraphDocxFiller(graph_solver, 1, 12).get_data_producers()
-    template: DocumentType = Document("view/graph/graph_template.docx")
+    graph_data_producer = GraphDocxFiller(graph_solver, 1, 9).get_data_producers()
+    template: DocumentType = Document("fillers/graph/graph_template.docx")
     fill_template(template=template, data_producers=graph_data_producer)
     template.save("fillers/graph/graph.docx")
 
 
 def fill_troubleshooting_docx():
     st = [
+        [True, False, True, False],
+        [True, True, True, False],
+        [True, False, False, False],
         [False, False, True, True],
-        [False, True, True, True],
-        [True, False, False, True],
-        [False, False, False, True],
-        [True, True, True, False]
+        # [True, True, True, False]
     ]
-    p = [0.15, 0.15, 0.2, 0.3, 0.2]
-    c = [10, 15, 15, 10]
+    p = [0.3, 0.2, 0.1, 0.4]
+    c = [20, 25, 5, 10]
     troubleshooting_solver = TroubleshootingSolver(st=st, p=p, c=c)
-    combs = troubleshooting_solver.get_optimal_average_losses_combinations_data(5)
+    combs = troubleshooting_solver.get_optimal_average_losses_combinations_data(4)
 
     doc_with_table: DocumentType = Document()
     table_header = [
@@ -55,7 +50,7 @@ def fill_troubleshooting_docx():
     ]
     table_data = [table_header] + list(map(lambda elem: [";".join([str(i) for i in elem[0]]), elem[1], elem[2]], combs))
     graph: Graph = Graph(directed=True)
-    troubleshooting_solver.get_test_graph(graph=graph, r=[1, 2, 3, 4, 5], combs=combs)
+    troubleshooting_solver.get_test_graph(graph=graph, r=[1, 2, 3, 4], combs=combs)
     gplot, _ = troubleshooting_solver._prepare_plot(graph)
     gplot.show()
     table = create_table_filled(document=doc_with_table, data=table_data)

@@ -76,14 +76,16 @@ class Constraint:
         if art_var_index < len(self._coeffs):
             raise ValueError("Индекс икусственной переменной должен быть больше существующих")
         if self._comp_operator == CompOperator.EQ:
-            return Constraint(coeffs=self.coeffs, comp_operator=eq_op, const=self.const, variable_symbol=self.variable_symbol)
+            return Constraint(coeffs=self.coeffs, comp_operator=eq_op, const=self.const,
+                              variable_symbol=self.variable_symbol)
         else:
             expanded_coefs = [self._coeffs[i] if i < len(self._coeffs) else Rational(0) for i in range(art_var_index)]
             if self._comp_operator == CompOperator.LE:
                 expanded_coefs.append(Rational(1))
             else:
                 expanded_coefs.append(Rational(-1))
-            return Constraint(coeffs=expanded_coefs, comp_operator=eq_op, const=self.const, variable_symbol=self.variable_symbol)
+            return Constraint(coeffs=expanded_coefs, comp_operator=eq_op, const=self.const,
+                              variable_symbol=self.variable_symbol)
 
     @property
     def as_expr(self) -> Type[Equality | GreaterThan | LessThan]:
@@ -120,6 +122,13 @@ class Constraint:
         sol = A.solve(B)
         return sol.T.tolist()[0]
 
+    @property
+    def norm(self):
+        return self.coeffs[:2]
+
+    # def angle(self, ):
+
+
     def __repr__(self):
         # return str(self.as_expr)
         return str(self.as_expr)
@@ -152,3 +161,7 @@ class Constraint:
         for k, v in self.__dict__.items():
             setattr(result, k, deepcopy(v, memo))
         return result
+
+    def __hash__(self):
+        data = (tuple(self._coeffs), self._comp_operator, self._const)
+        return hash(data)

@@ -1,9 +1,13 @@
 from typing import List
 from copy import deepcopy
 
-from .report import TSPReportData, TSPReportDataMinimal, TSPReportDataLast
-from .util import add_candidate, get_better_candidate
-from .tsp_city_matrix import TSPCityMatrix
+from tasks.task1_6_di_p.tsp.model.report_dataclasses import TSPReportData, TSPReportDataMinimal, TSPReportDataLast
+from tasks.task1_6_di_p.tsp.old.util import add_candidate, get_better_candidate
+from tasks.task1_6_di_p.tsp.model.tsp_city_matrix import TSPCityMatrix
+
+import os
+
+os.environ["PATH"] += os.pathsep + r'D:\Apps\Graphviz-12.2.1-win64\bin'
 
 
 class TSPSolver:
@@ -25,7 +29,19 @@ class TSPSolver:
         # Находим координаты всех нулей в матрице
         if start_matrix.size() == 2:
             zeros = start_matrix.find_zeros()
-            result_path = included_paths + zeros
+            filtered_zeros = []
+
+            def is_pairs_intersect(pair: tuple[int, int]):
+                for a, b in filtered_zeros:
+                    if pair[0] == a or pair[1] == b:
+                        return True
+                return False
+
+            for z in zeros:
+                if not is_pairs_intersect(z):
+                    filtered_zeros.append(z)
+
+            result_path = included_paths + filtered_zeros
             report = TSPReportDataLast(
                 tree_level=tree_level,
                 paths_way=paths_way,
@@ -52,10 +68,10 @@ class TSPSolver:
 
         # Элементы, дающие пути, не обходящие все вершины, меняем на бесконечность
         filtered_paths_matrix = trimmed_matrix.copy()
-        filtered_paths_matrix.filter_incomplete_paths(
-            cords=worse_tau[0],
-            current_path=included_paths
-        )
+        # filtered_paths_matrix.filter_incomplete_paths(
+        #     cords=worse_tau[0],
+        #     current_path=included_paths
+        # )
 
         # Шаг 4.
         # h равен сумме вычтенных элементов.

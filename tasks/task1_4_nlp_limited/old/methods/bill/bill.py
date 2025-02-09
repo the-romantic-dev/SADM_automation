@@ -81,7 +81,7 @@ class Bill(NPPMethod):
         table1, free, base = build_start_table(
             x=x, limitations=limitations, expr=new_expr
         )
-        table2 = None
+        # table2 = None
         while not is_opt(table1):
             self.all_free.append(free)
             self.all_base.append(base)
@@ -92,7 +92,7 @@ class Bill(NPPMethod):
             self.u_expressions.append(new_u)
             self.tables_2.append(table2)
             table1, free, base, new_expr, opt_row = build_table_1(
-                table2=table2, opt_col=opt_col, free=free, base=base, expr=new_expr
+                table2=table2, opt_col=opt_col, free=free, base=base, expr=new_expr, new_u=new_u
             )
             self.all_opt_rows.append(opt_row)
             self.f_expressions.append(new_expr)

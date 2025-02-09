@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from tasks.task1_6_di_p.tsp.tsp_city_matrix import TSPCityMatrix
+from tasks.task1_6_di_p.tsp.model.tsp_city_matrix import TSPCityMatrix
 
 
 @dataclass

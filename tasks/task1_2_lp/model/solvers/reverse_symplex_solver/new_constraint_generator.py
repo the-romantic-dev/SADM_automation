@@ -1,14 +1,30 @@
-from sympy import Rational, Matrix, gcd
+from sympy import Rational, gcd, sqrt, Matrix
 
 from tasks.task1_2_lp.model import BasisSolution, ObjectiveType
 from tasks.task1_2_lp.model import Constraint
 
 
-def __constraint_value(coeffs, sol):
-    x_values = sol.solution
-    return sum([c * x for c, x in zip(coeffs, x_values)])
+# def __constraint_value(coeffs, sol):
+#     x_values = sol.solution
+#     return sum([c * x for c, x in zip(coeffs, x_values)])
 
-
+# def is_basis_neighbors(basis_1: list[int], basis_2: list[int]) -> bool:
+#     """
+#     Проверяет, являются ли базисы соседними, т.е. имеют ли общее ограничение
+#     :param basis_1: Первый базис
+#     :param basis_2: Второй базис
+#     :return: True - базисы соседние, иначе False
+#     """
+#     if len(basis_1) != len(basis_2):
+#         return False
+#     basis_2 = set(basis_2)
+#     diff_count = 0
+#     for b1 in basis_1:
+#         if b1 in basis_2:
+#             diff_count += 1
+#         if diff_count > 1:
+#             return False
+#     return diff_count == 1
 def __round_rational_to_decimal(rat: Rational, decimals=0):
     mult = 10 ** decimals
     result = Rational(round(rat * mult), mult)
@@ -22,24 +38,45 @@ def __neighbor_edge_center(var_count: int, opt: BasisSolution, neighbor: BasisSo
     return center
 
 
-def __is_basis_neighbors(basis_1: list[int], basis_2: list[int]) -> bool:
-    if len(basis_1) != len(basis_2):
-        return False
-    basis_2 = set(basis_2)
-    diff_count = 0
-    for b1 in basis_1:
-        if b1 in basis_2:
-            diff_count += 1
-        if diff_count > 1:
-            return False
-    return diff_count == 1
-
-
-def __opt_neighbors(opt_basis: list[int], acceptable_solutions: list[BasisSolution]) -> list[BasisSolution]:
+def get_neighbor_solutions(curr_sol: BasisSolution, all_solutions: list[BasisSolution]) -> list[BasisSolution]:
+    """
+    Возвращает все допустимые соседние базисы для текущего
+    :param curr_sol: Текущий базис
+    :param all_solutions: Все базисы
+    :return: Список соседних базисов
+    """
     neighbors = []
-    for sol in acceptable_solutions:
-        if __is_basis_neighbors(opt_basis, sol.basis):
+    constraints = set(curr_sol.active_constraints)
+    for sol in all_solutions:
+        if curr_sol.is_neighbor(sol) and sol.is_acceptable:
+            common_constraint = constraints.intersection(sol.active_constraints)
+            if len(common_constraint) > 1:
+                raise ValueError('Больше одного пересечения в базисе')
+            if len(common_constraint) == 0:
+                raise ValueError('Нет пересечений в базисе')
+            constraints.remove(list(common_constraint)[0])
             neighbors.append(sol)
+
+    if len(constraints) > 0:
+        point = Matrix(curr_sol.solution[:2])
+        distance = curr_sol.distance(neighbors[0])
+        constraint = list(constraints)[0]
+        active = curr_sol.active_constraints
+        active.remove(constraint)
+        other_constraint = active[0]
+        norm = Matrix(other_constraint.norm)
+        norm_length = norm.norm()
+        unit = norm / norm_length
+
+        def offset(factor=1):
+            delta = factor * distance * unit
+            return point + unit
+
+        new_point = offset()
+        if other_constraint.accept(new_point):
+            neighbors.append(new_point)
+        else:
+            neighbors.append(offset(-1))
     return neighbors
 
 
@@ -54,6 +91,11 @@ def get_acceptable_and_opt_solutions(solutions: list[BasisSolution]):
     return acceptable_sols, opt_sol
 
 
+def generate_constraint_coeffs(var_count: int):
+    result = [Rational(0) for _ in range(var_count)]
+    centers = [__neighbor_edge_center(var_count, opt, neigh) for neigh in opt_neighbors]
+
+
 def __new_coeffs_and_const(var_count: int, opt: BasisSolution, opt_neighbors: list[BasisSolution]):
     if var_count != 2:
         raise ValueError('ПОШЕЛ НАХУЙ, ТОЛЬКО ДЛЯ ПЛОСКОСТИ СТРОИМ ДОП. ОГРАНИЧЕНИЕ')
@@ -61,6 +103,7 @@ def __new_coeffs_and_const(var_count: int, opt: BasisSolution, opt_neighbors: li
     new_constraint_value = Rational(0)
 
     centers = [__neighbor_edge_center(var_count, opt, neigh) for neigh in opt_neighbors]
+
     new_constraint_coeffs[0] = Rational(centers[1][1] - centers[0][1])
     new_constraint_coeffs[1] = Rational(centers[0][0] - centers[1][0])
     new_constraint_value = new_constraint_coeffs[0] * centers[0][0] + new_constraint_coeffs[1] * centers[0][1]
@@ -78,11 +121,11 @@ def __new_coeffs_and_const(var_count: int, opt: BasisSolution, opt_neighbors: li
     return new_constraint_coeffs, new_constraint_value
 
 
-def generate_new_constraint(solutions: list[BasisSolution]):
-    acceptable_sols, opt_sol = get_acceptable_and_opt_solutions(solutions)
+def generate_new_constraint(opt_sol: BasisSolution, solutions: list[BasisSolution]):
+    # acceptable_sols, opt_sol = get_acceptable_and_opt_solutions(solutions)
     var_count = opt_sol.lp_problem.var_count
-
-    neighbors = __opt_neighbors(opt_basis=opt_sol.basis, acceptable_solutions=acceptable_sols)
+    active_constraints = opt_sol.active_constraints
+    neighbors = get_neighbor_solutions(curr_sol=opt_sol, all_solutions=solutions)
 
     coeffs, const = __new_coeffs_and_const(var_count=var_count, opt=opt_sol, opt_neighbors=neighbors)
 

@@ -54,4 +54,5 @@ if __name__ == "__main__":
     document_template.fill_probabilistic_model(probabilistic_model_solver)
     document_template.fill_scheduling_problem(scheduling_problem_solver)
 
+    document_template.fill()
     document_template.save(save_path=config.folder)

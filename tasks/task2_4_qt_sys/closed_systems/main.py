@@ -15,7 +15,7 @@ if __name__ == '__main__':
     graph_drawer.show()
     picture_path = Path(data.working_directory, "graph_2.png")
     graph_drawer.save(path=picture_path)
-    template_path = Path(Path.cwd().parent, "_templates", "closed_system_template.docx")
+    template_path = Path(Path.cwd(), "../templates", "closed_system_template.docx")
     document_template = ClosedQTSystemDocumentTemplate(template_path)
 
     document_template.fill_input(picture_path)

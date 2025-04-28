@@ -58,7 +58,7 @@ class DocumentTemplate:
         self.data_producers[key] = TemplatesList(data).produce_data
 
     def save(self, save_path: Path, document_name: str = "output.docx", add_pdf: bool = True):
-        # fill_template(template=self.template, data_producers=self.data_producers)
+        fill_template(template=self.template, data_producers=self.data_producers)
         docx_path = save_path.joinpath(document_name)
         self.template.save(docx_path.absolute().as_posix())
         if add_pdf:
